@@ -1,0 +1,19 @@
+{
+    "name": "phptek/jsontext",
+    "type": "silverstripe-module",
+    "description": "JSON storage and querying",
+    "homepage": "http://theruss.com/",
+    "license": "BSD",
+    "keywords": ["silverstripe", "JSON", "Field""],
+    "authors": [
+        {
+            "name": "Russell Michell",
+            "email": "russ@theruss.com"
+        }
+    ],
+    "require": {
+	"php": ">=5.4<7",
+        "silverstripe/framework": ">=3.1",
+        "silverstripe/cms": ">=3.1"
+    }
+}
