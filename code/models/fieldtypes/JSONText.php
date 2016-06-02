@@ -18,6 +18,8 @@
  * @package silverstripe-jsontext
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
+ * @todo Create a method asJSON() that converts scalar function output to valid JSON
+ * ....run isJSON() over the result and throw an exception if that check fails
  */
 class JSONText extends StringField
 {
@@ -156,7 +158,9 @@ class JSONText extends StringField
             return null;
         }
         
-        return array_slice($data, 0, 1, true);
+        $data = array_slice($data, 0, 1, true);
+
+        return reset($data);
     }
 
     /**
@@ -172,7 +176,9 @@ class JSONText extends StringField
             return null;
         }
 
-        return array_slice($data, -1, 1, true);
+        $data = array_slice($data, -1, 1, true);
+        
+        return reset($data);
     }
 
     /**
@@ -180,7 +186,7 @@ class JSONText extends StringField
      *
      * @param int $n
      * @return mixed null|array
-     * @throws SimpleJSONException
+     * @throws JSONTextException
      */
     public function nth($n)
     {
@@ -192,14 +198,20 @@ class JSONText extends StringField
         
         if (!is_numeric($n)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be numeric.';
-            throw new SimpleJSONException($msg);
+            throw new JSONTextException($msg);
         }
         
         if (!isset(array_values($data)[$n])) {
             return null;
         }
 
-        return array_slice($data, $n, 1, true);
+        $data = array_slice($data, $n, 1, true);
+        
+        if (empty($data)) {
+            return null;
+        }
+        
+        return reset($data);
     }
 
     /**
@@ -207,25 +219,34 @@ class JSONText extends StringField
      *
      * @param string $value
      * @return mixed null|array
-     * @throws SimpleJSONException
+     * @throws JSONTextException
+     * @todo Allow $value to be a PCRE
      */
     public function find($value)
     {
         $data = $this->getValueAsArray();
-
+        
         if (!$data) {
             return null;
         }
         
         if (!is_scalar($value)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be a scalar.';
-            throw new SimpleJSONException($msg);
+            throw new JSONTextException($msg);
         }
         
-        return null;
-
-       // array_search($value, $data);
-        //array_keys
+        $found = null;
+        array_walk($data, function($k, $v) use(&$found, $value) {
+            if ($v == $value) {
+                $found = [$k => $v];
+            }
+        });
+        
+        if (empty($found)) {
+            return null;
+        }
+        
+        return $found;
     }
     
     /**
@@ -256,6 +277,6 @@ class JSONText extends StringField
  * @package silverstripe-advancedcontent
  * @author Russell Michell 2016 <russ@theruss.com>
  */
-class SimpleJSONException extends Exception
+class JSONTextException extends Exception
 {
 }

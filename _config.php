@@ -5,3 +5,4 @@
  */
 
 define('MODULE_NAME', 'JSON Text');
+define('MODULE_DIR', __DIR__);
