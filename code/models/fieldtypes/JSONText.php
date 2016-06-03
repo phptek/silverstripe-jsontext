@@ -147,8 +147,8 @@ class JSONText extends StringField
     
     /**
      * Return an array of the JSON key + value represented as first JSON node. 
-     * 
-     * @return mixed null|array
+     *
+     * @return array
      */
     public function first()
     {
@@ -160,13 +160,17 @@ class JSONText extends StringField
         
         $data = array_slice($data, 0, 1, true);
 
-        return reset($data);
+        if (empty($data)) {
+            return null;
+        }
+
+        return $data;
     }
 
     /**
      * Return an array of the JSON key + value represented as last JSON node.
      *
-     * @return mixed null|array
+     * @return array
      */
     public function last()
     {
@@ -177,8 +181,12 @@ class JSONText extends StringField
         }
 
         $data = array_slice($data, -1, 1, true);
-        
-        return reset($data);
+
+        if (empty($data)) {
+            return null;
+        }
+
+        return $data;
     }
 
     /**
@@ -196,7 +204,7 @@ class JSONText extends StringField
             return null;
         }
         
-        if (!is_numeric($n)) {
+        if (!is_int($n)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be numeric.';
             throw new JSONTextException($msg);
         }
@@ -211,7 +219,7 @@ class JSONText extends StringField
             return null;
         }
         
-        return reset($data);
+        return $data;
     }
 
     /**
@@ -236,8 +244,8 @@ class JSONText extends StringField
         }
         
         $found = null;
-        array_walk($data, function($k, $v) use(&$found, $value) {
-            if ($v == $value) {
+        array_walk($data, function($v, $k) use(&$found, $value, $data) {
+            if (($v == $value) || is_array($v) && in_array($value, $v)) {
                 $found = [$k => $v];
             }
         });

@@ -20,28 +20,21 @@ class JSONTextTest extends SapphireTest
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
-
-        $this->assertEquals('great wall', $field->first());
-
-        $fixture = '';
+        $this->assertEquals([0 => 'great wall'], $field->first());
+        
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
-
         $this->assertNull($field->first());
     }
 
     public function testLast()
     {
-        
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
-
-        $this->assertEquals('morris', $field->last());
-
-        $fixture = '';
+        $this->assertEquals([6 => 'morris'], $field->last());
+        
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
-
         $this->assertNull($field->last());
     }
 
@@ -49,22 +42,30 @@ class JSONTextTest extends SapphireTest
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
-
-        $this->assertEquals('great wall', $field->nth(0));
-        $this->assertEquals('trabant', $field->nth(2));
+        $this->assertEquals([0 => 'great wall'], $field->nth(0));
+        $this->assertEquals([2 => 'trabant'], $field->nth(2));
         
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
-
         $this->assertNull($field->nth(0));
+
+        $this->setExpectedException('JSONTextException');
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['hashed']);
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->nth('2'));
     }
 
     public function testFind()
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
-
         $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->find('morris'));
+        
+        $this->setExpectedException('JSONTextException');
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['hashed']);
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->find(new StdClass));
+        
     }
     
 }
