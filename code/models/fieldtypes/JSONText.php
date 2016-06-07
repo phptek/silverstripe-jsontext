@@ -1,35 +1,47 @@
 <?php
 
 /**
- * Simple text-based database field for storing and querying JSON formatted data. The field is "simple" in that it does not 
- * allow for multidimensional data.
+ * Simple text-based database field for storing and querying JSON structured data. 
  * 
- * Note: All getXX(), first(). nth() and last() methods will return `null` if no result is found. This behaviour 
- * may change in future versions, but will likely be governed by config settings.
+ * JSON sub-structures can be queried in a variety of ways using special operators who's syntax closely mimics those used
+ * in native JSON queries in PostGreSQL v9.2+.
+ * 
+ * Note: The extraction techniques employed here are simple key / value comparisons. They do not use any native JSON
+ * features of your project's underlying RDBMS, e.g. those found either in PostGreSQL >= v9.2 or MySQL >= v5.7. As such
+ * any JSON "queries" you construct will never be as performant as a native implementation. 
  *
- * Example definition via {@link DataObject::$db}:
+ * Example definition via {@link DataObject::$db} static:
  * 
  * <code>
- * static $db = array(
- * 	"MyJSONStructure" => "SimpleJSONText",
- * );
+ * static $db = [
+ *  'MyJSONStructure' => 'JSONText'
+ * ];
  * </code>
  * 
  * @package silverstripe-jsontext
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
- * @todo Create a method asJSON() that converts scalar function output to valid JSON
- * ....run isJSON() over the result and throw an exception if that check fails
  */
 class JSONText extends StringField
 {
     /**
-     * @var array
+     * Which RDBMS backend are we using? The value set here changes the actual operator routines for the given backend.
      * 
-     * internal-name => operator (for use in extract() method).
+     * @var string
+     * @config
      */
-    private static $operators = [
-        'get_element' => '->'  // Strict: Search source JSON for matching key of given type.
+    private static $backend = 'postgres';
+    
+    /**
+     * @var array
+     * @config
+     * 
+     * <method> => <operator> (for use in extract() method).
+     */
+    private static $allowed_operators = [
+        'postgres' => [
+            'getByKey' => '->'   // int/str type-check performed at runtime.
+        ]
     ];
 
     /**
@@ -49,57 +61,6 @@ class JSONText extends StringField
         parent::__construct($name, $title, $value);
     }
 
-    /**
-     * Tell all class methods to return data as JSON or JSON converted to an array.
-     * 
-     * @param string $type
-     * @return JSONText
-     * @throws JSONTextException
-     */
-    public function setReturnType($type)
-    {
-        if (!in_array($type, ['json', 'array'])) {
-            $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
-            throw new JSONTextException($msg);
-        }
-        
-        $this->returnType = $type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getReturnType()
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * @param mixed $data
-     * @return mixed
-     */
-    protected function returnAsType($data)
-    {
-        if (($this->getReturnType() === 'array') && is_array($data)) {
-            return $data;
-        }
-
-        if (($this->getReturnType() === 'json') && $this->isJson($data)) {
-            return $this->toJson($data);
-        }
-    }
-
-    /**
-     * Is the passed JSON operator valid?
-     * 
-     * @param string $operator
-     * @return boolean
-     */
-    protected function isValidOperator($operator)
-    {
-        return $operator && in_array($operator, $this->config()->operators, true);
-    }
-    
     /**
      * Taken from {@link TextField}.
      * @see DBField::requireField()
@@ -130,7 +91,7 @@ class JSONText extends StringField
     {
         return HiddenField::create($this->getName());
     }
-    
+
     /**
      * @param string $title
      * @return HiddenField
@@ -138,6 +99,31 @@ class JSONText extends StringField
     public function scaffoldFormField($title = null)
     {
         return HiddenField::create($this->getName());
+    }
+
+    /**
+     * Tell all class methods to return data as JSON or an array.
+     * 
+     * @param string $type
+     * @return JSONText
+     * @throws JSONTextException
+     */
+    public function setReturnType($type)
+    {
+        if (!in_array($type, ['json', 'array'])) {
+            $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
+            throw new JSONTextException($msg);
+        }
+        
+        $this->returnType = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReturnType()
+    {
+        return $this->returnType;
     }
 
     /**
@@ -162,20 +148,6 @@ class JSONText extends StringField
             new RecursiveArrayIterator(json_decode($json, true)),
             RecursiveIteratorIterator::SELF_FIRST
         );
-    }
-
-    /**
-     * @param mixed string|int
-     * @return mixed
-     */
-    public function getValueForKey($key)
-    {
-        $currentData = $this->getValueAsIterable();
-        if (isset($currentData[$key])) {
-            return $currentData[$key];
-        }
-
-        return null;
     }
 
     /**
@@ -207,7 +179,7 @@ class JSONText extends StringField
     }
     
     /**
-     * Return an array of the JSON key + value represented as first JSON node. 
+     * Return an array of the JSON key + value represented as first (top-level) JSON node. 
      *
      * @return array
      */
@@ -216,7 +188,7 @@ class JSONText extends StringField
         $data = $this->getValueAsIterable();
         
         if (!$data) {
-            return null;
+            return $this->returnAsType([]);
         }
 
         $flattened = iterator_to_array($data, true);
@@ -235,7 +207,7 @@ class JSONText extends StringField
         $data = $this->getValueAsIterable();
 
         if (!$data) {
-            return null;
+            return $this->returnAsType([]);
         }
 
         $flattened = iterator_to_array($data, true);
@@ -248,7 +220,7 @@ class JSONText extends StringField
      * Return an array of the JSON key + value represented as the $n'th JSON node.
      *
      * @param int $n
-     * @return mixed null|array
+     * @return mixed array
      * @throws JSONTextException
      */
     public function nth($n)
@@ -256,11 +228,11 @@ class JSONText extends StringField
         $data = $this->getValueAsIterable();
 
         if (!$data) {
-            return null;
+            return $this->returnAsType([]);
         }
         
         if (!is_int($n)) {
-            $msg = 'Argument passed to ' . __FUNCTION__ . ' must be numeric.';
+            $msg = 'Argument passed to ' . __FUNCTION__ . ' must be an integer.';
             throw new JSONTextException($msg);
         }
 
@@ -300,34 +272,63 @@ class JSONText extends StringField
         
         $i = 0;
         foreach ($data as $key => $val) {
-            switch ($operator) {
-                default:
-                    // TODO: This case should become own protected method...
-                case '->':
-                    if (!is_int($operand)) {
-                        $msg = 'Incorrect type used as operand with operator: ' . $operator;
-                        throw new JSONTextException($msg);
-                    }
-
-                    if ($i === $operand) {
-                        return $this->returnAsType([$key => $val]);
-                    }
+            if ($marshalled = $this->marshallQuery($key, $val, $i, func_get_args())) {
+                return $this->returnAsType($marshalled);
             }
             
             $i++;
         }
+
+        return $this->returnAsType([]);
     }
 
     /**
      * Alias of self::extract().
      * 
-     * @param string $path
-     * @return mixed null|array
+     * @param string $operator
+     * @return mixed string|array
      * @throws JSONTextException
      */
-    public function find($path)
+    public function find($operator)
     {
-        return $this->extract($path);
+        return $this->extract($operator);
+    }
+
+    /**
+     * @param mixed $key
+     * @param mixed $val
+     * @param int $idx
+     * @param array $args
+     * @return array
+     * @throws JSONTextException
+     */
+    private function marshallQuery($key, $val, $idx, $args)
+    {
+        $backend = $this->config()->backend;
+        $operator = $args[0];
+        $operand = $args[1];
+        $operators = $this->config()->allowed_operators[$backend];
+        
+        if (!in_array($operator, $operators)) {
+            $msg = 'Invalid ' . $backend . ' operator: ' . $operator . ', used for JSON query.';
+            throw new JSONTextException($msg);
+        }
+        
+        foreach ($operators as $routine => $operator) {
+            $backendDBApiInst = Injector::inst()->createWithArgs('JSONBackend', [
+                $key, 
+                $val, 
+                $idx, 
+                $operator,
+                $operand]
+            );
+            
+            if (method_exists($backendDBApiInst, $routine)) {
+                return $backendDBApiInst->$routine();
+            }
+        }
+        
+        return [];
     }
     
     /**
@@ -337,7 +338,7 @@ class JSONText extends StringField
      * @param boolean $invert 
      * @return string
      */
-    public function jsonSafe($value, $invert = false)
+    private function jsonSafe($value, $invert = false)
     {
         $map = [
             '{' => '%7B',
@@ -350,6 +351,34 @@ class JSONText extends StringField
         }
         
         return str_replace(array_keys($map), array_values($map), $value);
+    }
+
+    /**
+     * @param array $data
+     * @return mixed
+     */
+    private function returnAsType(array $data)
+    {
+        if (($this->getReturnType() === 'array')) {
+            return $data;
+        }
+
+        if (($this->getReturnType() === 'json')) {
+            return $this->toJson($data);
+        }
+    }
+
+    /**
+     * Is the passed JSON operator valid?
+     *
+     * @param string $operator
+     * @return boolean
+     */
+    private function isValidOperator($operator)
+    {
+        $backend = $this->config()->backend;
+        
+        return $operator && in_array($operator, $this->config()->allowed_operators[$backend], true);
     }
 
 }
