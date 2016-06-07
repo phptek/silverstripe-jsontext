@@ -13,15 +13,31 @@ class JSONTextTest extends SapphireTest
     protected $fixture = [
         'indexed' => '["great wall", "ford", "trabant", "oldsmobile", "buick", "vauxhall", "morris"]',
         'hashed' => '{"chinese":"great wall","american":["buick","oldsmobile","ford"],"british":["vauxhall","morris"]}',
+        'invalid' => '{"chinese":"great wall","american":["buick","oldsmobile","ford"],"british":["vauxhall","morris]',
+        'nested' => '{"cars":{"american":["buick","oldsmobile"],"british":["vauxhall","morris"]},"planes":{"russian":["antonov","mig"],"french":"airbus"}}',
+        'multiple' => '{"cars":{"american":["buick","oldsmobile"],"british":["vauxhall","morris"]},"planes":{"british":"airbus","french":"airbus"}}',
         'empty' => ''
     ];
     
+    public function testgetValueAsIterable()
+    {
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['invalid']);
+        $this->setExpectedException('JSONTextException');
+        $this->assertEquals(['chinese' => 'great wall'], $field->getValueAsIterable());
+
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['empty']);
+        $this->assertEquals([], $field->getValueAsIterable());
+    }
+
     public function testFirst()
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
+        $field->setReturnType('array');
         $this->assertEquals([0 => 'great wall'], $field->first());
-        
+
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
         $this->assertNull($field->first());
@@ -31,8 +47,9 @@ class JSONTextTest extends SapphireTest
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
+        $field->setReturnType('array');
         $this->assertEquals([6 => 'morris'], $field->last());
-        
+
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
         $this->assertNull($field->last());
@@ -42,9 +59,10 @@ class JSONTextTest extends SapphireTest
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['indexed']);
+        $field->setReturnType('array');
         $this->assertEquals([0 => 'great wall'], $field->nth(0));
         $this->assertEquals([2 => 'trabant'], $field->nth(2));
-        
+
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['empty']);
         $this->assertNull($field->nth(0));
@@ -52,20 +70,25 @@ class JSONTextTest extends SapphireTest
         $this->setExpectedException('JSONTextException');
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
+        $field->setReturnType('array');
         $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->nth('2'));
     }
 
-    public function testFind()
+    public function testExtract()
     {
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
-        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->find('morris'));
-        
+        $field->setReturnType('array');
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 2));
+
+/*        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['nested']);
+        $this->assertEquals(['cars' => ['british' => ['vauxhall', 'morris']]], $field->extract('->', 'morris'));
+
         $this->setExpectedException('JSONTextException');
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
-        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->find(new StdClass));
-        
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', new StdClass));*/
     }
-    
+
 }

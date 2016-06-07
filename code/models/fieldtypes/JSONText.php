@@ -24,6 +24,20 @@
 class JSONText extends StringField
 {
     /**
+     * @var array
+     * 
+     * internal-name => operator (for use in extract() method).
+     */
+    private static $operators = [
+        'get_element' => '->'  // Strict: Search source JSON for matching key of given type.
+    ];
+
+    /**
+     * @var string
+     */
+    protected $returnType = 'json';
+    
+    /**
      * Returns an input field.
      *
      * @param string $name
@@ -33,6 +47,57 @@ class JSONText extends StringField
     public function __construct($name, $title = null, $value = '')
     {
         parent::__construct($name, $title, $value);
+    }
+
+    /**
+     * Tell all class methods to return data as JSON or JSON converted to an array.
+     * 
+     * @param string $type
+     * @return JSONText
+     * @throws JSONTextException
+     */
+    public function setReturnType($type)
+    {
+        if (!in_array($type, ['json', 'array'])) {
+            $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
+            throw new JSONTextException($msg);
+        }
+        
+        $this->returnType = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReturnType()
+    {
+        return $this->returnType;
+    }
+
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
+    protected function returnAsType($data)
+    {
+        if (($this->getReturnType() === 'array') && is_array($data)) {
+            return $data;
+        }
+
+        if (($this->getReturnType() === 'json') && $this->isJson($data)) {
+            return $this->toJson($data);
+        }
+    }
+
+    /**
+     * Is the passed JSON operator valid?
+     * 
+     * @param string $operator
+     * @return boolean
+     */
+    protected function isValidOperator($operator)
+    {
+        return $operator && in_array($operator, $this->config()->operators, true);
     }
     
     /**
@@ -76,31 +141,27 @@ class JSONText extends StringField
     }
 
     /**
-     * Returns the value of this field as an associative array.
+     * Returns the value of this field as an iterable.
      * 
-     * @return array
-     * @throws SimpleJSONException 
+     * @return RecursiveIteratorIterator
+     * @throws JSONTextException
+     * @todo Cache this to an object field for performance
      */
-    public function getValueAsArray()
+    public function getValueAsIterable()
     {
-        if (!$value = $this->getValue()) {
+        if (!$json = $this->getValue()) {
             return [];
         }
         
-        if (!$this->isJson($value)) {
+        if (!$this->isJson($json)) {
             $msg = 'DB data is munged.';
-            throw new SimpleJSONException($msg);
-        }
-        
-        if (!$decoded = json_decode($value, true)) {
-            return [];
+            throw new JSONTextException($msg);
         }
 
-        if (!is_array($decoded)) {
-            $decoded = (array) $decoded;
-        }
-        
-        return $decoded;
+        return new RecursiveIteratorIterator(
+            new RecursiveArrayIterator(json_decode($json, true)),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
     }
 
     /**
@@ -109,7 +170,7 @@ class JSONText extends StringField
      */
     public function getValueForKey($key)
     {
-        $currentData = $this->getValueAsArray();
+        $currentData = $this->getValueAsIterable();
         if (isset($currentData[$key])) {
             return $currentData[$key];
         }
@@ -152,19 +213,16 @@ class JSONText extends StringField
      */
     public function first()
     {
-        $data = $this->getValueAsArray();
+        $data = $this->getValueAsIterable();
         
         if (!$data) {
             return null;
         }
-        
-        $data = array_slice($data, 0, 1, true);
 
-        if (empty($data)) {
-            return null;
-        }
-
-        return $data;
+        $flattened = iterator_to_array($data, true);
+        return $this->returnAsType([
+                array_keys($flattened)[0] => array_values($flattened)[0]
+            ]);
     }
 
     /**
@@ -174,19 +232,16 @@ class JSONText extends StringField
      */
     public function last()
     {
-        $data = $this->getValueAsArray();
+        $data = $this->getValueAsIterable();
 
         if (!$data) {
             return null;
         }
 
-        $data = array_slice($data, -1, 1, true);
-
-        if (empty($data)) {
-            return null;
-        }
-
-        return $data;
+        $flattened = iterator_to_array($data, true);
+        return $this->returnAsType([
+                array_keys($flattened)[count($flattened) -1] => array_values($flattened)[count($flattened) -1]
+            ]);
     }
 
     /**
@@ -198,7 +253,7 @@ class JSONText extends StringField
      */
     public function nth($n)
     {
-        $data = $this->getValueAsArray();
+        $data = $this->getValueAsIterable();
 
         if (!$data) {
             return null;
@@ -208,53 +263,71 @@ class JSONText extends StringField
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be numeric.';
             throw new JSONTextException($msg);
         }
-        
-        if (!isset(array_values($data)[$n])) {
-            return null;
-        }
 
-        $data = array_slice($data, $n, 1, true);
-        
-        if (empty($data)) {
-            return null;
+        $i = 0;
+        foreach ($data as $key => $val) {
+            if ($i === $n) {
+                return $this->returnAsType([$key => $val]);
+            }
+            $i++;
         }
         
-        return $data;
+        return $this->returnAsType($data);
     }
 
     /**
-     * Return an array of the JSON key(s) + value(s) represented when $value is found in a JSON node's value
+     * Return an array of the JSON key(s) + value(s) represented by $operator extracting relevant result in a JSON 
+     * node's value.
      *
-     * @param string $value
+     * @param string $operator
+     * @param string $operand
      * @return mixed null|array
      * @throws JSONTextException
-     * @todo Allow $value to be a PCRE
+     * @todo Move operator-specific logic to own methods
      */
-    public function find($value)
+    public function extract($operator, $operand)
     {
-        $data = $this->getValueAsArray();
+        $data = $this->getValueAsIterable();
         
         if (!$data) {
             return null;
         }
         
-        if (!is_scalar($value)) {
-            $msg = 'Argument passed to ' . __FUNCTION__ . ' must be a scalar.';
+        if (!$this->isValidOperator($operator)) {
+            $msg = 'JSON operator: ' . $operator . ' in invalid.';
             throw new JSONTextException($msg);
         }
         
-        $found = null;
-        array_walk($data, function($v, $k) use(&$found, $value, $data) {
-            if (($v == $value) || is_array($v) && in_array($value, $v)) {
-                $found = [$k => $v];
+        $i = 0;
+        foreach ($data as $key => $val) {
+            switch ($operator) {
+                default:
+                    // TODO: This case should become own protected method...
+                case '->':
+                    if (!is_int($operand)) {
+                        $msg = 'Incorrect type used as operand with operator: ' . $operator;
+                        throw new JSONTextException($msg);
+                    }
+
+                    if ($i === $operand) {
+                        return $this->returnAsType([$key => $val]);
+                    }
             }
-        });
-        
-        if (empty($found)) {
-            return null;
+            
+            $i++;
         }
-        
-        return $found;
+    }
+
+    /**
+     * Alias of self::extract().
+     * 
+     * @param string $path
+     * @return mixed null|array
+     * @throws JSONTextException
+     */
+    public function find($path)
+    {
+        return $this->extract($path);
     }
     
     /**
