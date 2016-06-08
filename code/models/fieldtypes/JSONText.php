@@ -21,11 +21,13 @@
  * @package silverstripe-jsontext
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
+ * @todo Make the current default of "strict mode" into ss config and default to strict.
  */
 class JSONText extends StringField
 {
     /**
-     * Which RDBMS backend are we using? The value set here changes the actual operator routines for the given backend.
+     * Which RDBMS backend are we using? The value set here changes the actual operators and operator-routines for the
+     * given backend.
      * 
      * @var string
      * @config
@@ -40,7 +42,8 @@ class JSONText extends StringField
      */
     private static $allowed_operators = [
         'postgres' => [
-            'getByKey' => '->'   // int/str type-check performed at runtime.
+            'getByKey' => '->', // int/str type-check performed at runtime.
+            'getByVal' => '<-'  // int/str type-check performed at runtime.
         ]
     ];
 
@@ -255,7 +258,6 @@ class JSONText extends StringField
      * @param string $operand
      * @return mixed null|array
      * @throws JSONTextException
-     * @todo Move operator-specific logic to own methods
      */
     public function extract($operator, $operand)
     {
@@ -266,7 +268,7 @@ class JSONText extends StringField
         }
         
         if (!$this->isValidOperator($operator)) {
-            $msg = 'JSON operator: ' . $operator . ' in invalid.';
+            $msg = 'JSON operator: ' . $operator . ' is invalid.';
             throw new JSONTextException($msg);
         }
         
@@ -314,16 +316,17 @@ class JSONText extends StringField
             throw new JSONTextException($msg);
         }
         
-        foreach ($operators as $routine => $operator) {
-            $backendDBApiInst = Injector::inst()->createWithArgs('JSONBackend', [
-                $key, 
-                $val, 
-                $idx, 
-                $operator,
-                $operand]
-            );
+        foreach ($operators as $routine => $backendOperator) {
+            $backendDBApiInst = Injector::inst()->createWithArgs(
+                'JSONBackend', [
+                    $key, 
+                    $val, 
+                    $idx,
+                    $backendOperator,
+                    $operand
+                ]);
             
-            if (method_exists($backendDBApiInst, $routine)) {
+            if ($operator === $backendOperator) {
                 return $backendDBApiInst->$routine();
             }
         }
@@ -377,7 +380,7 @@ class JSONText extends StringField
     private function isValidOperator($operator)
     {
         $backend = $this->config()->backend;
-        
+
         return $operator && in_array($operator, $this->config()->allowed_operators[$backend], true);
     }
 

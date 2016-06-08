@@ -134,9 +134,17 @@ class JSONTextTest extends SapphireTest
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
         $field->setReturnType('array');
+
+        // By key
         $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 'british'));
         $this->assertEquals([0 => 'vauxhall'], $field->extract('->', 6));
         $this->assertEquals([], $field->extract('->', '6')); // strict handling
+
+        // By value
+        // TODO: Use rewind() to get he tp-level key > val from the original iterator
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('<-', 'morris'));
+/*        $this->assertEquals([0 => 'vauxhall'], $field->extract('<-', 6));
+        $this->assertEquals([], $field->extract('->', '6')); // strict handling*/
     }
 
 }

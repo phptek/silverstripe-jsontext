@@ -71,4 +71,16 @@ class JSONBackend
         return [];
     }
     
+    /**
+     * @return array
+     */
+    public function getByVal()
+    {
+        if ($this->val === $this->operand) {
+            return [$this->key => $this->val];
+        }
+
+        return [];   
+    }
+    
 }
