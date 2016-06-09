@@ -1,18 +1,20 @@
 # SilverStripe JSONText
 
-Pretty much does what it says on the tin: Provides a simple Text field into 
-which JSON can be stored. Once stored, the module exposes a simple query API 
-based on the (JSON operators found in Postgres v9.2+)[https://www.postgresql.org/docs/9.5/static/functions-json.html].
+This does pretty much does what it says on the tin: Provides a simple Text field into 
+which JSON can be stored. 
+
+Once stored, the module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html).
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* natively use Postgres' or MySQL's native JSON operators. The aim however 
-is to allow dev's to use their preferred syntax and to this end, you can set
-the module into `mysql' or `postgres` backend mode using SS config:
+is to allow dev's to use their preferred syntax, and to this end, you can set
+the module into `mysql' or `postgres` mode using SS config:
 
 ```yml
 JSONText:
   backend: mysql
 ```
+
 
 Note: The default is to use `postgres`.
 
@@ -29,7 +31,7 @@ This leads me to..
 If you've been using Postgres or MySQL with its JSON functions for some time,
 I'm keen to hear from you. Some simple failing tests would be most welcome.
 
-See: (CONTRIBUTING.md)[CONTRIBUTING.md]
+See: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 # Usage
 
