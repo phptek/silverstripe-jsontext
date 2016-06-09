@@ -43,7 +43,7 @@ class JSONText extends StringField
     private static $allowed_operators = [
         'postgres' => [
             'getByKey' => '->', // int/str type-check performed at runtime.
-            'getByVal' => '<-'  // int/str type-check performed at runtime.
+            'getByVal' => '->>'  // int/str type-check performed at runtime.
         ]
     ];
 
@@ -151,6 +151,7 @@ class JSONText extends StringField
             new RecursiveArrayIterator(json_decode($json, true)),
             RecursiveIteratorIterator::SELF_FIRST
         );
+
     }
 
     /**
@@ -258,6 +259,7 @@ class JSONText extends StringField
      * @param string $operand
      * @return mixed null|array
      * @throws JSONTextException
+     * @todo How to increment an interator for each depth using $data->getDepth() and $i ??
      */
     public function extract($operator, $operand)
     {
@@ -272,8 +274,9 @@ class JSONText extends StringField
             throw new JSONTextException($msg);
         }
         
+        $cleaned = $this->cleanFlattenedArray($data);
         $i = 0;
-        foreach ($data as $key => $val) {
+        foreach ($cleaned as $key => $val) {
             if ($marshalled = $this->marshallQuery($key, $val, $i, func_get_args())) {
                 return $this->returnAsType($marshalled);
             }
@@ -282,6 +285,29 @@ class JSONText extends StringField
         }
 
         return $this->returnAsType([]);
+    }
+
+    /**
+     * TEMPORARY - doesn't work to the extent expected anyway.
+     * 
+     * @param $data
+     * @return array
+     */
+    private function cleanFlattenedArray($data)
+    {
+        $flattened = iterator_to_array($data);
+        $cleaned = [];
+        foreach ($flattened as $key => $val) {
+            if (is_int($key)) {
+                continue;
+            }
+            
+            if (!in_array($val, $cleaned)) {
+                $cleaned[$key] = $val;
+            }
+        }
+        
+        return $cleaned;
     }
 
     /**
@@ -326,8 +352,8 @@ class JSONText extends StringField
                     $operand
                 ]);
             
-            if ($operator === $backendOperator) {
-                return $backendDBApiInst->$routine();
+            if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {
+                return $result;
             }
         }
         

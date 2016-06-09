@@ -131,20 +131,25 @@ class JSONTextTest extends SapphireTest
 
     public function testExtract_AsArray()
     {
+        // Hashed
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
         $field->setReturnType('array');
-
-        // By key
+        
         $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 'british'));
-        $this->assertEquals([0 => 'vauxhall'], $field->extract('->', 6));
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 2));
+        $this->assertEquals(['american' => ['buick', 'oldsmobile', 'ford']], $field->extract('->', 1));
         $this->assertEquals([], $field->extract('->', '6')); // strict handling
 
-        // By value
-        // TODO: Use rewind() to get he tp-level key > val from the original iterator
-        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('<-', 'morris'));
-/*        $this->assertEquals([0 => 'vauxhall'], $field->extract('<-', 6));
-        $this->assertEquals([], $field->extract('->', '6')); // strict handling*/
+        // Nested
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['nested']);
+        $field->setReturnType('array');
+
+        $this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->extract('->', 'planes'));
+        //$this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->extract('->', 1));
+        //$this->assertEquals(['american' => ['buick', 'oldsmobile', 'ford']], $field->extract('->', 1));
+        //$this->assertEquals([], $field->extract('->', '6')); // strict handling*/
     }
 
 }
