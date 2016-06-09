@@ -129,27 +129,62 @@ class JSONTextTest extends SapphireTest
         $this->assertEquals('{"british":["vauxhall","morris"]}', $field->nth('2'));
     }
 
-    public function testExtract_AsArray()
+    /**
+     * Tests query() by means of the integer Postgres operator: ->
+     */
+    public function testquery_AsInt_AsArray()
     {
         // Hashed
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['hashed']);
         $field->setReturnType('array');
         
-        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 'british'));
-        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->extract('->', 2));
-        $this->assertEquals(['american' => ['buick', 'oldsmobile', 'ford']], $field->extract('->', 1));
-        $this->assertEquals([], $field->extract('->', '6')); // strict handling
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->query('->', 5));
+        $this->assertEquals(['american' => ['buick', 'oldsmobile', 'ford']], $field->query('->', 1));
+        $this->assertEquals([], $field->query('->', '6')); // strict handling
+
+        // Empty
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['empty']);
+        $field->setReturnType('array');
+        $this->assertEquals([], $field->query('->', 42));
+
+        // Nested
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['nested']);
+        $field->setReturnType('array');
+        
+        $this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->query('->', 7));
+        $this->assertEquals([], $field->query('->', '7')); // Attempt to match a string using the int matcher 
+        $this->assertEquals([0 => 'buick'], $field->query('->', 2));
+    }
+
+    /**
+     * Tests query() by means of the string Postgres operator: ->>
+     */
+    public function testquery_AsStr_AsArray()
+    {
+        // Hashed
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['hashed']);
+        $field->setReturnType('array');
+
+        $this->assertEquals(['british' => ['vauxhall', 'morris']], $field->query('->>', 'british'));
+        $this->assertEquals([], $field->query('->', '6')); // strict handling
+
+        // Empty
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->fixture['empty']);
+        $field->setReturnType('array');
+        $this->assertEquals([], $field->query('->>', 'british'));
 
         // Nested
         $field = JSONText::create('MyJSON');
         $field->setValue($this->fixture['nested']);
         $field->setReturnType('array');
 
-        $this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->extract('->', 'planes'));
-        //$this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->extract('->', 1));
-        //$this->assertEquals(['american' => ['buick', 'oldsmobile', 'ford']], $field->extract('->', 1));
-        //$this->assertEquals([], $field->extract('->', '6')); // strict handling*/
+        $this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->query('->>', 'planes'));
+        $this->assertEquals([], $field->query('->', '7')); // Attempt to match a string using the int matcher
     }
 
 }

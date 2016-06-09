@@ -56,31 +56,31 @@ class JSONBackend
     }
     
     /**
+     * Generic RDBMS agnostic integer based matcher.
+     * 
      * @return array
      */
-    public function getByKey()
+    public function intKeyMatcher()
     {
         if (is_int($this->operand) && $this->idx === $this->operand) {
-            return [$this->key => $this->val];
-        }
-
-        if (is_string($this->operand) && $this->key === $this->operand) {
             return [$this->key => $this->val];
         }
         
         return [];
     }
-    
+
     /**
+     * Generic RDBMS agnostic string based matcher.
+     * 
      * @return array
      */
-    public function getByVal()
+    public function strKeyMatcher()
     {
-        if ($this->val === $this->operand) {
+        if (is_string($this->operand) && $this->key === $this->operand) {
             return [$this->key => $this->val];
         }
 
-        return [];   
+        return [];
     }
     
 }

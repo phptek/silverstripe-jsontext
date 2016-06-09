@@ -42,8 +42,8 @@ class JSONText extends StringField
      */
     private static $allowed_operators = [
         'postgres' => [
-            'getByKey' => '->', // int/str type-check performed at runtime.
-            'getByVal' => '->>'  // int/str type-check performed at runtime.
+            'intKeyMatcher' => '->',
+            'strKeyMatcher' => '->>'
         ]
     ];
 
@@ -51,6 +51,13 @@ class JSONText extends StringField
      * @var string
      */
     protected $returnType = 'json';
+
+    /**
+     * Object cache for performance improvements.
+     * 
+     * @var RecursiveIteratorIterator
+     */
+    protected $data;
     
     /**
      * Returns an input field.
@@ -134,7 +141,6 @@ class JSONText extends StringField
      * 
      * @return RecursiveIteratorIterator
      * @throws JSONTextException
-     * @todo Cache this to an object field for performance
      */
     public function getValueAsIterable()
     {
@@ -147,10 +153,14 @@ class JSONText extends StringField
             throw new JSONTextException($msg);
         }
 
-        return new RecursiveIteratorIterator(
-            new RecursiveArrayIterator(json_decode($json, true)),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
+        if (!$this->data) {
+            $this->data = new RecursiveIteratorIterator(
+                new RecursiveArrayIterator(json_decode($json, true)),
+                RecursiveIteratorIterator::SELF_FIRST
+            );
+        }
+        
+        return $this->data;
 
     }
 
@@ -261,12 +271,12 @@ class JSONText extends StringField
      * @throws JSONTextException
      * @todo How to increment an interator for each depth using $data->getDepth() and $i ??
      */
-    public function extract($operator, $operand)
+    public function query($operator, $operand)
     {
         $data = $this->getValueAsIterable();
         
         if (!$data) {
-            return null;
+            return [];
         }
         
         if (!$this->isValidOperator($operator)) {
@@ -274,9 +284,8 @@ class JSONText extends StringField
             throw new JSONTextException($msg);
         }
         
-        $cleaned = $this->cleanFlattenedArray($data);
         $i = 0;
-        foreach ($cleaned as $key => $val) {
+        foreach ($data as $key => $val) {
             if ($marshalled = $this->marshallQuery($key, $val, $i, func_get_args())) {
                 return $this->returnAsType($marshalled);
             }
@@ -284,40 +293,17 @@ class JSONText extends StringField
             $i++;
         }
 
-        return $this->returnAsType([]);
+        return [];
     }
 
     /**
-     * TEMPORARY - doesn't work to the extent expected anyway.
-     * 
-     * @param $data
-     * @return array
-     */
-    private function cleanFlattenedArray($data)
-    {
-        $flattened = iterator_to_array($data);
-        $cleaned = [];
-        foreach ($flattened as $key => $val) {
-            if (is_int($key)) {
-                continue;
-            }
-            
-            if (!in_array($val, $cleaned)) {
-                $cleaned[$key] = $val;
-            }
-        }
-        
-        return $cleaned;
-    }
-
-    /**
-     * Alias of self::extract().
+     * Alias of self::query().
      * 
      * @param string $operator
      * @return mixed string|array
      * @throws JSONTextException
      */
-    public function find($operator)
+    public function extract($operator)
     {
         return $this->extract($operator);
     }
@@ -358,28 +344,6 @@ class JSONText extends StringField
         }
         
         return [];
-    }
-    
-    /**
-     * Converts special JSON characters in incoming data. Use the $invert param to convert strings coming back out.
-     * 
-     * @param string $value
-     * @param boolean $invert 
-     * @return string
-     */
-    private function jsonSafe($value, $invert = false)
-    {
-        $map = [
-            '{' => '%7B',
-            '}' => '%7D',
-            '"' => '&quot;'
-        ];
-        
-        if ($invert) {
-            $map = array_flip($map);
-        }
-        
-        return str_replace(array_keys($map), array_values($map), $value);
     }
 
     /**
