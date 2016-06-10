@@ -1,5 +1,7 @@
 # SilverStripe JSONText
 
+[![Build Status](https://api.travis-ci.org/phptek/silverstripe-jsontext.svg?branch=master)](https://travis-ci.org/phptek/silverstripe-jsontext)
+
 This does pretty much does what it says on the tin: Provides a simple Text field into 
 which JSON can be stored. 
 
