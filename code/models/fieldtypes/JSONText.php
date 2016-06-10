@@ -23,7 +23,10 @@
  * @author Russell Michell <russ@theruss.com>
  * @todo Make the current default of "strict mode" into ss config and default to strict.
  */
-class JSONText extends StringField
+
+namespace JSONText\Fields;
+
+class JSONText extends \StringField
 {
     /**
      * Which RDBMS backend are we using? The value set here changes the actual operators and operator-routines for the
@@ -122,7 +125,7 @@ class JSONText extends StringField
     {
         if (!in_array($type, ['json', 'array'])) {
             $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
         
         $this->returnType = $type;
@@ -150,13 +153,13 @@ class JSONText extends StringField
         
         if (!$this->isJson($json)) {
             $msg = 'DB data is munged.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
 
         if (!$this->data) {
-            $this->data = new RecursiveIteratorIterator(
-                new RecursiveArrayIterator(json_decode($json, true)),
-                RecursiveIteratorIterator::SELF_FIRST
+            $this->data = new \RecursiveIteratorIterator(
+                new \RecursiveArrayIterator(json_decode($json, true)),
+                \RecursiveIteratorIterator::SELF_FIRST
             );
         }
         
@@ -247,7 +250,7 @@ class JSONText extends StringField
         
         if (!is_int($n)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be an integer.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
 
         $i = 0;
@@ -281,7 +284,7 @@ class JSONText extends StringField
         
         if (!$this->isValidOperator($operator)) {
             $msg = 'JSON operator: ' . $operator . ' is invalid.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
         
         $i = 0;
@@ -325,12 +328,12 @@ class JSONText extends StringField
         
         if (!in_array($operator, $operators)) {
             $msg = 'Invalid ' . $backend . ' operator: ' . $operator . ', used for JSON query.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
         
         foreach ($operators as $routine => $backendOperator) {
-            $backendDBApiInst = Injector::inst()->createWithArgs(
-                'JSONBackend', [
+            $backendDBApiInst = \Injector::inst()->createWithArgs(
+                '\JSONText\Backends\JSONBackend', [
                     $key, 
                     $val, 
                     $idx,
@@ -380,6 +383,9 @@ class JSONText extends StringField
  * @package silverstripe-advancedcontent
  * @author Russell Michell 2016 <russ@theruss.com>
  */
-class JSONTextException extends Exception
+
+namespace JSONText\Exceptions;
+
+class JSONTextException extends \Exception
 {
 }

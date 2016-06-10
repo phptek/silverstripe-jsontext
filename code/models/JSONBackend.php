@@ -8,9 +8,11 @@
  * @subpackage models
  * @author Russell Michell <russ@theruss.com>
  */
+
+namespace JSONText\Backends;
+
 class JSONBackend
 {
-
     /**
      * @var mixed
      */

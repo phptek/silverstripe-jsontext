@@ -2,15 +2,15 @@
 
 [![Build Status](https://api.travis-ci.org/phptek/silverstripe-jsontext.svg?branch=master)](https://travis-ci.org/phptek/silverstripe-jsontext)
 
-This does pretty much does what it says on the tin: Provides a simple Text field into 
-which JSON can be stored. 
+This module does pretty much does what it says on the tin: Provides a simple Text field into 
+which JSON can be stored and queried.
 
 Once stored, the module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html).
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
-It does *not* natively use Postgres' or MySQL's native JSON operators. The aim however 
-is to allow dev's to use their preferred syntax, and to this end, you can set
-the module into `mysql' or `postgres` mode using SS config:
+It does *not* use Postgres' or MySQL's native JSON operators. The aim however 
+is to allow dev's to use their preferred DB's syntax, and to this end you can set
+the module into `mysql` or `postgres` mode using SS config:
 
 ```yml
 JSONText:
@@ -18,7 +18,7 @@ JSONText:
 ```
 
 
-Note: The default is to use `postgres`.
+Note: The module default is to use `postgres`.
 
 # Stability
 
