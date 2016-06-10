@@ -58,7 +58,7 @@ class JSONText extends \StringField
     /**
      * Object cache for performance improvements.
      * 
-     * @var RecursiveIteratorIterator
+     * @var \RecursiveIteratorIterator
      */
     protected $data;
     
@@ -118,8 +118,8 @@ class JSONText extends \StringField
      * Tell all class methods to return data as JSON or an array.
      * 
      * @param string $type
-     * @return JSONText
-     * @throws JSONTextException
+     * @return \JSONText
+     * @throws \JSONText\Exceptions\JSONTextException
      */
     public function setReturnType($type)
     {
@@ -142,8 +142,8 @@ class JSONText extends \StringField
     /**
      * Returns the value of this field as an iterable.
      * 
-     * @return RecursiveIteratorIterator
-     * @throws JSONTextException
+     * @return \RecursiveIteratorIterator
+     * @throws \JSONText\Exceptions\JSONTextException
      */
     public function getValueAsIterable()
     {
@@ -238,7 +238,7 @@ class JSONText extends \StringField
      *
      * @param int $n
      * @return mixed array
-     * @throws JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextException
      */
     public function nth($n)
     {
@@ -271,7 +271,7 @@ class JSONText extends \StringField
      * @param string $operator
      * @param string $operand
      * @return mixed null|array
-     * @throws JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextException
      * @todo How to increment an interator for each depth using $data->getDepth() and $i ??
      */
     public function query($operator, $operand)
@@ -304,7 +304,7 @@ class JSONText extends \StringField
      * 
      * @param string $operator
      * @return mixed string|array
-     * @throws JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextException
      */
     public function extract($operator)
     {
@@ -317,7 +317,7 @@ class JSONText extends \StringField
      * @param int $idx
      * @param array $args
      * @return array
-     * @throws JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextException
      */
     private function marshallQuery($key, $val, $idx, $args)
     {

@@ -1,0 +1,19 @@
+{
+  "cars":{
+    "american":
+      [
+        "buick",
+        "oldsmobile"
+      ],
+    "british": 
+      ["vauxhall","morris"]
+  },
+  "planes":{
+    "russian":
+      [
+        "antonov",
+        "mig"
+      ],
+    "french":"airbus"
+  }
+}
