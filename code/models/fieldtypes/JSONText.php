@@ -26,6 +26,8 @@
 
 namespace JSONText\Fields;
 
+use JSONText\Exceptions\JSONTextException;
+
 class JSONText extends \StringField
 {
     /**
@@ -41,12 +43,15 @@ class JSONText extends \StringField
      * @var array
      * @config
      * 
-     * <method> => <operator> (for use in extract() method).
+     * [<backend>] => [
+     *  [<method> => <operator>]
+     * ]; // For use in query() method.
      */
     private static $allowed_operators = [
         'postgres' => [
-            'intKeyMatcher' => '->',
-            'strKeyMatcher' => '->>'
+            'matchIfKeyIsInt'   => '->',
+            'matchIfKeyIsStr'   => '->>',
+            'matchOnPath'       => '#>'
         ]
     ];
 
@@ -194,6 +199,23 @@ class JSONText extends \StringField
         
         return json_encode($value, $opts);
     }
+
+    /**
+     * @param mixed $value
+     * @return array
+     * @throws \JSONText\Exceptions\JSONTextException
+     */
+    public function toArray($value)
+    {
+        $decode = json_decode($value, true);
+        
+        if (is_null($decode)) {
+            $msg = 'Decoded JSON is invalid.';
+            throw new JSONTextException($msg);
+        }
+        
+        return $decode;
+    }
     
     /**
      * Return an array of the JSON key + value represented as first (top-level) JSON node. 
@@ -279,7 +301,7 @@ class JSONText extends \StringField
         $data = $this->getValueAsIterable();
         
         if (!$data) {
-            return [];
+            return $this->returnAsType([]);
         }
         
         if (!$this->isValidOperator($operator)) {
@@ -296,7 +318,7 @@ class JSONText extends \StringField
             $i++;
         }
 
-        return [];
+        return $this->returnAsType([]);
     }
 
     /**
@@ -338,7 +360,8 @@ class JSONText extends \StringField
                     $val, 
                     $idx,
                     $backendOperator,
-                    $operand
+                    $operand,
+                    $this
                 ]);
             
             if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {

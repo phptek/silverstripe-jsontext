@@ -15,7 +15,7 @@ class JSONTextTest extends SapphireTest
      * @var array
      */
     protected $fixtures = [
-        'indexed'       => MODULE_DIR . '/tests/fixtures/json/indexed.json',
+        'array_simple'  => MODULE_DIR . '/tests/fixtures/json/array_simple.json',
         'hash_simple'   => MODULE_DIR . '/tests/fixtures/json/hash_simple.json',
         'invalid'       => MODULE_DIR . '/tests/fixtures/json/invalid.json',
         'hash_deep'     => MODULE_DIR . '/tests/fixtures/json/hash_deep.json',
@@ -38,7 +38,7 @@ class JSONTextTest extends SapphireTest
     public function testFirst_AsArray()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('array');
         $this->assertEquals([0 => 'great wall'], $field->first());
 
@@ -52,7 +52,7 @@ class JSONTextTest extends SapphireTest
     public function testFirst_AsJson()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('json');
         $this->assertEquals('["great wall"]', $field->first());
 
@@ -66,7 +66,7 @@ class JSONTextTest extends SapphireTest
     public function testLast_AsArray()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('array');
         $this->assertEquals([6 => 'morris'], $field->last());
 
@@ -80,7 +80,7 @@ class JSONTextTest extends SapphireTest
     public function testLast_AsJson()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('json');
         $this->assertEquals('{"6":"morris"}', $field->last());
 
@@ -94,7 +94,7 @@ class JSONTextTest extends SapphireTest
     public function testNth_AsArray()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('array');
         $this->assertEquals([0 => 'great wall'], $field->nth(0));
         $this->assertEquals([2 => 'trabant'], $field->nth(2));
@@ -115,7 +115,7 @@ class JSONTextTest extends SapphireTest
     public function testNth_AsJson()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('indexed'));
+        $field->setValue($this->getFixture('array_simple'));
         $field->setReturnType('json');
         $this->assertEquals('["great wall"]', $field->nth(0));
         $this->assertEquals('{"2":"trabant"}', $field->nth(2));
@@ -134,9 +134,9 @@ class JSONTextTest extends SapphireTest
     }
 
     /**
-     * Tests query() by means of the integer Postgres operator: ->
+     * Tests query() by means of the integer Postgres operator: '->'
      */
-    public function testquery_AsInt_AsArray()
+    public function testQuery_MatchOnKeyAsInt_AsArray()
     {
         // Hashed
         $field = JSONText\Fields\JSONText::create('MyJSON');
@@ -164,9 +164,9 @@ class JSONTextTest extends SapphireTest
     }
 
     /**
-     * Tests query() by means of the string Postgres operator: ->>
+     * Tests query() by means of the string Postgres operator: '->>'
      */
-    public function testquery_AsStr_AsArray()
+    public function testQuery_MatchOnKeyAsStr_AsArray()
     {
         // Hashed
         $field = JSONText\Fields\JSONText::create('MyJSON');
@@ -189,6 +189,63 @@ class JSONTextTest extends SapphireTest
 
         $this->assertEquals(['planes' => ['russian' => ['antonov', 'mig'], 'french' => 'airbus']], $field->query('->>', 'planes'));
         $this->assertEquals([], $field->query('->', '7')); // Attempt to match a string using the int matcher
+    }
+
+    /**
+     * Tests query() by means of the string Postgres operator: '->>'
+     */
+    public function testQuery_MatchOnKeyAsStr_AsJSON()
+    {
+        // Hashed
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_simple'));
+        $field->setReturnType('json');
+
+        $this->assertEquals('{"british":["vauxhall","morris"]}', $field->query('->>', 'british'));
+        $this->assertEquals('[]', $field->query('->', '6')); // strict handling
+
+        // Empty
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('empty'));
+        $field->setReturnType('json');
+        $this->assertEquals('[]', $field->query('->>', 'british'));
+
+        // Nested
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_deep'));
+        $field->setReturnType('json');
+
+        $this->assertEquals('{"planes":{"russian":["antonov","mig"],"french":"airbus"}}', $field->query('->>', 'planes'));
+        $this->assertEquals('[]', $field->query('->', '7')); // Attempt to match a string using the int matcher
+    }
+
+    /**
+     * Tests query() by means of path-matching using the Postgres path match operator: '#>'
+     */
+    public function testQuery_MatchPath_AsArray()
+    {
+        // Hashed
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_deep'));
+        $field->setReturnType('array');
+        
+        $this->assertEquals(["fast" => ["Kawasaki" => "KR1S250"],"slow" => ["Honda" => "FS150"]], $field->query('#>', '{"bikes":"japanese"}'));
+
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $field->query('#>', '{"bikes","japanese"}'); // Bad JSON
+    }
+
+    /**
+     * Tests query() by means of path-matching using the Postgres path match operator: '#>'
+     */
+    public function testQuery_MatchPath_AsJSON()
+    {
+        // Hashed
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_deep'));
+        $field->setReturnType('json');
+        
+        $this->assertEquals('{"fast":{"Kawasaki":"KR1S250"},"slow":{"Honda":"FS150"}}', $field->query('#>', '{"bikes":"japanese"}'));
     }
     
     /**

@@ -11,6 +11,9 @@
 
 namespace JSONText\Backends;
 
+use JSONText\Exceptions\JSONTextException;
+use JSONText\Fields\JSONText;
+
 class JSONBackend
 {
     /**
@@ -41,28 +44,35 @@ class JSONBackend
     protected $operator;
 
     /**
+     * @var JSONText
+     */
+    protected $jsonText;
+
+    /**
      * PostgresJSONBackend constructor.
      * 
      * @param mixed $key
      * @param mixed $val
      * @param int $idx
      * @param string $operand
+     * @param JSONText $jsonText
      */
-    public function __construct($key, $val, $idx, $operator, $operand)
+    public function __construct($key, $val, $idx, $operator, $operand, $jsonText)
     {
         $this->key = $key;
         $this->val = $val;
         $this->idx = $idx;
         $this->operator = $operator;
         $this->operand = $operand;
+        $this->jsonText = $jsonText;
     }
     
     /**
-     * Generic RDBMS agnostic integer based matcher.
+     * Match on keys by INT.
      * 
      * @return array
      */
-    public function intKeyMatcher()
+    public function matchIfKeyIsInt()
     {
         if (is_int($this->operand) && $this->idx === $this->operand) {
             return [$this->key => $this->val];
@@ -72,14 +82,54 @@ class JSONBackend
     }
 
     /**
-     * Generic RDBMS agnostic string based matcher.
+     * Match on keys by STRING.
      * 
      * @return array
      */
-    public function strKeyMatcher()
+    public function matchIfKeyIsStr()
     {
+        // operand can be a numeric string if it wants here
         if (is_string($this->operand) && $this->key === $this->operand) {
             return [$this->key => $this->val];
+        }
+
+        return [];
+    }
+
+    /**
+     * Match on path.
+     *
+     * @return array
+     * @throws \JSONText\Exceptions\JSONTextException
+     */
+    public function matchOnPath()
+    {
+        if (!is_string($this->operand) || !$this->jsonText->isJson($this->operand)) {
+            $msg = 'Invalid JSON passed as operand on RHS.';
+            throw new JSONTextException($msg);
+        }
+        
+        $operandAsArray = $this->jsonText->toArray($this->operand);
+        
+        // Empty is OK..could've been accidental...
+        if (!count($operandAsArray)) {
+            return [];
+        }
+
+        $keys = array_keys($operandAsArray);
+        if (count($keys) >1) {
+            $msg = 'Sorry. I can\'t handle complex operands.';
+            throw new JSONTextException($msg);
+        }
+
+        $vals = array_values($operandAsArray);
+        if (count($vals) >1) {
+            $msg = 'Sorry. I can\'t handle complex operands.';
+            throw new JSONTextException($msg);
+        }
+        
+        if ($this->key === $keys[0] && is_array($this->val) && !empty($this->val[$vals[0]])) {
+            return $this->val[$vals[0]];
         }
 
         return [];

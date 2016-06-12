@@ -15,5 +15,15 @@
         "mig"
       ],
     "french":"airbus"
+  },
+  "bikes":{
+    "japanese":{
+      "fast":{
+        "Kawasaki":"KR1S250"
+      },
+      "slow":{
+        "Honda":"FS150"
+      }
+    }
   }
 }

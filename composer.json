@@ -4,7 +4,7 @@
     "description": "JSON storage and querying",
     "homepage": "http://theruss.com/",
     "license": "BSD",
-    "keywords": ["silverstripe", "JSON", "Field""],
+    "keywords": ["silverstripe", "JSON", "json", "Field", "Query"],
     "authors": [
         {
             "name": "Russell Michell",

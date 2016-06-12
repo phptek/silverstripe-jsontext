@@ -3,9 +3,19 @@
 [![Build Status](https://api.travis-ci.org/phptek/silverstripe-jsontext.svg?branch=master)](https://travis-ci.org/phptek/silverstripe-jsontext)
 
 This module does pretty much does what it says on the tin: Provides a simple Text field into 
-which JSON can be stored and queried.
+which JSON can be stored and from which it can be queried.
 
-Once stored, the module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html).
+Once stored, the module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
+but with some modifications:
+
+In Postgres both the `->` and `->>` operators act as a string and integer key matcherx on a JSON source as array or object. The module
+however treats both source types the same - they are after all *both* JSON so `->` is used as an **Integer Matcher** and `->>` as a string matcher.
+
+In Postgress the `#>` patch match operator can act as an object or text matcher, but again, the module wishes to simplify things and as such
+the `#>` operator is *just a simple path matcher*.
+
+I see nothing but confusion if the same operator were to be treated differently
+depending on the format of the source data.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's native JSON operators. The aim however 
@@ -18,7 +28,7 @@ JSONText:
 ```
 
 
-Note: The module default is to use `postgres`.
+Note: The module default is to use `postgres` which is also the only backend that will work.
 
 # Stability
 
@@ -36,6 +46,31 @@ I'm keen to hear from you. Some simple failing tests would be most welcome.
 See: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 # Usage
+
+The module can be put into `mysql` or `postgres` query mode using SS config thus:
+
+```yml
+JSONText:
+  backend: mysql
+```
+
+You can also stipulate what format you want your results back as; either JSON or Array, thus:
+
+```php
+
+        // JSON
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue('{"a": {"b":{"c": "foo"}}}');
+        $field->setReturnType('json');
+        
+        // Array
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue('{"a": {"b":{"c": "foo"}}}');
+        $field->setReturnType('array');
+
+```
+
+In the examples below, if you pass invalid queries or malformed JSON (where applicable) an exception is thrown.
 
 ```php
     class MyDataObject extends DataObject
@@ -85,6 +120,15 @@ See: [CONTRIBUTING.md](CONTRIBUTING.md)
         public function getNestedByStrKey($str)
         {
             return $this->dbObject('MyJSON')->query('->>', $str);
+        }
+        
+        /**
+         * Returns a value based on a strict string/int match of the key-as-array
+         * Given source JSON ala: '{"a": {"b":{"c": "foo"}}}' will return '{"c": "foo"}'
+         */
+        public function getByPathMatch('{"a":"b"}')
+        {
+            return $this->dbObject('MyJSON')->query('#>', '{"a":"b"}'; 
         }
     }
 ```
