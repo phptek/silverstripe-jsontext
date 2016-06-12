@@ -8,33 +8,34 @@ which JSON can be stored and from which it can be queried.
 Once stored, the module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
 but with some modifications:
 
-In Postgres both the `->` and `->>` operators act as a string and integer key matcherx on a JSON source as array or object. The module
-however treats both source types the same - they are after all *both* JSON so `->` is used as an **Integer Matcher** and `->>` as a string matcher.
+In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object. The module
+however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a string matcher
+*regardless* of the "type" of JSON stored.
 
-In Postgress the `#>` patch match operator can act as an object or text matcher, but again, the module wishes to simplify things and as such
+In Postgress the `#>` path match operator can act as an object or a text matcher, but again, the module wishes to simplify things and as such
 the `#>` operator is *just a simple path matcher*.
 
 I see nothing but confusion if the same operator were to be treated differently
-depending on the format of the source data.
+depending on the format of the source data but am prepared for discussion on it if any were forthcoming.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
-It does *not* use Postgres' or MySQL's native JSON operators. The aim however 
+It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
 the module into `mysql` or `postgres` mode using SS config:
 
 ```yml
 JSONText:
-  backend: mysql
+  backend: postgres
 ```
 
 
-Note: The module default is to use `postgres` which is also the only backend that will work.
+Note: The module default is to use `postgres` which is also the only backend that will work at the moment.
 
 # Stability
 
 This is currently *alpha software*. At time of writing (June 2016) there is
-only partial support for the `->` and `->>` operators and although well-tested, 
-they are far from complete (or even correct).
+support for the `->` (Int matcher), `->>` (String matcher) and `#>` (Path matcher) operators and although well-tested, 
+they are far from complete.
 
 This leads me to..
 

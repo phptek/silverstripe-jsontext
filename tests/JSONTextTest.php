@@ -19,7 +19,7 @@ class JSONTextTest extends SapphireTest
         'hash_simple'   => MODULE_DIR . '/tests/fixtures/json/hash_simple.json',
         'invalid'       => MODULE_DIR . '/tests/fixtures/json/invalid.json',
         'hash_deep'     => MODULE_DIR . '/tests/fixtures/json/hash_deep.json',
-        'hash_dupes'    => MODULE_DIR . '/tests/fixtures/json/hash_duplicates.json',
+        'hash_dupes'    => MODULE_DIR . '/tests/fixtures/json/hash_duplicated.json',
         'empty'         => MODULE_DIR . '/tests/fixtures/json/empty.json'
     ];
     
@@ -247,6 +247,20 @@ class JSONTextTest extends SapphireTest
         
         $this->assertEquals('{"fast":{"Kawasaki":"KR1S250"},"slow":{"Honda":"FS150"}}', $field->query('#>', '{"bikes":"japanese"}'));
     }
+
+    /**
+     * Tests query() by means of path-matching using the Postgres path match operator: '#>' but where duplicate keys exist 
+     * for different parent structures in source data
+     */
+/*    public function testQuery_MatchPathDuplicate_AsArray()
+    {
+        // Hashed
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_dupes'));
+        $field->setReturnType('array');
+
+        $this->assertEquals([["Kawasaki" => "KR1S250"],["Subaru" => "Impreza"]], $field->query('#>', '{"japanese":"fast"}'));
+    }*/
     
     /**
      * Get the contents of a fixture

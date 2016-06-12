@@ -66,6 +66,15 @@ class JSONText extends \StringField
      * @var \RecursiveIteratorIterator
      */
     protected $data;
+
+    /**
+     * @var array
+     */
+    protected $cache = [];
+    
+    public function updateCache($val) {
+        $this->cache[] = $val;
+    }
     
     /**
      * Returns an input field.
@@ -130,7 +139,7 @@ class JSONText extends \StringField
     {
         if (!in_array($type, ['json', 'array'])) {
             $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
-            throw new \JSONText\Exceptions\JSONTextException($msg);
+            throw new JSONTextException($msg);
         }
         
         $this->returnType = $type;
@@ -158,7 +167,7 @@ class JSONText extends \StringField
         
         if (!$this->isJson($json)) {
             $msg = 'DB data is munged.';
-            throw new \JSONText\Exceptions\JSONTextException($msg);
+            throw new JSONTextException($msg);
         }
 
         if (!$this->data) {
@@ -169,7 +178,16 @@ class JSONText extends \StringField
         }
         
         return $this->data;
+    }
 
+    /**
+     * Returns the value of this field as a flattened array
+     *
+     * @return array
+     */
+    public function getValueAsArray()
+    {
+        return iterator_to_array($this->getValueAsIterable());
     }
 
     /**
@@ -272,7 +290,7 @@ class JSONText extends \StringField
         
         if (!is_int($n)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . ' must be an integer.';
-            throw new \JSONText\Exceptions\JSONTextException($msg);
+            throw new JSONTextException($msg);
         }
 
         $i = 0;
@@ -306,7 +324,7 @@ class JSONText extends \StringField
         
         if (!$this->isValidOperator($operator)) {
             $msg = 'JSON operator: ' . $operator . ' is invalid.';
-            throw new \JSONText\Exceptions\JSONTextException($msg);
+            throw new JSONTextException($msg);
         }
         
         $i = 0;
@@ -350,7 +368,7 @@ class JSONText extends \StringField
         
         if (!in_array($operator, $operators)) {
             $msg = 'Invalid ' . $backend . ' operator: ' . $operator . ', used for JSON query.';
-            throw new \JSONText\Exceptions\JSONTextException($msg);
+            throw new JSONTextException($msg);
         }
         
         foreach ($operators as $routine => $backendOperator) {
@@ -365,7 +383,7 @@ class JSONText extends \StringField
                 ]);
             
             if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {
-                return $result;
+               return $result;
             }
         }
         

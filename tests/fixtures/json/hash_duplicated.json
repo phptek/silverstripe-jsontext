@@ -1,0 +1,37 @@
+{
+  "cars":{
+    "american":
+      [
+        "buick",
+        "oldsmobile"
+      ],
+    "british": 
+      ["vauxhall","morris"],
+    "japanese": {
+      "fast": {
+        "Subaru": "Impreza"
+      },
+      "slow": {
+        "Honda": "Civic"
+      }
+    }
+  },
+  "planes":{
+    "russian":
+      [
+        "antonov",
+        "mig"
+      ],
+    "french":"airbus"
+  },
+  "bikes":{
+    "japanese":{
+      "fast":{
+        "Kawasaki":"KR1S250"
+      },
+      "slow":{
+        "Honda":"FS150"
+      }
+    }
+  }
+}

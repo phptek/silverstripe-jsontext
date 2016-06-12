@@ -69,7 +69,7 @@ class JSONBackend
     
     /**
      * Match on keys by INT.
-     * 
+     *
      * @return array
      */
     public function matchIfKeyIsInt()
@@ -83,7 +83,7 @@ class JSONBackend
 
     /**
      * Match on keys by STRING.
-     * 
+     *
      * @return array
      */
     public function matchIfKeyIsStr()
@@ -101,6 +101,8 @@ class JSONBackend
      *
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException
+     * @todo Naively only returns the first match. But what about where source JSON has legit duplicate keys? We need
+     * to return an array of matches..
      */
     public function matchOnPath()
     {
@@ -132,6 +134,16 @@ class JSONBackend
             return $this->val[$vals[0]];
         }
 
+/*        if ($this->key === $keys[0] && is_array($this->val) && !empty($this->val[$vals[0]])) {
+            $this->jsonText->updateCache($this->val[$vals[0]]);
+        }*/
+        
+/*        if (count($this->jsonText->cache) === 1) {
+            return $this->jsonText->cache[0];
+        }*/
+        
+     //   return $this->jsonText->cache;
+        
         return [];
     }
     
