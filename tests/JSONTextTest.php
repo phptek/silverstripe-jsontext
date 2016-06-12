@@ -15,14 +15,26 @@ class JSONTextTest extends SapphireTest
      * @var array
      */
     protected $fixtures = [
-        'array_simple'  => MODULE_DIR . '/tests/fixtures/json/array_simple.json',
-        'hash_simple'   => MODULE_DIR . '/tests/fixtures/json/hash_simple.json',
-        'invalid'       => MODULE_DIR . '/tests/fixtures/json/invalid.json',
-        'hash_deep'     => MODULE_DIR . '/tests/fixtures/json/hash_deep.json',
-        'hash_dupes'    => MODULE_DIR . '/tests/fixtures/json/hash_duplicated.json',
-        'empty'         => MODULE_DIR . '/tests/fixtures/json/empty.json'
+        'array_simple'  => 'tests/fixtures/json/array_simple.json',
+        'hash_simple'   => 'tests/fixtures/json/hash_simple.json',
+        'invalid'       => 'tests/fixtures/json/invalid.json',
+        'hash_deep'     => 'tests/fixtures/json/hash_deep.json',
+        'hash_dupes'    => 'tests/fixtures/json/hash_duplicated.json',
+        'empty'         => 'tests/fixtures/json/empty.json'
     ];
-    
+
+    /**
+     * JSONTextTest constructor.
+     * 
+     * Modify fixtures to be able to run on PHP <5.6 without use of constant in class property
+     */
+    public function __construct()
+    {
+        foreach($this->fixtures as $name => $path) {
+            $this->fixtures[$name] = MODULE_DIR . '/' . $path;
+        }
+    }
+
     public function testgetValueAsIterable()
     {
         $field = JSONText\Fields\JSONText::create('MyJSON');
