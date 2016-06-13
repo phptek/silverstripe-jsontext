@@ -388,7 +388,7 @@ class JSONText extends \StringField
     /**
      * Determine the desired userland format to return all query API method results in.
      * 
-     * @param array $data
+     * @param mixed array|\Iterator $data
      * @return mixed
      */
     private function returnAsType(array $data)
