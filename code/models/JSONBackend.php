@@ -1,7 +1,7 @@
 <?php
 
 /**
- * JSON backend for Postgres using the {@link JSONText} DB field. Allows us to use Postgres JSON query syntax within
+ * DB backend for use with the {@link JSONText} DB field. Allows us to use DB-specific JSON query syntax within
  * the module.
  * 
  * @package silverstripe-jsontext
@@ -37,19 +37,12 @@ class JSONBackend
     protected $operand;
 
     /**
-     * Not used.
-     * 
-     * @var string
-     */
-    protected $operator;
-
-    /**
      * @var JSONText
      */
     protected $jsonText;
 
     /**
-     * PostgresJSONBackend constructor.
+     * JSONBackend constructor.
      * 
      * @param mixed $key
      * @param mixed $val
@@ -57,12 +50,11 @@ class JSONBackend
      * @param string $operand
      * @param JSONText $jsonText
      */
-    public function __construct($key, $val, $idx, $operator, $operand, $jsonText)
+    public function __construct($key, $val, $idx, $operand, $jsonText)
     {
         $this->key = $key;
         $this->val = $val;
         $this->idx = $idx;
-        $this->operator = $operator;
         $this->operand = $operand;
         $this->jsonText = $jsonText;
     }
@@ -97,12 +89,10 @@ class JSONBackend
     }
 
     /**
-     * Match on path.
+     * Match on path. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException
-     * @todo Naively only returns the first match. But what about where source JSON has legit duplicate keys? We need
-     * to return an array of matches..
      */
     public function matchOnPath()
     {
@@ -130,21 +120,19 @@ class JSONBackend
             throw new JSONTextException($msg);
         }
         
-        if ($this->key === $keys[0] && is_array($this->val) && !empty($this->val[$vals[0]])) {
-            return $this->val[$vals[0]];
+        // TODO Move this back to JSONText no use in iterating twice over source data 
+        $data = [];
+        foreach ($this->jsonText->getValueAsIterable() as $sourceKey => $sourceVal) {
+            if ($keys[0] === $sourceKey && is_array($sourceVal) && !empty($sourceVal[$vals[0]])) {
+                $data[] = $sourceVal[$vals[0]];
+            }
         }
 
-/*        if ($this->key === $keys[0] && is_array($this->val) && !empty($this->val[$vals[0]])) {
-            $this->jsonText->updateCache($this->val[$vals[0]]);
-        }*/
-        
-/*        if (count($this->jsonText->cache) === 1) {
-            return $this->jsonText->cache[0];
-        }*/
-        
-     //   return $this->jsonText->cache;
-        
-        return [];
+        if (count($data) === 1) {
+            return $data[0];
+        }
+
+        return $data;
     }
     
 }

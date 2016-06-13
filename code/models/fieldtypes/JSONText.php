@@ -3,12 +3,12 @@
 /**
  * Simple text-based database field for storing and querying JSON structured data. 
  * 
- * JSON sub-structures can be queried in a variety of ways using special operators who's syntax closely mimics those used
+ * JSON sub-structures can be queried in a variety of ways using special    operators who's syntax closely mimics those used
  * in native JSON queries in PostGreSQL v9.2+.
  * 
  * Note: The extraction techniques employed here are simple key / value comparisons. They do not use any native JSON
  * features of your project's underlying RDBMS, e.g. those found either in PostGreSQL >= v9.2 or MySQL >= v5.7. As such
- * any JSON "queries" you construct will never be as performant as a native implementation. 
+ * any JSON queries you construct will never be as performant as a native implementation. 
  *
  * Example definition via {@link DataObject::$db} static:
  * 
@@ -17,6 +17,8 @@
  *  'MyJSONStructure' => 'JSONText'
  * ];
  * </code>
+ * 
+ * See the README for example queries.
  * 
  * @package silverstripe-jsontext
  * @subpackage fields
@@ -71,25 +73,18 @@ class JSONText extends \StringField
      * @var array
      */
     protected $cache = [];
-    
+
+    /**
+     * @param string $val
+     * @return void
+     */
     public function updateCache($val) {
         $this->cache[] = $val;
-    }
-    
-    /**
-     * Returns an input field.
-     *
-     * @param string $name
-     * @param null|string $title
-     * @param string $value
-     */
-    public function __construct($name, $title = null, $value = '')
-    {
-        parent::__construct($name, $title, $value);
     }
 
     /**
      * Taken from {@link TextField}.
+     * 
      * @see DBField::requireField()
      * @return void
      */
@@ -107,7 +102,7 @@ class JSONText extends \StringField
             'parts' => $parts
         ];
 
-        DB::require_field($this->tableName, $this->name, $values, $this->default);
+        DB::require_field($this->tableName, $this->name, $values);
     }
 
     /**
@@ -156,7 +151,7 @@ class JSONText extends \StringField
     /**
      * Returns the value of this field as an iterable.
      * 
-     * @return \RecursiveIteratorIterator
+     * @return mixed
      * @throws \JSONText\Exceptions\JSONTextException
      */
     public function getValueAsIterable()
@@ -305,14 +300,13 @@ class JSONText extends \StringField
     }
 
     /**
-     * Return an array of the JSON key(s) + value(s) represented by $operator extracting relevant result in a JSON 
-     * node's value.
+     * Return the key(s) + value(s) represented by $operator extracting relevant result from the source JSON's structure.
+     * N.b when using the path match operator '#>' with duplicate keys, an indexed array of results is returned.
      *
      * @param string $operator
      * @param string $operand
      * @return mixed null|array
      * @throws \JSONText\Exceptions\JSONTextException
-     * @todo How to increment an interator for each depth using $data->getDepth() and $i ??
      */
     public function query($operator, $operand)
     {
@@ -348,10 +342,12 @@ class JSONText extends \StringField
      */
     public function extract($operator)
     {
-        return $this->extract($operator);
+        return $this->query($operator);
     }
 
     /**
+     * Based on the passed operator, ensure the correct backend matcher method is called.
+     * 
      * @param mixed $key
      * @param mixed $val
      * @param int $idx
@@ -377,7 +373,6 @@ class JSONText extends \StringField
                     $key, 
                     $val, 
                     $idx,
-                    $backendOperator,
                     $operand,
                     $this
                 ]);
@@ -391,6 +386,8 @@ class JSONText extends \StringField
     }
 
     /**
+     * Determine the desired userland format to return all query API method results in.
+     * 
      * @param array $data
      * @return mixed
      */
@@ -421,7 +418,7 @@ class JSONText extends \StringField
 }
 
 /**
- * @package silverstripe-advancedcontent
+ * @package silverstripe-jsontext
  * @author Russell Michell 2016 <russ@theruss.com>
  */
 

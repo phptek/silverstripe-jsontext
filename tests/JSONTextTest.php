@@ -26,7 +26,7 @@ class JSONTextTest extends SapphireTest
     /**
      * JSONTextTest constructor.
      * 
-     * Modify fixtures to be able to run on PHP <5.6 without use of constant in class property
+     * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
     {
@@ -262,21 +262,22 @@ class JSONTextTest extends SapphireTest
 
     /**
      * Tests query() by means of path-matching using the Postgres path match operator: '#>' but where duplicate keys exist 
-     * for different parent structures in source data
+     * for different parent structures in the source data
      */
-/*    public function testQuery_MatchPathDuplicate_AsArray()
+    public function testQuery_MatchPathDuplicate_AsArray()
     {
         // Hashed
         $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setValue($this->getFixture('hash_dupes'));
         $field->setReturnType('array');
 
-        $this->assertEquals([["Kawasaki" => "KR1S250"],["Subaru" => "Impreza"]], $field->query('#>', '{"japanese":"fast"}'));
-    }*/
+        $this->assertEquals([["Subaru" => "Impreza"],["Kawasaki" => "KR1S250"]], $field->query('#>', '{"japanese":"fast"}'));
+    }
     
     /**
      * Get the contents of a fixture
      * 
+     * @param string $fixture
      * @return string
      */
     private function getFixture($fixture)
