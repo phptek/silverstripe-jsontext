@@ -24,6 +24,7 @@
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
  * @todo Make the current default of "strict mode" into ss config and default to strict.
+ * @todo Add tests for "minimal" yet valid JSON types e.g. `true`
  */
 
 namespace JSONText\Fields;

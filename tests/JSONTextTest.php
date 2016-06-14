@@ -20,7 +20,8 @@ class JSONTextTest extends SapphireTest
         'invalid'       => 'tests/fixtures/json/invalid.json',
         'hash_deep'     => 'tests/fixtures/json/hash_deep.json',
         'hash_dupes'    => 'tests/fixtures/json/hash_duplicated.json',
-        'empty'         => 'tests/fixtures/json/empty.json'
+        'empty'         => 'tests/fixtures/json/empty.json',
+        'minimal_bool'  => 'tests/fixtures/json/minimal_bool.json'
     ];
 
     /**
@@ -272,6 +273,23 @@ class JSONTextTest extends SapphireTest
         $field->setReturnType('array');
 
         $this->assertEquals([["Subaru" => "Impreza"],["Kawasaki" => "KR1S250"]], $field->query('#>', '{"japanese":"fast"}'));
+        $this->assertEquals([], $field->query('#>', '{"":"fast"}')); // No match
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $this->assertEquals([], $field->query('#>', 1)); // Bad matcher used
+    }
+
+    /**
+     * Tests query() by means of path-matching using the Postgres path match operator: '#>' but where duplicate keys exist
+     * for different parent structures in the source data
+     */
+    public function testQuery_MatchPathDuplicate_AsJSON()
+    {
+        // Hashed
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('hash_dupes'));
+        $field->setReturnType('json');
+
+        $this->assertEquals('[{"Subaru":"Impreza"},{"Kawasaki":"KR1S250"}]', $field->query('#>', '{"japanese":"fast"}'));
     }
     
     /**
