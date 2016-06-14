@@ -24,12 +24,16 @@
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
  * @todo Make the current default of "strict mode" into ss config and default to strict.
+ * @todo Rename query() to getValue() that accepts optional param $expr (for JSONPath queries)
  * @todo Add tests for "minimal" yet valid JSON types e.g. `true`
+ * @todo Incorporate Currency class in castToDBField()
  */
 
 namespace JSONText\Fields;
 
 use JSONText\Exceptions\JSONTextException;
+use JSONText\Backends;
+use Peekmo\JsonPath\JsonStore;
 
 class JSONText extends \StringField
 {
@@ -52,10 +56,19 @@ class JSONText extends \StringField
      */
     private static $allowed_operators = [
         'postgres' => [
-            'matchIfKeyIsInt'   => '->',
-            'matchIfKeyIsStr'   => '->>',
-            'matchOnPath'       => '#>'
+            'matchOnInt'    => '->',
+            'matchOnStr'    => '->>',
+            'matchOnPath'   => '#>'
         ]
+    ];
+
+    /**
+     * Legitimate query return types
+     * 
+     * @var array
+     */
+    private static $return_types = [
+        'json', 'array', 'silverstripe'
     ];
 
     /**
@@ -64,24 +77,9 @@ class JSONText extends \StringField
     protected $returnType = 'json';
 
     /**
-     * Object cache for performance improvements.
-     * 
-     * @var \RecursiveIteratorIterator
+     * @var \Peekmo\JsonPath\JsonStore
      */
-    protected $data;
-
-    /**
-     * @var array
-     */
-    protected $cache = [];
-
-    /**
-     * @param string $val
-     * @return void
-     */
-    public function updateCache($val) {
-        $this->cache[] = $val;
-    }
+    protected $jsonStore;
 
     /**
      * Taken from {@link TextField}.
@@ -125,7 +123,7 @@ class JSONText extends \StringField
     }
 
     /**
-     * Tell all class methods to return data as JSON or an array.
+     * Tell all class methods to return data as JSON , an array or an array of SilverStripe DBField subtypes.
      * 
      * @param string $type
      * @return \JSONText
@@ -133,12 +131,14 @@ class JSONText extends \StringField
      */
     public function setReturnType($type)
     {
-        if (!in_array($type, ['json', 'array'])) {
+        if (!in_array($type, $this->config()->return_types)) {
             $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
             throw new JSONTextException($msg);
         }
         
         $this->returnType = $type;
+        
+        return $this;
     }
 
     /**
@@ -152,10 +152,10 @@ class JSONText extends \StringField
     /**
      * Returns the value of this field as an iterable.
      * 
-     * @return mixed
+     * @return \Peekmo\JsonPath\JsonStore
      * @throws \JSONText\Exceptions\JSONTextException
      */
-    public function getValueAsIterable()
+    public function getJSONStore()
     {
         if (!$json = $this->getValue()) {
             return [];
@@ -166,24 +166,24 @@ class JSONText extends \StringField
             throw new JSONTextException($msg);
         }
 
-        if (!$this->data) {
-            $this->data = new \RecursiveIteratorIterator(
-                new \RecursiveArrayIterator(json_decode($json, true)),
-                \RecursiveIteratorIterator::SELF_FIRST
-            );
-        }
+        $this->jsonStore = new \Peekmo\JsonPath\JsonStore($json);
         
-        return $this->data;
+        return $this->jsonStore;
     }
 
     /**
-     * Returns the value of this field as a flattened array
+     * Returns the JSON value of this field as an array.
      *
      * @return array
      */
-    public function getValueAsArray()
+    public function getStoreAsArray()
     {
-        return iterator_to_array($this->getValueAsIterable());
+        $store = $this->getJSONStore();
+        if (!is_array($store)) {
+            return $store->toArray();
+        }
+        
+        return $store;
     }
 
     /**
@@ -198,10 +198,12 @@ class JSONText extends \StringField
     }
 
     /**
+     * Convert an array to JSON via json_encode().
+     * 
      * @param array $value
      * @return mixed null|string
      */
-    public function toJson($value)
+    public function toJson(array $value)
     {
         if (!is_array($value)) {
             $value = (array) $value;
@@ -212,6 +214,31 @@ class JSONText extends \StringField
         );
         
         return json_encode($value, $opts);
+    }
+    
+    /**
+     * Convert an array's values into an array of SilverStripe DBField subtypes ala:
+     * 
+     * - {@link Int}
+     * - {@link Float}
+     * - {@link Boolean}
+     * - {@link Varchar}
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function toSSTypes(array $data)
+    {
+        $newList = [];
+        foreach ($data as $key => $val) {
+            if (is_array($val)) {
+                $newList[$key] = $this->toSSTypes($val);
+            } else {
+                $newList[$key] = $this->castToDBField($val);
+            }
+        }
+        
+        return $newList;
     }
 
     /**
@@ -238,16 +265,16 @@ class JSONText extends \StringField
      */
     public function first()
     {
-        $data = $this->getValueAsIterable();
+        $data = $this->getStoreAsArray();
         
         if (!$data) {
             return $this->returnAsType([]);
         }
 
-        $flattened = iterator_to_array($data, true);
-        return $this->returnAsType([
-                array_keys($flattened)[0] => array_values($flattened)[0]
-            ]);
+        $key = array_keys($data)[0];
+        $val = array_values($data)[0];
+
+        return $this->returnAsType([$key => $val]);
     }
 
     /**
@@ -257,16 +284,17 @@ class JSONText extends \StringField
      */
     public function last()
     {
-        $data = $this->getValueAsIterable();
+        $data = $this->getStoreAsArray();
 
         if (!$data) {
             return $this->returnAsType([]);
         }
 
-        $flattened = iterator_to_array($data, true);
-        return $this->returnAsType([
-                array_keys($flattened)[count($flattened) -1] => array_values($flattened)[count($flattened) -1]
-            ]);
+        $count = count($data) -1;
+        $key = array_keys($data)[$count];
+        $val = array_values($data)[$count];
+
+        return $this->returnAsType([$key => $val]);
     }
 
     /**
@@ -278,7 +306,7 @@ class JSONText extends \StringField
      */
     public function nth($n)
     {
-        $data = $this->getValueAsIterable();
+        $data = $this->getStoreAsArray();
 
         if (!$data) {
             return $this->returnAsType([]);
@@ -311,7 +339,7 @@ class JSONText extends \StringField
      */
     public function query($operator, $operand)
     {
-        $data = $this->getValueAsIterable();
+        $data = $this->getStoreAsArray();
         
         if (!$data) {
             return $this->returnAsType([]);
@@ -321,14 +349,9 @@ class JSONText extends \StringField
             $msg = 'JSON operator: ' . $operator . ' is invalid.';
             throw new JSONTextException($msg);
         }
-        
-        $i = 0;
-        foreach ($data as $key => $val) {
-            if ($marshalled = $this->marshallQuery($key, $val, $i, func_get_args())) {
-                return $this->returnAsType($marshalled);
-            }
-            
-            $i++;
+
+        if ($marshalled = $this->marshallQuery(func_get_args())) {
+            return $this->returnAsType($marshalled);
         }
 
         return $this->returnAsType([]);
@@ -356,12 +379,13 @@ class JSONText extends \StringField
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException
      */
-    private function marshallQuery($key, $val, $idx, $args)
+    private function marshallQuery($args)
     {
         $backend = $this->config()->backend;
         $operator = $args[0];
         $operand = $args[1];
         $operators = $this->config()->allowed_operators[$backend];
+        $dbBackend = ucfirst($backend) . 'JSONBackend';
         
         if (!in_array($operator, $operators)) {
             $msg = 'Invalid ' . $backend . ' operator: ' . $operator . ', used for JSON query.';
@@ -370,10 +394,7 @@ class JSONText extends \StringField
         
         foreach ($operators as $routine => $backendOperator) {
             $backendDBApiInst = \Injector::inst()->createWithArgs(
-                '\JSONText\Backends\JSONBackend', [
-                    $key, 
-                    $val, 
-                    $idx,
+                '\JSONText\Backends\\' . $dbBackend, [
                     $operand,
                     $this
                 ]);
@@ -389,18 +410,40 @@ class JSONText extends \StringField
     /**
      * Determine the desired userland format to return all query API method results in.
      * 
-     * @param mixed array|\Iterator $data
+     * @param mixed
      * @return mixed
+     * @throws \JSONText\Exceptions\JSONTextException
      */
-    private function returnAsType(array $data)
+    private function returnAsType($data)
     {
-        if (($this->getReturnType() === 'array')) {
+        $data = (array) $data;
+        $type = $this->getReturnType();
+        if ($type === 'array') {
+            if (!count($data)) {
+                return [];
+            }
+            
             return $data;
         }
 
-        if (($this->getReturnType() === 'json')) {
+        if ($type === 'json') {
+            if (!count($data)) {
+                return '[]';
+            }
+            
             return $this->toJson($data);
         }
+
+        if ($type === 'silverstripe') {
+            if (!count($data)) {
+                return null;
+            }
+            
+            return $this->toSSTypes($data);
+        }
+        
+        $msg = 'Bad argument passed to ' . __FUNCTION__;
+        throw new JSONTextException($msg);
     }
 
     /**
@@ -414,6 +457,29 @@ class JSONText extends \StringField
         $backend = $this->config()->backend;
 
         return $operator && in_array($operator, $this->config()->allowed_operators[$backend], true);
+    }
+    
+    /**
+     * Casts a value to a {@link DBField} subclass.
+     * 
+     * @param mixed $val
+     * @return mixed DBField|array
+     */
+    private function castToDBField($val)
+    {
+        if (is_float($val)) {
+            return \DBField::create_field('Float', $val);
+        } else if (is_bool($val)) {
+            $value = ($val === true ? 1 : 0); // *mutter....*
+            return \DBField::create_field('Boolean', $value);
+        } else if (is_int($val)) {
+            return \DBField::create_field('Int', $val);
+        } else if (is_string($val)) {
+            return \DBField::create_field('Varchar', $val);
+        } else {
+            // Default to just returnign empty val (castToDBField() is used exclusively from within a loop)
+            return $val;
+        }
     }
 
 }
