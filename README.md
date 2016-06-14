@@ -44,7 +44,7 @@ Note: The module default is to use `postgres` which is also the only backend tha
 ## Installation
 
 ```bash
-#> composer require phptek/silverstripe-jsontext
+#> composer require phptek/jsontext dev-master
 ```
 
 ## Stability
