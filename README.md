@@ -32,7 +32,7 @@ I'm a reasonable man however, and am prepared for a discussion on it, if any wer
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
-the module into `mysql` or `postgres` mode using SS config, see [Configuration Docs](configuration.md).
+the module into `mysql` or `postgres` mode using SS config, see [Configuration Docs](docs/en/configuration.md).
 
 ## Installation
 
@@ -41,6 +41,10 @@ the module into `mysql` or `postgres` mode using SS config, see [Configuration D
 ## Configuration
 
 See: [Configuration Docs](docs/en/configuration.md).
+
+## Usage
+
+See: [Usage Docs](docs/en/usage.md). 
 
 ## Stability
 
@@ -61,10 +65,6 @@ See: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Please include all details, no matter how small. If it were *your module*, what would you need to know from a bug/reature request? :-)
 
-## Usage
-
-See: [Usage Docs](docs/en/usage.md).
- 
 ## TODO
 
 * Lose the fugly way that data is queried via `$this->dbObject()`

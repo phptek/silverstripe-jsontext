@@ -1,12 +1,6 @@
 # Usage
 
-The module can be put into `mysql` or `postgres` query mode using SS config thus:
-
-
-    JSONText:
-      backend: mysql
-
-You can also stipulate what format you want your query results back as; JSON or Array, thus:
+You can stipulate what format you want your query results back as via passing one of **json** or **array** to `setReturnType()`, thus:
 
     // JSON
     $field = JSONText\Fields\JSONText::create('MyJSON');
@@ -18,10 +12,7 @@ You can also stipulate what format you want your query results back as; JSON or 
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('array');
 
-## Examples
-
-In the examples below, if you pass invalid queries or malformed JSON (where applicable) an exception is thrown.
-
+In the examples below, if you pass invalid queries or malformed JSON (where applicable) an instnce of `JSONTextException` is thrown.
 
     class MyDataObject extends DataObject
     {
@@ -52,3 +43,34 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
          */
         public function getNthJSONVal($n)
         {
+            return $this->dbObject('MyJSON')->nth($n);
+        }
+        
+        /**
+         * Returns a key=>value pair based on a strict integer -> key match.
+         * If a string is passed, an empty array is returned.
+         */
+        public function getNestedByIntKey($int)
+        {
+            return $this->dbObject('MyJSON')->query('->', $int);
+        }
+        
+        /**
+         * Returns a key=>value pair based on a strict string -> key match.
+         * If an integer is passed, an empty array is returned.
+         */
+        public function getNestedByStrKey($str)
+        {
+            return $this->dbObject('MyJSON')->query('->>', $str);
+        }
+        
+        /**
+         * Returns a value based on a strict string/int match of the key-as-array
+         * Given source JSON ala: '{"a": {"b":{"c": "foo"}}}' will return '{"c": "foo"}'
+         */
+        public function getByPathMatch('{"a":"b"}')
+        {
+            return $this->dbObject('MyJSON')->query('#>', '{"a":"b"}'; 
+        }
+        
+    }
