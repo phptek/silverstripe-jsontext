@@ -8,9 +8,9 @@ JSON storage and querying.
 
 ## Requirements
 
-PHP 5.4+
-SilverStripe Framework 3.1+
-SilverStripe CMS 3.1+
+* PHP 5.4+
+* SilverStripe Framework 3.1+
+* SilverStripe CMS 3.1+
 
 ## Introduction
 
@@ -32,18 +32,15 @@ I'm a reasonable man however, and am prepared for a discussion on it, if any wer
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
-the module into `mysql` or `postgres` mode using SS config:
-
-
-    JSONText:
-      backend: postgres
-
-
-Note: The module default is to use `postgres` which is also the only backend that will work at the moment.
+the module into `mysql` or `postgres` mode using SS config, see [Configuration Docs](configuration.md).
 
 ## Installation
 
     #> composer require phptek/jsontext dev-master
+
+## Configuration
+
+See: [Configuration Docs](configuration.md).
 
 ## Stability
 
@@ -58,96 +55,16 @@ This leads me to..
 If you've been using Postgres or MySQL with its JSON functions for some time,
 I'm keen to hear from you. Some simple failing tests would be most welcome.
 
-See: [CONTRIBUTING.md](CONTRIBUTING.md)
+See: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Reporting an issue
 
-I shouldn't need to tell you what I need in a bug report. If it were *your module*, what would you need to know? :-)
+Please include all details, no matter how small. If it were *your module*, what would you need to know from a bug/reature request? :-)
 
 ## Usage
 
-The module can be put into `mysql` or `postgres` query mode using SS config thus:
-
-
-    JSONText:
-      backend: mysql
-
-You can also stipulate what format you want your results back as; either JSON or Array, thus:
-
-    // JSON
-    $field = JSONText\Fields\JSONText::create('MyJSON');
-    $field->setValue('{"a": {"b":{"c": "foo"}}}');
-    $field->setReturnType('json');
-    
-    // Array
-    $field = JSONText\Fields\JSONText::create('MyJSON');
-    $field->setValue('{"a": {"b":{"c": "foo"}}}');
-    $field->setReturnType('array');
-
-In the examples below, if you pass invalid queries or malformed JSON (where applicable) an exception is thrown.
-
-
-    class MyDataObject extends DataObject
-    {
-    
-        private static $db = [
-            'MyJSON'    => 'JSONText'
-        ];
-    
-        /*
-         * Returns the first key=>value pair found in the source JSON
-         */
-        public function getFirstJSONVal()
-        {
-            return $this->dbObject('MyJSON')->first();
-        }
-    
-        /*
-         * Returns the last key=>value pair found in the source JSON
-         */
-        public function getLastJSONVal()
-        {
-            return $this->dbObject('MyJSON')->last();
-        }
-    
-        /*
-         * Returns the Nth key=>value pair found in the source JSON (Top-level only)
-         * For nested hashes use the int matcher ("->") or string matcher ("->>").
-         */
-        public function getNthJSONVal($n)
-        {
-            return $this->dbObject('MyJSON')->nth($n);
-        }
-        
-        /**
-         * Returns a key=>value pair based on a strict integer -> key match.
-         * If a string is passed, an empty array is returned.
-         */
-        public function getNestedByIntKey($int)
-        {
-            return $this->dbObject('MyJSON')->query('->', $int);
-        }
-        
-        /**
-         * Returns a key=>value pair based on a strict string -> key match.
-         * If an integer is passed, an empty array is returned.
-         */
-        public function getNestedByStrKey($str)
-        {
-            return $this->dbObject('MyJSON')->query('->>', $str);
-        }
-        
-        /**
-         * Returns a value based on a strict string/int match of the key-as-array
-         * Given source JSON ala: '{"a": {"b":{"c": "foo"}}}' will return '{"c": "foo"}'
-         */
-        public function getByPathMatch('{"a":"b"}')
-        {
-            return $this->dbObject('MyJSON')->query('#>', '{"a":"b"}'; 
-        }
-        
-    }
-    
+See: [Usage Docs](usage.md).
+ 
 ## TODO
 
 * Lose the fugly way that data is queried via `$this->dbObject()`
