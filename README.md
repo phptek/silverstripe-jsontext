@@ -34,19 +34,16 @@ It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
 the module into `mysql` or `postgres` mode using SS config:
 
-```yml
-JSONText:
-  backend: postgres
-```
+
+    JSONText:
+      backend: postgres
 
 
 Note: The module default is to use `postgres` which is also the only backend that will work at the moment.
 
 ## Installation
 
-```bash
-#> composer require phptek/jsontext dev-master
-```
+    #> composer require phptek/jsontext dev-master
 
 ## Stability
 
@@ -71,36 +68,32 @@ I shouldn't need to tell you what I need in a bug report. If it were *your modul
 
 The module can be put into `mysql` or `postgres` query mode using SS config thus:
 
-```yml
-JSONText:
-  backend: mysql
-```
+
+    JSONText:
+      backend: mysql
 
 You can also stipulate what format you want your results back as; either JSON or Array, thus:
 
-```php
-
-        // JSON
-        $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue('{"a": {"b":{"c": "foo"}}}');
-        $field->setReturnType('json');
-        
-        // Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue('{"a": {"b":{"c": "foo"}}}');
-        $field->setReturnType('array');
-
-```
+    // JSON
+    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field->setValue('{"a": {"b":{"c": "foo"}}}');
+    $field->setReturnType('json');
+    
+    // Array
+    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field->setValue('{"a": {"b":{"c": "foo"}}}');
+    $field->setReturnType('array');
 
 In the examples below, if you pass invalid queries or malformed JSON (where applicable) an exception is thrown.
 
-```php
+
     class MyDataObject extends DataObject
     {
+    
         private static $db = [
             'MyJSON'    => 'JSONText'
         ];
-        
+    
         /*
          * Returns the first key=>value pair found in the source JSON
          */
@@ -108,7 +101,7 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
         {
             return $this->dbObject('MyJSON')->first();
         }
-        
+    
         /*
          * Returns the last key=>value pair found in the source JSON
          */
@@ -116,7 +109,7 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
         {
             return $this->dbObject('MyJSON')->last();
         }
-        
+    
         /*
          * Returns the Nth key=>value pair found in the source JSON (Top-level only)
          * For nested hashes use the int matcher ("->") or string matcher ("->>").
@@ -152,8 +145,8 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
         {
             return $this->dbObject('MyJSON')->query('#>', '{"a":"b"}'; 
         }
+        
     }
-```
     
 ## TODO
 
