@@ -63,7 +63,7 @@ See: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Reporting an issue
 
-Please include all details, no matter how small. If it were *your module*, what would you need to know from a bug/reature request? :-)
+Please include all details, no matter how small. If it were *your module*, what would you need to know from a bug/feature request? :-)
 
 ## TODO
 

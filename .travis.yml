@@ -35,3 +35,7 @@ before_script:
 
 script:
   - vendor/bin/phpunit jsontext/tests
+
+branches:
+  except:
+    - master-experimental
