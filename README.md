@@ -40,7 +40,7 @@ the module into `mysql` or `postgres` mode using SS config, see [Configuration D
 
 ## Configuration
 
-See: [Configuration Docs](configuration.md).
+See: [Configuration Docs](docs/en/configuration.md).
 
 ## Stability
 
@@ -63,7 +63,7 @@ Please include all details, no matter how small. If it were *your module*, what 
 
 ## Usage
 
-See: [Usage Docs](usage.md).
+See: [Usage Docs](docs/en/usage.md).
  
 ## TODO
 
