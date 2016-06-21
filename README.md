@@ -14,7 +14,8 @@ JSON storage and querying.
 
 ## Introduction
 
-The module exposes a simple query API based on the [JSON operators found in Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
+The module exposes a fully featured JSON query API that allows developers to use either XPath-like queries using [JSONPath](http://goessner.net/articles/JsonPath/)
+or a JSON-aware RDBMS-like syntax such as those found in the [JSON operators of Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
 but with some modifications:
 
 In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
@@ -25,9 +26,26 @@ In Postgress the `#>` path match operator can act as an object or a text matcher
 the `#>` operator is *just a simple path matcher*.
 
 I see nothing but confusion arising if the same operator were to be treated differently
-depending on the specific *type of JSON* stored. 
+depending on the specific *type of JSON* stored. I'm a reasonable man however, and am prepared for a discussion :-)
 
-I'm a reasonable man however, and am prepared for a discussion on it, if any were to be forthcoming.
+Regardless of the type of query in-use you can set what form you'd like the data returned in via the `setReturnType()` method, on a query by query basis. 
+
+Legitimate types are:
+
+* JSON
+* Array
+* SilverStripe
+
+If using `SilverStripe`, the module will automatically cast the result(s) to one of SilverStripe's four native "scalar" `DBObject` subtypes:
+
+* `Boolean`
+* `Int`
+* `Float`
+* `Varchar`
+
+If there are multiple results, the output will be an indexed array containing a single-value array for each result found.
+
+See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres queries.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
@@ -64,6 +82,11 @@ See: [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Reporting an issue
 
 Please include all details, no matter how small. If it were *your module*, what would you need to know from a bug/feature request? :-)
+
+## Credits
+
+* [Axel Anceau](https://github.com/Peekmo/) for his packaging-up of the pretty amazing JSONPath implementation by [Stefan Goessner](https://code.google.com/archive/p/jsonpath/)
+* [Stefan Goessner](https://code.google.com/archive/p/jsonpath/) for the original work on JSONPath dating back to 2005! 
 
 ## TODO
 

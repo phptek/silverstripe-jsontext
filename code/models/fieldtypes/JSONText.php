@@ -3,7 +3,7 @@
 /**
  * Simple text-based database field for storing and querying JSON structured data. 
  * 
- * JSON sub-structures can be queried in a variety of ways using special    operators who's syntax closely mimics those used
+ * JSON sub-structures can be queried in a variety of ways using special operators who's syntax closely mimics those used
  * in native JSON queries in PostGreSQL v9.2+.
  * 
  * Note: The extraction techniques employed here are simple key / value comparisons. They do not use any native JSON
@@ -358,23 +358,8 @@ class JSONText extends \StringField
     }
 
     /**
-     * Alias of self::query().
-     * 
-     * @param string $operator
-     * @return mixed string|array
-     * @throws \JSONText\Exceptions\JSONTextException
-     */
-    public function extract($operator)
-    {
-        return $this->query($operator);
-    }
-
-    /**
      * Based on the passed operator, ensure the correct backend matcher method is called.
-     * 
-     * @param mixed $key
-     * @param mixed $val
-     * @param int $idx
+     *
      * @param array $args
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException

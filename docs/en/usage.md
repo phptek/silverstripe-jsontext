@@ -1,5 +1,9 @@
 # Usage
 
+In the examples below, if you pass invalid queries or malformed JSON (where applicable) an instance of `JSONTextException` is thrown.
+
+## General
+
 You can stipulate what format you want your query results back as via passing one of **json** or **array** to `setReturnType()`, thus:
 
     // JSON
@@ -11,8 +15,12 @@ You can stipulate what format you want your query results back as via passing on
     $field = JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('array');
-
-In the examples below, if you pass invalid queries or malformed JSON (where applicable) an instnce of `JSONTextException` is thrown.
+    
+    // SilverStripe
+    // Will give you Varchar instances for each scalar value
+    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field->setValue('{"a": {"b":{"c": "foo"}}}');
+    $field->setReturnType('silverstripe');
 
     class MyDataObject extends DataObject
     {
@@ -45,7 +53,16 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
         {
             return $this->dbObject('MyJSON')->nth($n);
         }
+    }
+    
+## Postgres Operators  
         
+    class MyOtherDataObject extends DataObject
+    {
+        private static $db = [
+            'MyJSON'    => 'JSONText'
+        ];
+    
         /**
          * Returns a key=>value pair based on a strict integer -> key match.
          * If a string is passed, an empty array is returned.
@@ -74,3 +91,73 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
         }
         
     }
+    
+## JSONPath Expressions
+
+Not implemented yet, but syntax will be very similar to the following example:
+
+    class MyDataObject extends DataObject
+    {
+        /*
+         * @var string
+         */
+         protected $stubJSON = '{ "store": {
+                                    "book": [ 
+                                      { "category": "reference",
+                                        "author": "Nigel Rees",
+                                      },
+                                      { "category": "fiction",
+                                        "author": "Evelyn Waugh",
+                                      }
+                                    ]
+                                }';
+    
+        private static $db = [
+            'MyJSON'    => 'JSONText'
+        ];
+        
+        public function requireDefaultRecords()
+        {
+            parent::requireDefaultRecords();
+            
+            if (!$this->MyJSON) {
+                $this->setValue($this->stubJSON);
+            }
+        }
+        
+        public function doStuffWithMyJSON()
+        {
+            // Query as Array
+            $expr = '$.store.book[*].author'; // The authors of all books in the store 
+            $result = $this->dbObject('MyJSON')->query($expr);
+            $result->setReturnType('array');
+            var_dump($result); // Returns ['Nigel Rees', 'Evelyn Waugh']
+            
+            // Query as Array
+            $expr = '$..book[1]'; // The second book 
+            $result = $this->dbObject('MyJSON')->query($expr);
+            $result->setReturnType('array');
+            var_dump($this->dbObject('MyJSON')->query($expr)); // Returns ['book' => ['category' => 'reference'], ['author' => 'Nigel Rees']]
+            
+            // Query as JSON
+            $expr = '$..book[1]'; // The second book 
+            $result = $this->dbObject('MyJSON')->query($expr);
+            $result->setReturnType('json');
+            var_dump($this->dbObject('MyJSON')->query($expr));
+            /* Returns:
+              {"book": [ 
+                { 
+                    "category": "reference", 
+                    "author": "Nigel Rees", 
+                },
+                { 
+                    "category": "fiction",
+                    "author": "Evelyn Waugh"
+                } ] }
+            */
+        }
+        
+    }
+
+               
+    
