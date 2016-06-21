@@ -1,0 +1,74 @@
+{
+  "cars":{
+    "american":
+      [
+        "buick",
+        "oldsmobile"
+      ],
+    "british": 
+      [
+        "vauxhall",
+        "morris"
+      ],
+    "japanese": {
+      "fast": {
+        "Subaru": "Impreza"
+      },
+      "slow": {
+        "Honda": "Civic"
+      }
+    }
+  },
+  "planes":{
+    "russian":
+      [
+        "antonov",
+        "mig"
+      ],
+    "french":"airbus"
+  },
+  "bikes":{
+    "japanese":{
+      "fast":{
+        "Kawasaki":"KR1S250"
+      },
+      "slow":{
+        "Honda":"FS1"
+      }
+    }
+  },
+  "booleans":[
+    {
+      "beer tastes good": true,
+      "beer is healthy": false
+    }
+  ],
+  "floats":[
+    {
+      "how sure are you": 99.99,
+      "whats a third": 33.3333
+    }
+  ],
+  "ints":[
+    {
+      "how old": 41,
+      "how high": 6
+    }
+  ],
+  "strings":[
+    {
+      "how old": "Fourty One",
+      "how high": "6 foot"
+    }
+  ],
+  "deep":[
+    {
+      "riddles": [
+        {
+          "fast": "how much wood..",
+          "slow": "man talks in the forest is still wrong.."
+        }
+      ]
+    }
+  ]
+}
