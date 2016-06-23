@@ -79,7 +79,7 @@ class PostgresJSONBackend extends JSONBackend
 
         $keys = array_keys($operandAsArray);
         $vals = array_values($operandAsArray);
-        if (count($keys) >1 || count($vals) >1) {
+        if (count($keys) > 1 || count($vals) > 1) {
             $msg = 'Sorry. I can\'t handle complex operands.';
             throw new JSONTextException($msg);
         }

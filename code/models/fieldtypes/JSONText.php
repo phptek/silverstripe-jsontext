@@ -133,7 +133,7 @@ class JSONText extends \StringField
      * Tell all class methods to return data as JSON , an array or an array of SilverStripe DBField subtypes.
      * 
      * @param string $type
-     * @return \JSONText
+     * @return JSONText
      * @throws \JSONText\Exceptions\JSONTextException
      */
     public function setReturnType($type)
@@ -208,7 +208,7 @@ class JSONText extends \StringField
      * Convert an array to JSON via json_encode().
      * 
      * @param array $value
-     * @return mixed null|string
+     * @return string null|string
      */
     public function toJson(array $value)
     {

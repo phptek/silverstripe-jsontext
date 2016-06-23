@@ -6,4 +6,4 @@ checks:
     duplication: true
 
 filter:
-  paths: [code/*]
+  paths: [code/*, tests/*]
