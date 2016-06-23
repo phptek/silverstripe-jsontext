@@ -74,8 +74,6 @@ abstract class JSONBackend
     public function matchOnExpr()
     {
         if (!is_string($this->operand)) {
-            var_dump($this->operand);
-            die;
             $msg = 'Non-string operand passed to: ' . __FUNCTION__;
             throw new JSONTextException($msg);
         }
@@ -83,7 +81,7 @@ abstract class JSONBackend
         // Re-use existing field passed via constructor
         $expr = $this->operand;
         $fetch = $this->jsonText->getJSONStore()->get($expr);
-        if (!$fetch) {
+        if (empty($fetch)) {
             return [];
         }
 

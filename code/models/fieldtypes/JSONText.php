@@ -165,7 +165,7 @@ class JSONText extends \StringField
     public function getJSONStore()
     {
         if (!$json = $this->getValue()) {
-            return [];
+            return new \Peekmo\JsonPath\JsonStore('[]');
         }
         
         if (!$this->isJson($json)) {
@@ -274,7 +274,7 @@ class JSONText extends \StringField
     {
         $data = $this->getStoreAsArray();
         
-        if (!$data) {
+        if (empty($data)) {
             return $this->returnAsType([]);
         }
 
@@ -293,7 +293,7 @@ class JSONText extends \StringField
     {
         $data = $this->getStoreAsArray();
 
-        if (!$data) {
+        if (empty($data)) {
             return $this->returnAsType([]);
         }
 
@@ -315,7 +315,7 @@ class JSONText extends \StringField
     {
         $data = $this->getStoreAsArray();
 
-        if (!$data) {
+        if (empty($data)) {
             return $this->returnAsType([]);
         }
         
@@ -347,8 +347,8 @@ class JSONText extends \StringField
     public function query($operator, $operand = null)
     {
         $data = $this->getStoreAsArray();
-        
-        if (!$data) {
+
+        if (empty($data)) {
             return $this->returnAsType([]);
         }
 
@@ -421,12 +421,12 @@ class JSONText extends \StringField
      * @return JSONText
      * @throws JSONTextException
      */
-    public function setValue($value, $record = null, $expr = null)
+    public function setValue($value, $record = null, $expr = '')
     {
         // Deal with standard SS behaviour
         parent::setValue($value, $record);
         
-        if (!$expr) {
+        if (empty($expr)) {
             $this->value = $value;
         } else {
             if (!$this->isValidExpression($expr)) {
