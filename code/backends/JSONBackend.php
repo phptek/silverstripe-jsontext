@@ -74,7 +74,9 @@ abstract class JSONBackend
     public function matchOnExpr()
     {
         if (!is_string($this->operand)) {
-            $msg = 'Non-string passed to: ' . __FUNCTION__;
+            var_dump($this->operand);
+            die;
+            $msg = 'Non-string operand passed to: ' . __FUNCTION__;
             throw new JSONTextException($msg);
         }
 

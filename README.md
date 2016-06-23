@@ -14,9 +14,9 @@ JSON storage and querying.
 
 ## Introduction
 
-The module exposes a fully featured JSON query API that allows developers to use either XPath-like queries using [JSONPath](http://goessner.net/articles/JsonPath/)
+The module exposes a fully featured JSON query and update API allowing developers to use either XPath-like queries using [JSONPath](http://goessner.net/articles/JsonPath/)
 or a JSON-aware RDBMS-like syntax such as those found in the [JSON operators of Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
-but with some modifications:
+- but with some modifications - to query and update JSON data.
 
 In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
 however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a **String Matcher**

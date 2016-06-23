@@ -67,6 +67,53 @@ class JSONTextSetValueTest extends SapphireTest
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
         $field->setValue(99.99, null, '$[6]'); // Invalid JSON path expression
     }
+
+    /**
+     * Tests JSONText::setValue() by means of a simple JSONPath expression operating on a JSON object
+     * 
+     * Tests performing single and multiple updates
+     */
+    public function testSetValueOnSourceObject()
+    {
+        // Data Source: Object
+        // Return Type: ARRAY
+        // Expression: '$.[2]' The third item
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('array');
+        $field->setValue($this->getFixture('object'));
+        // Assert we cannot use array accessors at the root level of the source JSON _object_
+        $this->assertEmpty($field->query('$.[2]'));
+        // Assert current types and value
+        $this->assertInternalType('array', $field->query('$.cars'));
+        $this->assertCount(1, $field->query('$.cars')); // The "cars" key's value is an object returned as a single value array
+        $this->assertCount(3, $field->query('$.cars')[0]); //...with three classifications of car manufacturer by country
+        $this->assertCount(2, $field->query('$.cars')[0]['british']);
+        $this->assertEquals('morris', $field->query('$.cars')[0]['british'][1]);
+        
+        // Now do a multiple update
+        $newCars = [
+            'american'  => ['ford', 'tesla'],
+            'british'   => ['aston martin', 'austin', 'rover']
+        ];
+
+        $field->setValue($newCars, null, '$.cars');
+        
+        // Assert news types and value
+        $this->assertInternalType('array', $field->query('$.cars'));
+        $this->assertCount(1, $field->query('$.cars')); // The "cars" key's value is an object returned as a single value array
+        $this->assertCount(2, $field->query('$.cars')[0]); //...with three classifications of car manufacturer by country
+        $this->assertCount(3, $field->query('$.cars')[0]['british']);
+        $this->assertEquals('austin', $field->query('$.cars')[0]['british'][1]);
+        
+        // So far we've used JSONPath to identify and update, let's try Postgres operators too
+        // Now do attempt multiple update
+        $newerCars = [
+            'american'   => ['chrysler', 'general motors', 'edsel']
+        ];
+
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $field->setValue($newerCars, null, '{"cars":"american"}'); // setValue() only takes JSONPath expressions
+    }
     
     /**
      * Get the contents of a fixture

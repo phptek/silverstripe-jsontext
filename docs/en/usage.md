@@ -4,7 +4,8 @@ In the examples below, if you pass invalid queries or malformed JSON (where appl
 
 ## General
 
-You can stipulate what format you want your query results back as via passing one of **json** or **array** to `setReturnType()`, thus:
+You can stipulate what format you want your query results back in, by passing one of 
+**json**, **array** or **silverstripe** to the `setReturnType()` method, thus:
 
     // JSON
     $field = JSONText\Fields\JSONText::create('MyJSON');

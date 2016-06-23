@@ -374,7 +374,7 @@ class JSONText extends \StringField
     }
 
     /**
-     * Based on the passed operator or expression, ensure the correct backend matcher method is called.
+     * Based on the passed operator or expression, it marshalls the correct backend matcher method into account.
      *
      * @param array $args
      * @param integer $type
@@ -387,30 +387,19 @@ class JSONText extends \StringField
         $operator = $expression = $args[0];
         $operand = isset($args[1]) ? $args[1] : null;
         $operators = $this->config()->allowed_operators[$backend];
-        $dbBackend = ucfirst($backend) . 'JSONBackend';
         $operatorParamIsValid = $type === self::JSONTEXT_QUERY_OPERATOR;
         $expressionParamIsValid = $type === self::JSONTEXT_QUERY_JSONPATH;
         
         if ($operatorParamIsValid) {
+            $dbBackendInst = $this->createBackendInst($operand);
             foreach ($operators as $routine => $backendOperator) {
-                $backendDBApiInst = \Injector::inst()->createWithArgs(
-                    '\JSONText\Backends\\' . $dbBackend, [
-                    $operand,
-                    $this
-                ]);
-
-                if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {
+                if ($operator === $backendOperator && $result = $dbBackendInst->$routine()) {
                     return $result;
                 }
             }
         } else if($expressionParamIsValid) {
-            $backendDBApiInst = \Injector::inst()->createWithArgs(
-                '\JSONText\Backends\\' . $dbBackend, [
-                $expression,
-                $this
-            ]);
-            
-            if ($result = $backendDBApiInst->matchOnExpr()) {
+            $dbBackendInst = $this->createBackendInst($expression);
+            if ($result = $dbBackendInst->matchOnExpr()) {
                 return $result;
             }
         }
@@ -422,6 +411,9 @@ class JSONText extends \StringField
      * Same as standard setValue() method except we can also accept a JSONPath expression. This expression will
      * conditionally update the parts of the field's source JSON referenced by $expr with $value
      * then re-set the entire JSON string as the field's new value.
+     * 
+     * Note: The $expr parameter can only accept JSONPath expressions. Using Postgres operators will not work and will
+     * throw an instance of JSONTextException.
      *
      * @param mixed $value
      * @param array $record
@@ -490,6 +482,24 @@ class JSONText extends \StringField
         
         $msg = 'Bad argument passed to ' . __FUNCTION__;
         throw new JSONTextException($msg);
+    }
+    
+    /**
+     * Create an instance of {@link JSONBackend} according to the value of JSONText::backend defined by SS config.
+     * 
+     * @param string operand
+     * @return JSONBackend
+     */
+    protected function createBackendInst($operand)
+    {
+        $backend = $this->config()->backend;
+        $dbBackendClass = ucfirst($backend) . 'JSONBackend';
+        
+        return \Injector::inst()->createWithArgs(
+            '\JSONText\Backends\\' . $dbBackendClass, [
+            $operand,
+            $this
+        ]);
     }
 
     /**
@@ -561,15 +571,4 @@ class JSONText extends \StringField
         }
     }
 
-}
-
-/**
- * @package silverstripe-jsontext
- * @author Russell Michell 2016 <russ@theruss.com>
- */
-
-namespace JSONText\Exceptions;
-
-class JSONTextException extends \Exception
-{
 }
