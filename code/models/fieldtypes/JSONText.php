@@ -23,10 +23,7 @@
  * @package silverstripe-jsontext
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
- * @todo Make the current default of "strict mode" into ss config and default to strict.
  * @todo Rename query() to getValue() that accepts optional param $expr (for JSONPath queries)
- * @todo Add tests for "minimal" yet valid JSON types e.g. `true`
- * @todo Incorporate Currency class in castToDBField()
  */
 
 namespace JSONText\Fields;
@@ -37,6 +34,16 @@ use Peekmo\JsonPath\JsonStore;
 
 class JSONText extends \StringField
 {
+    /**
+     * @var int
+     */
+    const JSONTEXT_QUERY_OPERATOR = 1;
+
+    /**
+     * @var int
+     */
+    const JSONTEXT_QUERY_JSONPATH = 2;
+    
     /**
      * Which RDBMS backend are we using? The value set here changes the actual operators and operator-routines for the
      * given backend.
@@ -63,7 +70,7 @@ class JSONText extends \StringField
     ];
 
     /**
-     * Legitimate query return types
+     * Legitimate query return types.
      * 
      * @var array
      */
@@ -332,25 +339,34 @@ class JSONText extends \StringField
      * Return the key(s) + value(s) represented by $operator extracting relevant result from the source JSON's structure.
      * N.b when using the path match operator '#>' with duplicate keys, an indexed array of results is returned.
      *
-     * @param string $operator
+     * @param string $operator One of the legitimate operators for the current backend or a valid JSONPath expression.
      * @param string $operand
      * @return mixed null|array
      * @throws \JSONText\Exceptions\JSONTextException
      */
-    public function query($operator, $operand)
+    public function query($operator, $operand = null)
     {
         $data = $this->getStoreAsArray();
         
         if (!$data) {
             return $this->returnAsType([]);
         }
+
+        $isOp = ($operand && $this->isOperator($operator));
+        $isEx = (is_null($operand) && $this->isExpression($operator));
         
-        if (!$this->isValidOperator($operator)) {
+        if ($isOp && !$this->isValidOperator($operator)) {
             $msg = 'JSON operator: ' . $operator . ' is invalid.';
             throw new JSONTextException($msg);
         }
 
-        if ($marshalled = $this->marshallQuery(func_get_args())) {
+        if ($isEx && !$this->isValidExpression($operator)) {
+            $msg = 'JSON expression: ' . $operator . ' is invalid.';
+            throw new JSONTextException($msg);
+        }
+
+        $validType = ($isEx ? self::JSONTEXT_QUERY_JSONPATH : self::JSONTEXT_QUERY_OPERATOR);
+        if ($marshalled = $this->marshallQuery(func_get_args(), $validType)) {
             return $this->returnAsType($marshalled);
         }
 
@@ -358,38 +374,83 @@ class JSONText extends \StringField
     }
 
     /**
-     * Based on the passed operator, ensure the correct backend matcher method is called.
+     * Based on the passed operator or expression, ensure the correct backend matcher method is called.
      *
      * @param array $args
+     * @param integer $type
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException
      */
-    private function marshallQuery($args)
+    private function marshallQuery($args, $type = 1)
     {
         $backend = $this->config()->backend;
-        $operator = $args[0];
-        $operand = $args[1];
+        $operator = $expression = $args[0];
+        $operand = isset($args[1]) ? $args[1] : null;
         $operators = $this->config()->allowed_operators[$backend];
         $dbBackend = ucfirst($backend) . 'JSONBackend';
+        $operatorParamIsValid = $type === self::JSONTEXT_QUERY_OPERATOR;
+        $expressionParamIsValid = $type === self::JSONTEXT_QUERY_JSONPATH;
         
-        if (!in_array($operator, $operators)) {
-            $msg = 'Invalid ' . $backend . ' operator: ' . $operator . ', used for JSON query.';
-            throw new JSONTextException($msg);
-        }
-        
-        foreach ($operators as $routine => $backendOperator) {
-            $backendDBApiInst = \Injector::inst()->createWithArgs(
-                '\JSONText\Backends\\' . $dbBackend, [
+        if ($operatorParamIsValid) {
+            foreach ($operators as $routine => $backendOperator) {
+                $backendDBApiInst = \Injector::inst()->createWithArgs(
+                    '\JSONText\Backends\\' . $dbBackend, [
                     $operand,
                     $this
                 ]);
+
+                if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {
+                    return $result;
+                }
+            }
+        } else if($expressionParamIsValid) {
+            $backendDBApiInst = \Injector::inst()->createWithArgs(
+                '\JSONText\Backends\\' . $dbBackend, [
+                $expression,
+                $this
+            ]);
             
-            if ($operator === $backendOperator && $result = $backendDBApiInst->$routine()) {
-               return $result;
+            if ($result = $backendDBApiInst->matchOnExpr()) {
+                return $result;
             }
         }
         
         return [];
+    }
+
+    /**
+     * Same as standard setValue() method except we can also accept a JSONPath expression. This expression will
+     * conditionally update the parts of the field's source JSON referenced by $expr with $value
+     * then re-set the entire JSON string as the field's new value.
+     *
+     * @param mixed $value
+     * @param array $record
+     * @param string $expr  A valid JSONPath expression.
+     * @return JSONText
+     * @throws JSONTextException
+     */
+    public function setValue($value, $record = null, $expr = null)
+    {
+        // Deal with standard SS behaviour
+        parent::setValue($value, $record);
+        
+        if (!$expr) {
+            $this->value = $value;
+        } else {
+            if (!$this->isValidExpression($expr)) {
+                $msg = 'Invalid JSONPath expression: ' . $expr . ' passed to ' . __FUNCTION__;
+                throw new JSONTextException($msg);
+            }
+            
+            if (!$this->jsonStore->set($expr, $value)) {
+                $msg = 'Failed to properly set custom data to the JSONStore in ' . __FUNCTION__;
+                throw new JSONTextException($msg);
+            }
+
+            $this->value = $this->jsonStore->toString();
+        }
+        
+        return $this;
     }
 
     /**
@@ -441,7 +502,40 @@ class JSONText extends \StringField
     {
         $backend = $this->config()->backend;
 
-        return $operator && in_array($operator, $this->config()->allowed_operators[$backend], true);
+        return $operator && in_array(
+            $operator, 
+            $this->config()->allowed_operators[$backend],
+            true
+        );
+    }
+
+    /**
+     * @param string $arg
+     * @return bool
+     */
+    private function isExpression($arg)
+    {
+        return (bool) preg_match("#^\\$\.#", $arg);
+    }
+
+    /**
+     * @param string $arg
+     * @return bool
+     */
+    public function isOperator($arg)
+    {
+        return !$this->isExpression($arg);
+    }
+    
+    /**
+     * Is the passed JSON expression valid?
+     *
+     * @param string $expr
+     * @return boolean
+     */
+    public function isValidExpression($expr)
+    {
+        return (bool) preg_match("#^\\$\.#", $expr);
     }
     
     /**
@@ -462,7 +556,7 @@ class JSONText extends \StringField
         } else if (is_string($val)) {
             return \DBField::create_field('Varchar', $val);
         } else {
-            // Default to just returnign empty val (castToDBField() is used exclusively from within a loop)
+            // Default to just returning empty val (castToDBField() is used exclusively from within a loop)
             return $val;
         }
     }

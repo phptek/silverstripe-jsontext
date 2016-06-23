@@ -5,7 +5,6 @@
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
  * @todo Add tests where source data is a JSON array, not just a JSON object
- * @todo Split tests into discreet types
  * @todo $this->clearFixtures(); in setUp()
  * @todo Use same source data instead of repeating for each test
  * @todo See the PHPUnit @dataProvider annotaton ala
@@ -406,6 +405,73 @@ class JSONTextQueryTest extends SapphireTest
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(['Kawasaki' => 'KR1S250'], $field->query('#>', '{"japanese":"fast"'));
+    }
+
+    /**
+     * Tests query() by means of JSONPath expressions.
+     * N.b. only a minimum no. tests should be required, given that the 3rd party lib via which this functionality
+     * is derived, is itself well tested.
+     */
+    public function testQueryWithMatchOnExpr()
+    {
+        // Data Source: Object
+        // Return Type: ARRAY
+        // Expression: "$.." (Everything)
+        // Expect: Array, obviously due to no. nodes in the source JSON
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('array');
+        $field->setValue($this->getFixture('object'));
+        $this->assertInternalType('array', $field->query('$..'));
+        $this->assertCount(25, $field->query('$..'));
+
+        // Data Source: Object
+        // Return Type: ARRAY
+        // Expression: "$..japanese[*]" (An array of children of all keys matching "japanese")
+        // Expect: Array
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('array');
+        $field->setValue($this->getFixture('object'));
+        $this->assertCount(4, $field->query('$..japanese[*]'));
+        $this->assertEquals([
+            ['Subaru' => 'Impreza'],
+            ['Honda' => 'Civic'],
+            ['Kawasaki' => 'KR1S250'],
+            ['Honda' => 'FS1']
+        ], $field->query('$..japanese[*]'));
+
+        // Data Source: Object
+        // Return Type: JSON
+        // Expression: "$..japanese[*]" (An array of children of all keys matching "japanese")
+        // Expect: JSON Array of JSON objects
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('json');
+        $field->setValue($this->getFixture('object'));
+        $this->assertEquals(
+            '[{"Subaru":"Impreza"},{"Honda":"Civic"},{"Kawasaki":"KR1S250"},{"Honda":"FS1"}]',
+            $field->query('$..japanese[*]')
+        );
+
+        // Data Source: Object
+        // Return Type: Array
+        // Expression: "$.cars.american[*]" (All entries in the american cars node)
+        // Expect: Array
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('array');
+        $field->setValue($this->getFixture('object'));
+        $this->assertEquals(['buick', 'oldsmobile'], $field->query('$.cars.american[*]'));
+        $this->assertEquals(['buick'], $field->query('$.cars.american[0]'));
+
+        // Data Source: Object
+        // Return Type: Array
+        // Expression: "$.cars.american[*]" (All entries in the american cars node)
+        // Expect: Array 0f SilverStripe types
+        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('silverstripe');
+        $field->setValue($this->getFixture('object'));
+        $this->assertInternalType('array', $field->query('$.cars.american[*]'));
+        $this->assertCount(2, $field->query('$.cars.american[*]'));
+        $this->assertInstanceOf('Varchar', $field->query('$.cars.american[*]')[0]);
+        $this->assertEquals('buick', $field->query('$.cars.american[*]')[0]->getValue());
     }
     
     /**

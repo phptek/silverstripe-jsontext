@@ -37,5 +37,6 @@ script:
   - vendor/bin/phpunit jsontext/tests
 
 branches:
-  except:
-    - master-experimental
+  only: 
+    - master
+    - develop

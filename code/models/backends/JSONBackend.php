@@ -42,7 +42,7 @@ abstract class JSONBackend
     }
     
     /**
-     * Match on keys by INT.
+     * Match on keys by INT. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
      * @throws JSONTextException
@@ -50,7 +50,7 @@ abstract class JSONBackend
     abstract public function matchOnInt();
 
     /**
-     * Match on keys by STRING.
+     * Match on keys by STRING. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
      * @throws JSONTextException
@@ -58,11 +58,34 @@ abstract class JSONBackend
     abstract function matchOnStr();
 
     /**
-     * Match on path. If >1 matches are found, an indexed array of all matches is returned.
+     * Match on RDBMS-specific path operator. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
      * @throws \JSONText\Exceptions\JSONTextException
      */
     abstract public function matchOnPath();
+
+    /**
+     * Match on JSONPath expression. If >1 matches are found, an indexed array of all matches is returned.
+     *
+     * @return array
+     * @throws JSONTextException
+     */
+    public function matchOnExpr()
+    {
+        if (!is_string($this->operand)) {
+            $msg = 'Non-string passed to: ' . __FUNCTION__;
+            throw new JSONTextException($msg);
+        }
+
+        // Re-use existing field passed via constructor
+        $expr = $this->operand;
+        $fetch = $this->jsonText->getJSONStore()->get($expr);
+        if (!$fetch) {
+            return [];
+        }
+
+        return $fetch;
+    }
     
 }
