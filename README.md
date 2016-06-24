@@ -17,18 +17,16 @@ JSON storage, querying and modification.
 * Write JSON to a standard `DBField` subclass.
 * Query JSON via simple accessors, Postgres-like operators or JSONPath expressions.
 * Selectively return data as JSON, Arrays or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
-* Selectively update specific portions of your source JSON, using JSPNPath expressions.
+* Selectively update specific portions of your source JSON, using JSONPath expressions.
 
 ## Introduction
 
-The module exposes a fully featured JSON query and update API allowing developers to use either XPath-like queries using [JSONPath](http://goessner.net/articles/JsonPath/)
-or a JSON-aware RDBMS-like syntax such as those found in the [JSON operators of Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html), but with some differences, to query and update JSON data.
+The module exposes a fully featured JSON query and update API, that allows developers to use XPath-like queries via [JSONPath](http://goessner.net/articles/JsonPath/)
+or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functions-json.html) (with some differences, see below) to query and update JSON data.
 
 In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
 however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a **String Matcher**
-*regardless* of the "type" of source JSON stored.
-
-In Postgress the `#>` path match operator can act as an object or a text matcher, but the module wishes to simplify things and as such
+*regardless* of the "type" of source JSON stored. The `#>` **Path Matcher** operator can act as an object or a text matcher, but the module wishes to simplify things and as such
 the `#>` operator is *just a simple path matcher*.
 
 Regardless of the type of query in-use you can set what form you'd like the data returned in via the `setReturnType()` method, on a query by query basis. 
@@ -39,7 +37,7 @@ Legitimate types are:
 * Array
 * SilverStripe
 
-If using `SilverStripe`, the module will automatically cast the result(s) to one of SilverStripe's four native "scalar" `DBObject` subtypes:
+If using `SilverStripe`, the module will automatically cast the result(s) to one of SilverStripe's `DBObject` subtypes:
 
 * `Boolean`
 * `Int`
@@ -53,7 +51,7 @@ The module also allows developers to selectively *update* all, or just parts of 
 See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres queries and updating.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
-It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
+It does *not* use Postgres' or MySQL's native JSON operators at or below the level of the ORM. The aim however 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
 the module into `mysql` or `postgres` mode using SS config, see [Configuration Docs](docs/en/configuration.md).
 
