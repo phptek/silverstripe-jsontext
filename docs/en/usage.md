@@ -1,28 +1,49 @@
 # Usage
 
-In the examples below, if you pass invalid queries or malformed JSON (where applicable) an instance of `JSONTextException` is thrown.
+In the examples below, if you pass invalid queries, expressions or malformed JSON (where applicable) an instance of `JSONTextException` is thrown.
 
 ## General
 
 You can stipulate what format you want your query results back in, by passing one of 
 **json**, **array** or **silverstripe** to the `setReturnType()` method, thus:
 
-    // JSON
+**JSON**
+```
     $field = JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('json');
-    
-    // Array
+```
+
+**Array**
+```
     $field = JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('array');
-    
-    // SilverStripe
+```
+
+**SilverStripe**
+```
     // Will give you Varchar instances for each scalar value
     $field = JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('silverstripe');
+```
 
+The module's overloaded declaration of the standard SS `setValue()` method is also chainable for a slightly
+cleaner syntax:
+
+**Chaining**
+```
+    $field = JSONText\Fields\JSONText::create('MyJSON')
+        ->setValue('{"a": {"b":{"c": "foo"}}}')
+        ->setReturnType('array');
+```
+
+## Simple Queries
+
+A small handful of simple query methods `first()`, `last()` and `nth()` exist for when your source JSON is a simple JSON array:
+
+```
     class MyDataObject extends DataObject
     {
     
@@ -47,17 +68,21 @@ You can stipulate what format you want your query results back in, by passing on
         }
     
         /*
-         * Returns the Nth key=>value pair found in the source JSON (Top-level only)
-         * For nested hashes use the int matcher ("->") or string matcher ("->>").
+         * Returns the Nth key=>value pair found in the source JSON
+         * For nested hashes use the Postgres int matcher ("->") or string matcher(s) ("->>").
          */
         public function getNthJSONVal($n)
         {
             return $this->dbObject('MyJSON')->nth($n);
         }
     }
+```
     
-## Postgres Operators  
-        
+## Postgres Operators
+
+You can also use Postgres-like JSON querying syntax, for querying more complex JSON data as nested JSON objects:
+
+```
     class MyOtherDataObject extends DataObject
     {
         private static $db = [
@@ -92,11 +117,16 @@ You can stipulate what format you want your query results back in, by passing on
         }
         
     }
+```
     
 ## JSONPath Expressions
 
-Not implemented yet, but syntax will be very similar to the following example:
+The most power and control over your source JSON comes from using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
+JSONPath is an XPath-like syntax but specific to traversing JSON.
 
+See: [Table of JSONPath expressions](jsonpath.md)
+
+```
     class MyDataObject extends DataObject
     {
         /*
@@ -159,6 +189,54 @@ Not implemented yet, but syntax will be very similar to the following example:
         }
         
     }
+```
 
-               
+## Updating and Modifying JSON
+
+No self-respecting JSON query solution is complete without the ability to selectively modify
+nested JSON data and sub-nodes. The module overloads `setValue()` to accept an optional 3rd parameter, a valid JSONPath
+expression.
+
+If the expression matches >1 JSON nodes, then that result is expressed as an indexed array, and each matching
+node will be modified with the data passed to `setValue()` as the standard `$value` (first) param.
+
+```
+    class MyDataObject extends DataObject
+    {
+            /*
+             * @var string
+             */
+             protected $stubJSON = '{ "store": {
+                                        "book": [ 
+                                          { "category": "reference",
+                                            "author": "Nigel Rees",
+                                          },
+                                          { "category": "fiction",
+                                            "author": "Evelyn Waugh",
+                                          }
+                                        ]
+                                    }';
+        
+            private static $db = [
+                'MyJSON'    => 'JSONText'
+            ];
+            
+            public function requireDefaultRecords()
+            {
+                parent::requireDefaultRecords();
+                
+                if (!$this->MyJSON) {
+                    $this->setValue($this->stubJSON);
+                }
+            }
     
+            // Perform a multiple node update
+            $newReference = [
+                'category'  => "new-age",
+                'author'    => "Lucy Lastic"
+            ];
+    
+            $field->setValue($newReference, null, '$.store.book.[0]');
+    
+    }
+```

@@ -15,8 +15,7 @@ JSON storage and querying.
 ## Introduction
 
 The module exposes a fully featured JSON query and update API allowing developers to use either XPath-like queries using [JSONPath](http://goessner.net/articles/JsonPath/)
-or a JSON-aware RDBMS-like syntax such as those found in the [JSON operators of Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html),
-- but with some modifications - to query and update JSON data.
+or a JSON-aware RDBMS-like syntax such as those found in the [JSON operators of Postgres v9.2+](https://www.postgresql.org/docs/9.5/static/functions-json.html), but with some differences, to query and update JSON data.
 
 In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
 however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a **String Matcher**
@@ -24,9 +23,6 @@ however treats both source types the same - they are after all *both JSON* so `-
 
 In Postgress the `#>` path match operator can act as an object or a text matcher, but the module wishes to simplify things and as such
 the `#>` operator is *just a simple path matcher*.
-
-I see nothing but confusion arising if the same operator were to be treated differently
-depending on the specific *type of JSON* stored. I'm a reasonable man however, and am prepared for a discussion :-)
 
 Regardless of the type of query in-use you can set what form you'd like the data returned in via the `setReturnType()` method, on a query by query basis. 
 
@@ -45,7 +41,9 @@ If using `SilverStripe`, the module will automatically cast the result(s) to one
 
 If there are multiple results, the output will be an indexed array containing a single-value array for each result found.
 
-See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres queries.
+The module also allows developers to selectively *update* all, or just parts of the source JSON, via JSONPath expressions.
+
+See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres queries and updating.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's JSON operators at the ORM level. The aim however 
