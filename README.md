@@ -4,13 +4,20 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/?branch=master)
 [![License](https://poser.pugx.org/phptek/jsontext/license.svg)](https://github.com/phptek/silverstripe-jsontext/blob/master/LICENSE.md)
 
-JSON storage and querying.
+JSON storage, querying and modification.
 
 ## Requirements
 
 * PHP 5.4+
 * SilverStripe Framework 3.1+
 * SilverStripe CMS 3.1+
+
+## Features
+
+* Write JSON to a standard `DBField` subclass.
+* Query JSON via simple accessors, Postgres-like operators or JSONPath expressions.
+* Selectively return data as JSON, Arrays or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
+* Selectively update specific portions of your source JSON, using JSPNPath expressions.
 
 ## Introduction
 
