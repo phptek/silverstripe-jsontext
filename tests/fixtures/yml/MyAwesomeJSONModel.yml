@@ -1,0 +1,7 @@
+MyAwesomeJSONModel:
+  json-as-object:
+    MyJSON: '{"cars":{"american":["buick","oldsmobile"]}}'
+  json-as-array:
+    MyJSON: '["buick","oldsmobile"]'
+  json-as-boolean:
+    MyJSON: 'true'

@@ -48,7 +48,7 @@ A small handful of simple query methods `first()`, `last()` and `nth()` exist fo
     {
     
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => '\JSONText\Fields\JSONText'
         ];
     
         /*
@@ -86,7 +86,7 @@ You can also use Postgres-like JSON querying syntax, for querying more complex J
     class MyOtherDataObject extends DataObject
     {
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => '\JSONText\Fields\JSONText'
         ];
     
         /**
@@ -144,7 +144,7 @@ See: [Table of JSONPath expressions](jsonpath.md)
                                 }';
     
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => '\JSONText\Fields\JSONText'
         ];
         
         public function requireDefaultRecords()
@@ -152,7 +152,7 @@ See: [Table of JSONPath expressions](jsonpath.md)
             parent::requireDefaultRecords();
             
             if (!$this->MyJSON) {
-                $this->setValue($this->stubJSON);
+                $this->setField($this->MyJSON, $this->stubJSON);
             }
         }
         
@@ -193,8 +193,8 @@ See: [Table of JSONPath expressions](jsonpath.md)
 
 ## Updating and Modifying JSON
 
-No self-respecting JSON query solution is complete without the ability to selectively modify
-nested JSON data and sub-nodes. The module overloads `setValue()` to accept an optional 3rd parameter, a valid JSONPath
+No self-respecting JSON query solution would be complete without the ability to selectively modify
+nested JSON data. The module overloads `setValue()` to accept an optional 3rd parameter, a valid JSONPath
 expression.
 
 If the expression matches >1 JSON nodes, then that result is expressed as an indexed array, and each matching
@@ -218,7 +218,7 @@ node will be modified with the data passed to `setValue()` as the standard `$val
                                     }';
         
             private static $db = [
-                'MyJSON'    => 'JSONText'
+                'MyJSON'    => '\JSONText\Fields\JSONText'
             ];
             
             public function requireDefaultRecords()
@@ -226,7 +226,7 @@ node will be modified with the data passed to `setValue()` as the standard `$val
                 parent::requireDefaultRecords();
                 
                 if (!$this->MyJSON) {
-                    $this->setValue($this->stubJSON);
+                    $this->setField($this->MyJSON, $this->stubJSON);
                 }
             }
     

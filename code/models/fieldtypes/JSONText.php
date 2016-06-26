@@ -14,7 +14,7 @@
  * 
  * <code>
  * static $db = [
- *  'MyJSONStructure' => 'JSONText'
+ *  'MyJSONStructure' => '\JSONText\Fields\JSONText'
  * ];
  * </code>
  * 
@@ -23,7 +23,6 @@
  * @package silverstripe-jsontext
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
- * @todo Rename query() to getValue() that accepts optional param $expr (for JSONPath queries)
  */
 
 namespace JSONText\Fields;
@@ -107,8 +106,8 @@ class JSONText extends \StringField
             'type'  => 'text',
             'parts' => $parts
         ];
-
-        DB::require_field($this->tableName, $this->name, $values);
+        
+        \DB::require_field($this->tableName, $this->name, $values);
     }
 
     /**
@@ -149,14 +148,6 @@ class JSONText extends \StringField
     }
 
     /**
-     * @return string
-     */
-    public function getReturnType()
-    {
-        return $this->returnType;
-    }
-
-    /**
      * Returns the value of this field as an iterable.
      * 
      * @return \Peekmo\JsonPath\JsonStore
@@ -164,16 +155,16 @@ class JSONText extends \StringField
      */
     public function getJSONStore()
     {
-        if (!$json = $this->getValue()) {
-            return new \Peekmo\JsonPath\JsonStore('[]');
+        if (!$value = $this->getValue()) {
+            return new JsonStore('[]');
         }
         
-        if (!$this->isJson($json)) {
+        if (!$this->isJson($value)) {
             $msg = 'DB data is munged.';
             throw new JSONTextException($msg);
         }
-
-        $this->jsonStore = new \Peekmo\JsonPath\JsonStore($json);
+        
+        $this->jsonStore = new JsonStore($value);
         
         return $this->jsonStore;
     }
@@ -366,7 +357,7 @@ class JSONText extends \StringField
         }
 
         $validType = ($isEx ? self::JSONTEXT_QUERY_JSONPATH : self::JSONTEXT_QUERY_OPERATOR);
-        if ($marshalled = $this->marshallQuery(func_get_args(), $validType)) {
+        if ($marshalled = $this->marshallQuery(func_get_args(), $validType, $this->getJSONStore())) {
             return $this->returnAsType($marshalled);
         }
 
@@ -423,9 +414,6 @@ class JSONText extends \StringField
      */
     public function setValue($value, $record = null, $expr = '')
     {
-        // Deal with standard SS behaviour
-        parent::setValue($value, $record);
-        
         if (empty($expr)) {
             $this->value = $value;
         } else {
@@ -434,13 +422,16 @@ class JSONText extends \StringField
                 throw new JSONTextException($msg);
             }
             
-            if (!$this->jsonStore->set($expr, $value)) {
+            if (!$this->getJSONStore()->set($expr, $value)) {
                 $msg = 'Failed to properly set custom data to the JSONStore in ' . __FUNCTION__;
                 throw new JSONTextException($msg);
             }
 
             $this->value = $this->jsonStore->toString();
         }
+
+        // Deal with standard SS behaviour
+        parent::setValue($this->value, $record);
         
         return $this;
     }
@@ -455,7 +446,7 @@ class JSONText extends \StringField
     private function returnAsType($data)
     {
         $data = (array) $data;
-        $type = $this->getReturnType();
+        $type = $this->returnType;
         if ($type === 'array') {
             if (!count($data)) {
                 return [];
@@ -485,18 +476,24 @@ class JSONText extends \StringField
     }
     
     /**
-     * Create an instance of {@link JSONBackend} according to the value of JSONText::backend defined by SS config.
+     * Create an instance of {@link JSONBackend} according to the value of JSONText::backend defined in SS config.
      * 
      * @param string operand
      * @return JSONBackend
+     * @throws JSONTextException
      */
     protected function createBackendInst($operand)
     {
         $backend = $this->config()->backend;
-        $dbBackendClass = ucfirst($backend) . 'JSONBackend';
+        $dbBackendClass = '\JSONText\Backends\\' . ucfirst($backend) . 'JSONBackend';
+        
+        if (!class_exists($dbBackendClass)) {
+            $msg = 'JSONText backend class ' . $dbBackendClass . ' not found.';
+            throw new JSONTextException($msg);
+        }
         
         return \Injector::inst()->createWithArgs(
-            '\JSONText\Backends\\' . $dbBackendClass, [
+            $dbBackendClass, [
             $operand,
             $this
         ]);

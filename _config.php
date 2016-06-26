@@ -4,5 +4,5 @@
  * @package jsontext
  */
 
-define('MODULE_NAME', 'JSON Text');
+define('MODULE_NAME', 'JSONText');
 define('MODULE_DIR', __DIR__);
