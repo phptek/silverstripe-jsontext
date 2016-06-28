@@ -15,7 +15,7 @@
 	"php": ">=5.4,<7",
         "silverstripe/framework": "~3.1",
         "silverstripe/cms": "~3.1",
-	    "peekmo/jsonpath": "dev-master"
+	"peekmo/jsonpath": "dev-master"
     },
     "support": {
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"

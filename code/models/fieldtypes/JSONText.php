@@ -107,9 +107,13 @@ class JSONText extends \StringField
             'parts' => $parts
         ];
         
-        // Weirdly, namespacing-as-root ala \DB::require_field() fails in PHP v5.4
-        $db = singleton('DB');
-        $db::require_field($this->tableName, $this->name, $values);
+        // SS <= v3.1
+        if (!method_exists('DB', 'require_field')) {
+            \DB::requireField($this->tableName, $this->name, $values);
+        // SS > v3.1
+        } else {
+            \DB::require_field($this->tableName, $this->name, $values);
+        }
     }
 
     /**
