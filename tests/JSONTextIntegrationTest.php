@@ -6,7 +6,6 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Fields;
 use JSONText\Exceptions;
 
 class JSONTextIntegrationTest extends SapphireTest
@@ -34,8 +33,8 @@ class JSONTextIntegrationTest extends SapphireTest
         $model = $this->objFromFixture('MyAwesomeJSONModel', 'json-as-object');
         $expression = '$.cars.american.[0]';
         $field = $model->dbObject('MyJSON');
-        
-        // What's the value at $expression now? (JSON as return type is the default)
+
+        // Primary assertion (JSON as return type is the default)
         $this->assertEquals('["buick"]', $field->query($expression));
         
         // How about now?
@@ -44,11 +43,12 @@ class JSONTextIntegrationTest extends SapphireTest
         $model->write();
         $this->assertEquals('["ford"]', $field->query($expression));
 
-        // And now? (With chaining)
+        // Secondary assertion
         $field
             ->setValue('chrysler', null, $expression)
             ->setReturnType('array');
 
+        // With chaining
         $model->setField('MyJSON', $field->getValue());
         $model->write();
         $this->assertEquals(['chrysler'], $field->query($expression));
@@ -64,16 +64,16 @@ class JSONTextIntegrationTest extends SapphireTest
         $expression = '$.[0]';
         $field = $model->dbObject('MyJSON');
 
-        // What's the value at $expression now? (JSON as return type is the default)
+        // Primary assertion (JSON as return type is the default)
         $this->assertEquals('["buick"]', $field->query($expression));
 
-        // How about now?
+        // Secondary assertion
         $field->setValue('ford', null, $expression);
         $model->setField('MyJSON', $field->getValue());
         $model->write();
         $this->assertEquals('["ford"]', $field->query($expression));
         
-        // And now? (With chaining)
+        // With chaining
         $field
             ->setValue('chrysler', null, $expression)
             ->setReturnType('array');
@@ -88,7 +88,7 @@ class JSONTextIntegrationTest extends SapphireTest
 /**
  * @package silverstripe-jsontext
  */
-class MyAwesomeJSONModel extends DataObject
+class MyAwesomeJSONModel extends \DataObject
 {
     private static $db = [
         'MyJSON' => '\JSONText\Fields\JSONText'

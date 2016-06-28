@@ -6,7 +6,7 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Fields;
+use JSONText\Fields\JSONText;
 use JSONText\Exceptions;
 
 class JSONTextSetValueTest extends SapphireTest
@@ -40,7 +40,7 @@ class JSONTextSetValueTest extends SapphireTest
         // Data Source: Array
         // Return Type: ARRAY
         // Expression: '$.[2]' The third item
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field = JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         // Assert current value
@@ -53,7 +53,7 @@ class JSONTextSetValueTest extends SapphireTest
         // Data Source: Array
         // Return Type: ARRAY
         // Expression: '$.[6]' The seventh item
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field = JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         // Assert current value
@@ -78,7 +78,7 @@ class JSONTextSetValueTest extends SapphireTest
         // Data Source: Object
         // Return Type: ARRAY
         // Expression: '$.[2]' The third item
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field = JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         // Assert we cannot use array accessors at the root level of the source JSON _object_

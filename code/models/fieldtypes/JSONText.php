@@ -357,7 +357,7 @@ class JSONText extends \StringField
         }
 
         $validType = ($isEx ? self::JSONTEXT_QUERY_JSONPATH : self::JSONTEXT_QUERY_OPERATOR);
-        if ($marshalled = $this->marshallQuery(func_get_args(), $validType, $this->getJSONStore())) {
+        if ($marshalled = $this->marshallQuery(func_get_args(), $validType)) {
             return $this->returnAsType($marshalled);
         }
 

@@ -69,10 +69,8 @@ class PostgresJSONBackend extends JSONBackend
             throw new JSONTextException($msg);
         }
         
-        //$this->jsonText->getJSONStore()
         $operandAsArray = $this->jsonText->toArray($this->operand);
         
-        // Empty is OK..could've been accidental...
         if (!count($operandAsArray)) {
             return [];
         }

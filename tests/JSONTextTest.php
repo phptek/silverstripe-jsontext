@@ -6,17 +6,17 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Fields;
-use JSONText\Exceptions;
+use JSONText\Fields\JSONText;
 
 class JSONTextTest extends SapphireTest
 {
     /**
      * @todo There are a ton more permutations of a JSONPath regex
+     * See the walk() method in JSONStore
      */
     public function testIsExpressionValid()
     {
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field = JSONText::create('MyJSON');
         
         $this->assertTrue($field->isValidExpression('$..'));
         $this->assertTrue($field->isValidExpression('$.[2]'));

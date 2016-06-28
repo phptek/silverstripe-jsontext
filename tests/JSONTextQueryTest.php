@@ -9,7 +9,7 @@
  *
  */
 
-use JSONText\Fields;
+use JSONText\Fields\JSONText;
 use JSONText\Exceptions;
 
 class JSONTextQueryTest extends SapphireTest
@@ -47,7 +47,7 @@ class JSONTextQueryTest extends SapphireTest
     {
         parent::setUp();
 
-        $this->sut = JSONText\Fields\JSONText::create('MyJSON');
+        $this->sut = JSONText::create('MyJSON');
     }
 
     /**

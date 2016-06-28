@@ -7,7 +7,7 @@
  * @todo Add 'object' fixture to each
  */
 
-use JSONText\Fields;
+use JSONText\Fields\JSONText;
 use JSONText\Exceptions;
 
 class JSONTextBasicTest extends SapphireTest
@@ -44,7 +44,7 @@ class JSONTextBasicTest extends SapphireTest
     {
         parent::setUp();
         
-        $this->sut = JSONText\Fields\JSONText::create('MyJSON');
+        $this->sut = JSONText::create('MyJSON');
     }
 
     public function testGetValueAsJSONStore()
