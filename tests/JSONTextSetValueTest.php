@@ -66,6 +66,20 @@ class JSONTextSetValueTest extends SapphireTest
         // Invalid #1
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
         $field->setValue(99.99, null, '$[6]'); // Invalid JSON path expression
+
+        // Reset expected exception
+        $this->setExpectedException(null);
+
+        // Invalid #2
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $field->setValue('true'); // Invalid JSON passed to setValue()
+
+        // Reset expected exception
+        $this->setExpectedException(null);
+
+        // Ensure default SS behaviour is respected
+        $field->setValue('');
+        $this->assertEquals('', $field->getValue());
     }
 
     /**

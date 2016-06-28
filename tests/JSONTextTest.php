@@ -24,4 +24,25 @@ class JSONTextTest extends SapphireTest
         $this->assertFalse($field->isValidExpression('$'));
         $this->assertFalse($field->isValidExpression('$[2]'));
     }
+
+    /**
+     * Ordinarily we can just use !is_null(json_decode($json)) but SS allows empty strings passed to setValue() so we need
+     * to allow otherwise invalid JSON by means of an optional 2nd param
+     */
+    public function testIsJson()
+    {
+        $field = JSONText::create('MyJSON');
+
+        $this->assertFalse($field->isJson(''));
+        $this->assertTrue($field->isJson('true'));
+        $this->assertTrue($field->isJson('false'));
+        $this->assertFalse($field->isJson('null'));
+        $this->assertFalse($field->isJson("['one']"));
+        $this->assertFalse($field->isJson('["one]'));
+        $this->assertTrue($field->isJson('[]'));
+        $this->assertTrue($field->isJson('["one"]'));
+        $this->assertTrue($field->isJson('["one","two"]'));
+        $this->assertTrue($field->isJson('{"cars":{"american":["buick","oldsmobile"]}}'));
+        $this->assertTrue($field->isJson('', ['']));
+    }
 }

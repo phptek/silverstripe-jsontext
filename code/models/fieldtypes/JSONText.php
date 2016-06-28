@@ -122,7 +122,7 @@ class JSONText extends \StringField
      */
     public function scaffoldSearchField($title = null)
     {
-        return HiddenField::create($this->getName());
+        return \HiddenField::create($this->getName());
     }
 
     /**
@@ -131,7 +131,7 @@ class JSONText extends \StringField
      */
     public function scaffoldFormField($title = null)
     {
-        return HiddenField::create($this->getName());
+        return \HiddenField::create($this->getName());
     }
 
     /**
@@ -192,12 +192,30 @@ class JSONText extends \StringField
 
     /**
      * Utility method to determine whether the data is really JSON or not.
+     * The Peekmo JSONStore lib won't accept otherwise valid JSON scalars like `true`, `false` & `null` so these need
+     * to be disallowed.
      * 
      * @param string $value
+     * @param array $allowed    An optional array of allowed "invalid" JSON values
      * @return boolean
      */
-    public function isJson($value)
+    public function isJson($value, array $allowed = [])
     {
+        if (!isset($value)) {
+            return false;
+        }
+        
+        $value = trim($value);
+        
+        if (!empty($allowed)) {
+            $invalid = array_diff(['true', 'false', ''], $allowed);
+            if (in_array($value, $invalid)) {
+                return false;
+            }
+            
+            return true;
+        }
+        
         return !is_null(json_decode($value, true));
     }
 
@@ -421,6 +439,11 @@ class JSONText extends \StringField
     public function setValue($value, $record = null, $expr = '')
     {
         if (empty($expr)) {
+            $allowed = ['']; // Ordinarily this would be invalid JSON, but SS allows it to clear a field
+            if (!$this->isJson($value, $allowed)) {
+                $msg = 'Invalid data passed to ' . __FUNCTION__;
+                throw new JSONTextException($msg);
+            }
             $this->value = $value;
         } else {
             if (!$this->isValidExpression($expr)) {
@@ -435,8 +458,7 @@ class JSONText extends \StringField
 
             $this->value = $this->jsonStore->toString();
         }
-
-        // Deal with standard SS behaviour
+        
         parent::setValue($this->value, $record);
         
         return $this;
@@ -446,7 +468,7 @@ class JSONText extends \StringField
      * Determine the desired userland format to return all query API method results in.
      * 
      * @param mixed
-     * @return mixed
+     * @return mixed array|null
      * @throws \JSONText\Exceptions\JSONTextException
      */
     private function returnAsType($data)
