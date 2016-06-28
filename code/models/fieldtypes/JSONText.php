@@ -88,7 +88,7 @@ class JSONText extends \StringField
     protected $jsonStore;
 
     /**
-     * Taken from {@link TextField}.
+     * Taken from {@link Text}.
      * 
      * @see DBField::requireField()
      * @return void
@@ -107,7 +107,9 @@ class JSONText extends \StringField
             'parts' => $parts
         ];
         
-        \DB::require_field($this->tableName, $this->name, $values);
+        // Weirdly, namespacing-as-root ala \DB::require_field() fails in PHP v5.4
+        $db = singleton('DB');
+        $db::require_field($this->tableName, $this->name, $values);
     }
 
     /**
