@@ -17,14 +17,18 @@ class JSONTextBasicTest extends SapphireTest
      */
     protected $fixtures = [
         'array'     => 'tests/fixtures/json/array.json',
-        'object'    => 'tests/fixtures/json/object.json',
-        'invalid'   => 'tests/fixtures/json/invalid.json'
+        'object'    => 'tests/fixtures/json/object.json'
     ];
+
+    /**
+     * @var \JSONText\Fields\JSONText
+     */
+    protected $sut;
 
     /**
      * JSONTextTest constructor.
      * 
-     * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
+     * Modifies fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
     {
@@ -33,23 +37,34 @@ class JSONTextBasicTest extends SapphireTest
         }
     }
 
-    public function testgetValueAsIterable()
+    /**
+     * Setup the System Under Test for this test suite.
+     */
+    public function setUp()
     {
-        $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setValue($this->getFixture('invalid'));
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $this->assertEquals(['chinese' => 'great wall'], $field->getJSONStore());
+        parent::setUp();
+        
+        $this->sut = JSONText\Fields\JSONText::create('MyJSON');
+    }
 
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+    public function testGetValueAsJSONStore()
+    {
+        $field = $this->sut;
+        
         $field->setValue('');
-        $this->assertEquals([], $field->getJSONStore());
+        $this->assertEquals([], $field->getStoreAsArray());
+        
+        $field->setValue('{');
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $field->getJSONStore();
     }
 
     public function testFirst()
     {
+        $field = $this->sut;
+
         // Test: Source data is simple JSON array
         // Return type: Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->first());
@@ -58,7 +73,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: JSON
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('string', $field->first());
@@ -66,7 +80,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: SilverStripe
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->first());
@@ -74,14 +87,12 @@ class JSONTextBasicTest extends SapphireTest
         $this->assertEquals('great wall', $field->first()[0]->getValue());
 
         // Test: Empty
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertInternalType('array', $field->first());
         $this->assertCount(0, $field->first());
 
         // Test: Invalid
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('{');
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
@@ -90,9 +101,10 @@ class JSONTextBasicTest extends SapphireTest
 
     public function testLast()
     {
+        $field = $this->sut;
+        
         // Test: Source data is simple JSON array
         // Return type: Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->last());
@@ -101,7 +113,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: JSON
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('string', $field->last());
@@ -109,7 +120,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: SilverStripe
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->last());
@@ -117,14 +127,12 @@ class JSONTextBasicTest extends SapphireTest
         $this->assertEquals(33.3333, $field->last()[6]->getValue());
 
         // Test: Empty
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertInternalType('array', $field->last());
         $this->assertCount(0, $field->last());
 
         // Test: Invalid
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('{');
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
@@ -133,9 +141,10 @@ class JSONTextBasicTest extends SapphireTest
 
     public function testNth()
     {
+        $field = $this->sut;
+        
         // Test: Source data is simple JSON array
         // Return type: Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->nth(1));
@@ -144,7 +153,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: JSON
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('string', $field->nth(1));
@@ -152,7 +160,6 @@ class JSONTextBasicTest extends SapphireTest
 
         // Test: Source data is simple JSON array
         // Return type: SilverStripe
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->nth(1));
@@ -160,14 +167,12 @@ class JSONTextBasicTest extends SapphireTest
         $this->assertEquals(true, $field->nth(1)[1]->getValue());
 
         // Test: Empty
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertInternalType('array', $field->nth(1));
         $this->assertCount(0, $field->nth(1));
 
         // Test: Invalid
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('{');
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');

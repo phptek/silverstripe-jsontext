@@ -14,7 +14,6 @@
 namespace JSONText\Backends;
 
 use JSONText\Exceptions\JSONTextException;
-use JSONText\Fields\JSONText;
 
 class PostgresJSONBackend extends JSONBackend
 {
@@ -70,6 +69,7 @@ class PostgresJSONBackend extends JSONBackend
             throw new JSONTextException($msg);
         }
         
+        //$this->jsonText->getJSONStore()
         $operandAsArray = $this->jsonText->toArray($this->operand);
         
         // Empty is OK..could've been accidental...

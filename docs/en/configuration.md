@@ -7,4 +7,7 @@ do this via standard SS config in your project's `mysite/_config/config.yml` fil
       backend: postgres
 
 
-Note: The module default is to use `postgres` which is also the only backend that will work at the moment.
+Notes: 
+
+* The module uses namespacing so take this into account when calling any part of the module's public API. 
+* The module default is to use `postgres` which is also the only backend that will work at the moment.

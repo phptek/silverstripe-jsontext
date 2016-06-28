@@ -5,30 +5,9 @@
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
  * @todo Add tests where source data is a JSON array, not just a JSON object
- * @todo $this->clearFixtures(); in setUp()
- * @todo Use same source data instead of repeating for each test
- * @todo See the PHPUnit @dataProvider annotaton ala
  * 
  *
  */
-
-/**
- * @dataProvider additionProvider
- */
-/*public function testAdd($a, $b, $expected)
-{
-    $this->assertEquals($expected, $a + $b);
-}
-
-public function additionProvider()
-{
-    return [
-        [0, 0, 0],
-        [0, 1, 1],
-        [1, 0, 1],
-        [1, 1, 3]
-    ];
-}*/
 
 use JSONText\Fields;
 use JSONText\Exceptions;
@@ -45,6 +24,11 @@ class JSONTextQueryTest extends SapphireTest
     ];
 
     /**
+     * @var \JSONText\Fields\JSONText
+     */
+    protected $sut;
+
+    /**
      * JSONTextTest constructor.
      * 
      * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
@@ -57,16 +41,27 @@ class JSONTextQueryTest extends SapphireTest
     }
 
     /**
+     * Setup the System Under Test for this test suite.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->sut = JSONText\Fields\JSONText::create('MyJSON');
+    }
+
+    /**
      * Tests query() by means of the integer Postgres Int match operator: '->'
      * 
      * @todo Use same source data instead of repeating..
      */
     public function testQueryWithMatchOnInt()
     {
+        $field = $this->sut;
+        
         // Data Source: Array
         // Return Type: ARRAY
         // Operator: "->" (Int)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         $this->assertEquals([2 => 'trabant'], $field->query('->', 2));
@@ -74,7 +69,6 @@ class JSONTextQueryTest extends SapphireTest
         // Data Source: Array
         // Return Type: JSON
         // Operator: "->" (Int)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('array'));
         $this->assertEquals('{"2":"trabant"}', $field->query('->', 2));
@@ -84,7 +78,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "->" (Int)
         // SS Type: Float
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->query('->', 3));
@@ -95,7 +88,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "->" (Int)
         // SS Type: Boolean
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->query('->', 1));
@@ -106,7 +98,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "->" (Int)
         // SS Type: Int
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->query('->', 5));
@@ -117,7 +108,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "->" (Int)
         // SS Type: Varchar
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->query('->', 4));
@@ -125,26 +115,22 @@ class JSONTextQueryTest extends SapphireTest
         $this->assertEquals('buick', $field->query('->', 4)[4]->getValue());
 
         // Test: Empty #1
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertInternalType('array', $field->query('->', 3));
         $this->assertCount(0, $field->query('->', 3));
 
-        // Test: Empty #2
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        // Test: Invalid #1
         $field->setReturnType('array');
         $field->setValue('["morris"]');
         $this->assertEquals([], $field->query('->', 17));
 
-        // Test: Invalid #1
-        $field = JSONText\Fields\JSONText::create('MyJSON');
-        $field->setReturnType('array');
-        $field->setValue('["trabant"]');
-        $this->assertEquals([], $field->query('->', 1));
-
         // Test: Invalid #2
-        $field = JSONText\Fields\JSONText::create('MyJSON');
+        $field->setReturnType('array');
+        $field->setValue('["ass"]');
+        $this->assertEquals(['ass'], $field->query('->', 0));
+
+        // Test: Invalid #3
         $field->setReturnType('array');
         $field->setValue('{');
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
@@ -156,10 +142,11 @@ class JSONTextQueryTest extends SapphireTest
      */
     public function testQueryWithMatchOnStr()
     {
+        $field = $this->sut;
+        
         // Data Source: Object
         // Return Type: ARRAY
         // Operator: "->>" (String)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(['Subaru' => 'Impreza'], $field->query('->>', 'Subaru'));
@@ -171,7 +158,6 @@ class JSONTextQueryTest extends SapphireTest
         // Data Source: Object
         // Return Type: JSON
         // Operator: "->>" (String)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals('{"Subaru":"Impreza"}', $field->query('->>', 'Subaru'));
@@ -184,7 +170,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SilverStripe
         // Operator: "->>" (String)
         // SS Type: Varchar
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('->>', 'Subaru'));
@@ -195,7 +180,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SilverStripe
         // Operator: "->>" (String)
         // SS Type: Boolean
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('->>', 'beer tastes good'));
@@ -206,7 +190,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SilverStripe
         // Operator: "->>" (String)
         // SS Type: Float
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('->>', 'how sure are you'));
@@ -217,7 +200,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SilverStripe
         // Operator: "->>" (String)
         // SS Type: Int
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('->>', 'how high'));
@@ -228,7 +210,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SilverStripe
         // Operator: "->>" (String)
         // SS Type: N/A Nested sub-array example, expect an array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('->>', 'planes')['planes']);
@@ -238,26 +219,22 @@ class JSONTextQueryTest extends SapphireTest
         $this->assertInstanceOf('Varchar', $field->query('->>', 'planes')['planes']['russian'][1]);
 
         // Test: Empty #1
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertInternalType('array', $field->query('->>', 'planes'));
         $this->assertCount(0, $field->query('->', 3));
 
         // Test: Empty #2
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('["morris"]');
         $this->assertEquals([], $field->query('->', 17));
 
         // Test: Invalid #1
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('["trabant"]');
         $this->assertEquals([], $field->query('->', 1));
 
         // Test: Invalid #2
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('{');
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
@@ -269,11 +246,12 @@ class JSONTextQueryTest extends SapphireTest
      */
     public function testQueryWithMatchOnPath()
     {
+        $field = $this->sut;
+        
         // Data Source: Object
         // Return Type: ARRAY
         // Operator: "#>" (Path)
         // Expect: Array due to duplicate keys in different parts of the source data
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(
@@ -285,7 +263,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: JSON
         // Operator: "#>" (Path)
         // Expect: Array due to duplicate keys in different parts of the source data
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(
@@ -297,7 +274,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "#>" (Path)
         // Expect: Array due to duplicate keys in different parts of the source data
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('#>', '{"japanese":"fast"}'));
@@ -317,7 +293,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: ARRAY
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(['airbus'], $field->query('#>', '{"planes":"french"}'));
@@ -326,7 +301,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: JSON
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals('["airbus"]', $field->query('#>', '{"planes":"french"}'));
@@ -335,7 +309,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion (Varchar)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('#>', '{"planes":"french"}'));
@@ -346,7 +319,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion (Float)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         
@@ -361,7 +333,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion (Int)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
 
@@ -376,7 +347,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: SILVERSTRIPE
         // Operator: "#>" (Path)
         // Expect: Direct scalar comparison assertion (Boolean)
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
 
@@ -388,20 +358,17 @@ class JSONTextQueryTest extends SapphireTest
         $this->assertEquals(1, array_values($res[0])[0]->getValue());
 
         // #1 Empty source data
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue('');
         $this->assertEquals([], $field->query('#>', '{"japanese":"fast"}'));
 
         // #2 JSON path not found
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertNull($field->query('#>', '{"ints":"1"}')); // The "ints" key only has a single array as a value
 
         // #3 Invalid operand on RHS
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(['Kawasaki' => 'KR1S250'], $field->query('#>', '{"japanese":"fast"'));
@@ -414,11 +381,12 @@ class JSONTextQueryTest extends SapphireTest
      */
     public function testQueryWithMatchOnExpr()
     {
+        $field = $this->sut;
+        
         // Data Source: Object
         // Return Type: ARRAY
         // Expression: "$.." (Everything)
         // Expect: Array, obviously due to no. nodes in the source JSON
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('$..'));
@@ -428,7 +396,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: ARRAY
         // Expression: "$..japanese[*]" (An array of children of all keys matching "japanese")
         // Expect: Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertCount(4, $field->query('$..japanese[*]'));
@@ -443,7 +410,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: JSON
         // Expression: "$..japanese[*]" (An array of children of all keys matching "japanese")
         // Expect: JSON Array of JSON objects
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('json');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(
@@ -455,7 +421,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: Array
         // Expression: "$.cars.american[*]" (All entries in the american cars node)
         // Expect: Array
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('array');
         $field->setValue($this->getFixture('object'));
         $this->assertEquals(['buick', 'oldsmobile'], $field->query('$.cars.american[*]'));
@@ -465,7 +430,6 @@ class JSONTextQueryTest extends SapphireTest
         // Return Type: Array
         // Expression: "$.cars.american[*]" (All entries in the american cars node)
         // Expect: Array 0f SilverStripe types
-        $field = JSONText\Fields\JSONText::create('MyJSON');
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('$.cars.american[*]'));
