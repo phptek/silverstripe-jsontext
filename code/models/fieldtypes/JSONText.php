@@ -118,7 +118,7 @@ class JSONText extends \StringField
 
     /**
      * @param string $title
-     * @return HiddenField
+     * @return \HiddenField
      */
     public function scaffoldSearchField($title = null)
     {
@@ -127,7 +127,7 @@ class JSONText extends \StringField
 
     /**
      * @param string $title
-     * @return HiddenField
+     * @return \HiddenField
      */
     public function scaffoldFormField($title = null)
     {
@@ -208,12 +208,9 @@ class JSONText extends \StringField
         $value = trim($value);
         
         if (!empty($allowed)) {
+            // Valid JSON, but invalid from the perspective of {@link JSONPath}.
             $invalid = array_diff(['true', 'false', ''], $allowed);
-            if (in_array($value, $invalid)) {
-                return false;
-            }
-            
-            return true;
+            return !in_array($value, $invalid);
         }
         
         return !is_null(json_decode($value, true));
@@ -231,11 +228,7 @@ class JSONText extends \StringField
             $value = (array) $value;
         }
         
-        $opts = (
-            JSON_UNESCAPED_SLASHES
-        );
-        
-        return json_encode($value, $opts);
+        return json_encode($value, JSON_UNESCAPED_SLASHES);
     }
     
     /**
@@ -367,21 +360,19 @@ class JSONText extends \StringField
             return $this->returnAsType([]);
         }
 
-        $isOp = ($operand && $this->isOperator($operator));
-        $isEx = (is_null($operand) && $this->isExpression($operator));
+        $isOperator = !is_null($operand) && $this->isValidOperator($operator);
+        $isExpresssion = is_null($operand) && $this->isValidExpression($operator);
         
-        if ($isOp && !$this->isValidOperator($operator)) {
-            $msg = 'JSON operator: ' . $operator . ' is invalid.';
-            throw new JSONTextException($msg);
-        }
-
-        if ($isEx && !$this->isValidExpression($operator)) {
+        if ($isOperator) {
+            $type = self::JSONTEXT_QUERY_OPERATOR;
+        } else if ($isExpresssion) {
+            $type = self::JSONTEXT_QUERY_JSONPATH;
+        } else {
             $msg = 'JSON expression: ' . $operator . ' is invalid.';
             throw new JSONTextException($msg);
         }
-
-        $validType = ($isEx ? self::JSONTEXT_QUERY_JSONPATH : self::JSONTEXT_QUERY_OPERATOR);
-        if ($marshalled = $this->marshallQuery(func_get_args(), $validType)) {
+        
+        if ($marshalled = $this->marshallQuery(func_get_args(), $type)) {
             return $this->returnAsType($marshalled);
         }
 
@@ -533,7 +524,7 @@ class JSONText extends \StringField
      * @param string $operator
      * @return boolean
      */
-    private function isValidOperator($operator)
+    public function isValidOperator($operator)
     {
         $backend = $this->config()->backend;
 
@@ -545,32 +536,14 @@ class JSONText extends \StringField
     }
 
     /**
-     * @param string $arg
+     * Is the passed JSPONPath expression valid?
+     * 
+     * @param string $expression
      * @return bool
      */
-    private function isExpression($arg)
+    public function isValidExpression($expression)
     {
-        return (bool) preg_match("#^\\$\.#", $arg);
-    }
-
-    /**
-     * @param string $arg
-     * @return bool
-     */
-    public function isOperator($arg)
-    {
-        return !$this->isExpression($arg);
-    }
-    
-    /**
-     * Is the passed JSON expression valid?
-     *
-     * @param string $expr
-     * @return boolean
-     */
-    public function isValidExpression($expr)
-    {
-        return (bool) preg_match("#^\\$\.#", $expr);
+        return (bool) preg_match("#^\\$\.#", $expression);
     }
     
     /**
