@@ -144,7 +144,7 @@ class JSONText extends \StringField
     public function setReturnType($type)
     {
         if (!in_array($type, $this->config()->return_types)) {
-            $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__;
+            $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__ . '()';
             throw new JSONTextException($msg);
         }
         
@@ -165,7 +165,7 @@ class JSONText extends \StringField
             return new JsonStore('[]');
         }
         
-        if (!$this->isJson($value)) {
+        if (!$this->isValidJson($value)) {
             $msg = 'DB data is munged.';
             throw new JSONTextException($msg);
         }
@@ -188,32 +188,6 @@ class JSONText extends \StringField
         }
         
         return $store;
-    }
-
-    /**
-     * Utility method to determine whether the data is really JSON or not.
-     * The Peekmo JSONStore lib won't accept otherwise valid JSON scalars like `true`, `false` & `null` so these need
-     * to be disallowed.
-     * 
-     * @param string $value
-     * @param array $allowed    An optional array of allowed "invalid" JSON values
-     * @return boolean
-     */
-    public function isJson($value, array $allowed = [])
-    {
-        if (!isset($value)) {
-            return false;
-        }
-        
-        $value = trim($value);
-        
-        if (!empty($allowed)) {
-            // Valid JSON, but invalid from the perspective of {@link JSONPath}.
-            $invalid = array_diff(['true', 'false', ''], $allowed);
-            return !in_array($value, $invalid);
-        }
-        
-        return !is_null(json_decode($value, true));
     }
 
     /**
@@ -328,7 +302,7 @@ class JSONText extends \StringField
         }
         
         if (!is_int($n)) {
-            $msg = 'Argument passed to ' . __FUNCTION__ . ' must be an integer.';
+            $msg = 'Argument passed to ' . __FUNCTION__ . '() must be an integer.';
             throw new JSONTextException($msg);
         }
 
@@ -430,20 +404,20 @@ class JSONText extends \StringField
     public function setValue($value, $record = null, $expr = '')
     {
         if (empty($expr)) {
-            $allowed = ['']; // Ordinarily this would be invalid JSON, but SS allows it to clear a field
-            if (!$this->isJson($value, $allowed)) {
-                $msg = 'Invalid data passed to ' . __FUNCTION__;
+            if (!$this->isValidDBValue($value)) {
+                $msg = 'Invalid data passed to ' . __FUNCTION__ . '()';
                 throw new JSONTextException($msg);
             }
+            
             $this->value = $value;
         } else {
             if (!$this->isValidExpression($expr)) {
-                $msg = 'Invalid JSONPath expression: ' . $expr . ' passed to ' . __FUNCTION__;
+                $msg = 'Invalid JSONPath expression: ' . $expr . ' passed to ' . __FUNCTION__ . '()';
                 throw new JSONTextException($msg);
             }
             
             if (!$this->getJSONStore()->set($expr, $value)) {
-                $msg = 'Failed to properly set custom data to the JSONStore in ' . __FUNCTION__;
+                $msg = 'Failed to properly set custom data to the JSONStore in ' . __FUNCTION__ . '()';
                 throw new JSONTextException($msg);
             }
 
@@ -490,7 +464,7 @@ class JSONText extends \StringField
             return $this->toSSTypes($data);
         }
         
-        $msg = 'Bad argument passed to ' . __FUNCTION__;
+        $msg = 'Bad argument passed to ' . __FUNCTION__ . '()';
         throw new JSONTextException($msg);
     }
     
@@ -516,6 +490,41 @@ class JSONText extends \StringField
             $operand,
             $this
         ]);
+    }
+
+    /**
+     * Utility method to determine whether a value is really valid JSON or not.
+     * The Peekmo JSONStore lib won't accept otherwise valid JSON values like `true`, `false` & `""` so these need
+     * to be disallowed.
+     *
+     * @param string $value
+     * @return boolean
+     */
+    public function isValidJson($value)
+    {
+        if (!isset($value)) {
+            return false;
+        }
+
+        $value = trim($value);
+        return !is_null(json_decode($value, true));
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isValidDBValue($value) {
+        $value = trim($value);
+        
+        if (in_array($value, ['true', 'false'])) {
+            return false;
+        }
+        
+        if (is_string($value) && strlen($value) === 0) {
+            return true;
+        }
+        
+        return $this->isValidJson($value);
     }
 
     /**

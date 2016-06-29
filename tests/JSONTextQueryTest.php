@@ -129,12 +129,6 @@ class JSONTextQueryTest extends SapphireTest
         $field->setReturnType('array');
         $field->setValue('["ass"]');
         $this->assertEquals(['ass'], $field->query('->', 0));
-
-        // Test: Invalid #3
-        $field->setReturnType('array');
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->query('->', 3);
     }
 
     /**
@@ -233,12 +227,6 @@ class JSONTextQueryTest extends SapphireTest
         $field->setReturnType('array');
         $field->setValue('["trabant"]');
         $this->assertEquals([], $field->query('->', 1));
-
-        // Test: Invalid #2
-        $field->setReturnType('array');
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->query('->', 3);
     }
 
     /**

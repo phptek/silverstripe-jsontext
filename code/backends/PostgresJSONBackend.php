@@ -23,7 +23,7 @@ class PostgresJSONBackend extends JSONBackend
     public function matchOnInt()
     {
         if (!is_int($this->operand)) {
-            $msg = 'Non-integer passed to: ' . __FUNCTION__;
+            $msg = 'Non-integer passed to: ' . __FUNCTION__ . '()';
             throw new JSONTextException($msg);
         }
         
@@ -44,7 +44,7 @@ class PostgresJSONBackend extends JSONBackend
     public function matchOnStr()
     {
         if (!is_string($this->operand)) {
-            $msg = 'Non-string passed to: ' . __FUNCTION__;
+            $msg = 'Non-string passed to: ' . __FUNCTION__ . '()';
             throw new JSONTextException($msg);
         }
         
@@ -64,7 +64,7 @@ class PostgresJSONBackend extends JSONBackend
      */
     public function matchOnPath()
     {
-        if (!is_string($this->operand) || !$this->jsonText->isJson($this->operand)) {
+        if (!is_string($this->operand) || !$this->jsonText->isValidJson($this->operand)) {
             $msg = 'Invalid JSON passed as operand on RHS.';
             throw new JSONTextException($msg);
         }

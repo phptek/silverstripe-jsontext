@@ -14,8 +14,9 @@ JSON storage, querying and modification.
 
 ## Features
 
-* Query custom JSON data via simple accessors, Postgres-like operators or [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
-* Selectively return queries as JSON, Array or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
+* Store JSON in a dedicated JSON-specific `DBField`  subclass
+* Query JSON data via simple accessors, Postgres-like operators or [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
+* Selectively return results of queries as JSON, Array or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
 * Selectively update portions of your source JSON, using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
 
 ## Introduction
@@ -23,12 +24,32 @@ JSON storage, querying and modification.
 The module exposes a fully featured JSON query and update API allowing developers to use XPath-like queries via [JSONPath](http://goessner.net/articles/JsonPath/)
 or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functions-json.html) (with some differences, see below) to query and update JSON data.
 
+### Why?
+
+I've been wanting to write this module for over two years. Prior-to and during that time I have encountered
+scenarios in more than one project where storing several (10s) of terse configuration parameters in separate database columns
+just seemed crazy. 
+
+There's also the time all you wanted was a simple key -> value store but didn't want to muck
+about with the overhead of two or more datastores like MySQL or Postgres together with MongoDB for example.
+
+On one project I even went as far as an entire tab within `getCMSFields()` that used multiple standard CMS form fields
+taking their data from, and updating to, a single field comprising JSON data for one spect of the system's
+configuration.
+
+And if you needed further convincing that a JSON store in an RDBMS is not such a crazy idea, well Postgres, MySQL, Oracle and MSSQL 2016
+all have, or at time of writing, are planning to have such a field...
+
+### Postgres
+
 In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
 however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a **String Matcher**
 *regardless* of the "type" of source JSON stored. The `#>` **Path Matcher** operator can act as an object or a text matcher, but the module wishes to simplify things and as such
 the `#>` operator is *just a simple path matcher*.
 
-Regardless of the type of query in-use you can set what type you'd like the data returned in via the `setReturnType()` method, on a query by query basis. 
+### Return types
+
+Regardless of the type of query you can set what type you'd like the data returned in via the `setReturnType()` method on a query by query basis. 
 
 Legitimate types are:
 
@@ -45,9 +66,10 @@ If using `SilverStripe`, the module will automatically cast the result(s) to one
 
 If there are multiple results from a query, the output will be an indexed array containing a single-value array for each result found.
 
-The module also allows developers to selectively *update* all, or just parts of the source JSON, via JSONPath expressions.
+The module also allows developers to selectively *update* all, or just parts of the source JSON, via JSONPath expressions passed
+to an overloaded `setValue()` method.
 
-See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres queries and updating.
+See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres querying and updating.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
 It does *not* use Postgres' or MySQL's native JSON operators at or below the level of the ORM. The aim however 

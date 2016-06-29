@@ -53,10 +53,6 @@ class JSONTextBasicTest extends SapphireTest
         
         $field->setValue('');
         $this->assertEquals([], $field->getStoreAsArray());
-        
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->getJSONStore();
     }
 
     public function testFirst()
@@ -91,12 +87,6 @@ class JSONTextBasicTest extends SapphireTest
         $field->setValue('');
         $this->assertInternalType('array', $field->first());
         $this->assertCount(0, $field->first());
-
-        // Test: Invalid
-        $field->setReturnType('array');
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->first();
     }
 
     public function testLast()
@@ -131,12 +121,6 @@ class JSONTextBasicTest extends SapphireTest
         $field->setValue('');
         $this->assertInternalType('array', $field->last());
         $this->assertCount(0, $field->last());
-
-        // Test: Invalid
-        $field->setReturnType('array');
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->last();
     }
 
     public function testNth()
@@ -171,12 +155,6 @@ class JSONTextBasicTest extends SapphireTest
         $field->setValue('');
         $this->assertInternalType('array', $field->nth(1));
         $this->assertCount(0, $field->nth(1));
-
-        // Test: Invalid
-        $field->setReturnType('array');
-        $field->setValue('{');
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
-        $field->nth(1);
     }
     
     /**
