@@ -55,7 +55,7 @@ abstract class JSONBackend
      * @return array
      * @throws JSONTextException
      */
-    abstract function matchOnStr();
+    abstract public function matchOnStr();
 
     /**
      * Match on RDBMS-specific path operator. If >1 matches are found, an indexed array of all matches is returned.
