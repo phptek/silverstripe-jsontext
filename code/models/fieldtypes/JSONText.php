@@ -1,24 +1,27 @@
 <?php
 
 /**
- * Simple text-based database field for storing and querying JSON structured data. 
+ * A text-based database field intended for the storage and querying of JSON structured data. 
  * 
- * JSON sub-structures can be queried in a variety of ways using special operators who's syntax closely mimics those used
- * in native JSON queries in PostGreSQL v9.2+.
+ * JSON data can be queried in a variety of ways:
+ * 
+ * 1. Simple:            `first()`, `last()` and `nth()`
+ * 2. Postgres style:    `->`, `->>` and `#>`
+ * 3. JSONPath style:    `$..`, `$.store.book[*].author`, `$..book[?(@.price<10)]` (etc)
  * 
  * Note: The extraction techniques employed here are simple key / value comparisons. They do not use any native JSON
- * features of your project's underlying RDBMS, e.g. those found either in PostGreSQL >= v9.2 or MySQL >= v5.7. As such
- * any JSON queries you construct will never be as performant as a native implementation. 
+ * features of your project's underlying RDBMS, e.g. those found either in PostGreSQL >= v9.3 or MySQL >= v5.7. As such
+ * any JSON queries you construct are unlikely to be as performant as a native implementation. 
  *
  * Example definition via {@link DataObject::$db} static:
  * 
  * <code>
  * static $db = [
- *  'MyJSONStructure' => '\JSONText\Fields\JSONText'
+ *  'MyJSON' => 'JSONText'
  * ];
  * </code>
  * 
- * See the README for example queries.
+ * See the README and docs/en/usage.md for example queries.
  * 
  * @package silverstripe-jsontext
  * @subpackage fields

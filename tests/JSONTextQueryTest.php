@@ -19,8 +19,7 @@ class JSONTextQueryTest extends SapphireTest
      */
     protected $fixtures = [
         'array'     => 'tests/fixtures/json/array.json',
-        'object'    => 'tests/fixtures/json/object.json',
-        'invalid'   => 'tests/fixtures/json/invalid.json'
+        'object'    => 'tests/fixtures/json/object.json'
     ];
 
     /**
