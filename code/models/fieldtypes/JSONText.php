@@ -51,22 +51,11 @@ class JSONText extends \StringField
      * @config
      */
     private static $backend = 'postgres';
-    
+
     /**
-     * @var array
-     * @config
-     * 
-     * [<backend>] => [
-     *  [<method> => <operator>]
-     * ]; // For use in query() method.
+     * @var boolean
      */
-    private static $allowed_operators = [
-        'postgres' => [
-            'matchOnInt'    => '->',
-            'matchOnStr'    => '->>',
-            'matchOnPath'   => '#>'
-        ]
-    ];
+    protected $nullifyEmpty = false;
 
     /**
      * Legitimate query return types.
@@ -83,6 +72,8 @@ class JSONText extends \StringField
     protected $returnType = 'json';
 
     /**
+     * A representation of this field's data as a {@link JSONStore} object.
+     * 
      * @var \Peekmo\JsonPath\JsonStore
      */
     protected $jsonStore;
@@ -335,11 +326,11 @@ class JSONText extends \StringField
         }
 
         $isOperator = !is_null($operand) && $this->isValidOperator($operator);
-        $isExpresssion = is_null($operand) && $this->isValidExpression($operator);
+        $isExpression = is_null($operand) && $this->isValidExpression($operator);
         
         if ($isOperator) {
             $type = self::JSONTEXT_QUERY_OPERATOR;
-        } else if ($isExpresssion) {
+        } else if ($isExpression) {
             $type = self::JSONTEXT_QUERY_JSONPATH;
         } else {
             $msg = 'JSON expression: ' . $operator . ' is invalid.';
@@ -363,15 +354,14 @@ class JSONText extends \StringField
      */
     private function marshallQuery($args, $type = 1)
     {
-        $backend = $this->config()->backend;
         $operator = $expression = $args[0];
         $operand = isset($args[1]) ? $args[1] : null;
-        $operators = $this->config()->allowed_operators[$backend];
         $operatorParamIsValid = $type === self::JSONTEXT_QUERY_OPERATOR;
         $expressionParamIsValid = $type === self::JSONTEXT_QUERY_JSONPATH;
         
         if ($operatorParamIsValid) {
             $dbBackendInst = $this->createBackendInst($operand);
+            $operators = $dbBackendInst->config()->allowed_operators;
             foreach ($operators as $routine => $backendOperator) {
                 if ($operator === $backendOperator && $result = $dbBackendInst->$routine()) {
                     return $result;
@@ -475,7 +465,7 @@ class JSONText extends \StringField
      * @return JSONBackend
      * @throws JSONTextException
      */
-    protected function createBackendInst($operand)
+    protected function createBackendInst($operand = '')
     {
         $backend = $this->config()->backend;
         $dbBackendClass = '\JSONText\Backends\\' . ucfirst($backend) . 'JSONBackend';
@@ -535,11 +525,11 @@ class JSONText extends \StringField
      */
     public function isValidOperator($operator)
     {
-        $backend = $this->config()->backend;
+        $dbBackendInst = $this->createBackendInst();
 
         return $operator && in_array(
-            $operator, 
-            $this->config()->allowed_operators[$backend],
+            $operator,
+            $dbBackendInst->config()->allowed_operators,
             true
         );
     }

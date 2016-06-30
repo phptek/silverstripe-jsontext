@@ -1,14 +1,12 @@
 <?php
 
 /**
- * DB backend for use with a Postgres RDBMS like JSON querying syntax.
+ * JSONText database backend that encapsulates a Postgres-like syntax for JSON querying.
  * 
  * @package silverstripe-jsontext
  * @subpackage models
  * @author Russell Michell <russ@theruss.com>
- * @see {@link JSONBackend}
- * @see https://github.com/Peekmo/JsonPath/blob/master/tests/JsonStoreTest.php
- * @see http://goessner.net/articles/JsonPath/
+ * @see https://www.postgresql.org/docs/9.6/static/functions-json.html
  */
 
 namespace JSONText\Backends;
@@ -17,6 +15,18 @@ use JSONText\Exceptions\JSONTextException;
 
 class PostgresJSONBackend extends JSONBackend
 {
+    /**
+     * An array of acceptable operators for this backend.
+     * 
+     * @var array
+     * @config
+     */
+    private static $allowed_operators = [
+        'matchOnInt'    => '->',
+        'matchOnStr'    => '->>',
+        'matchOnPath'   => '#>'
+    ];
+    
     /**
      * @inheritdoc
      */

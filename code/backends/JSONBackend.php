@@ -16,7 +16,7 @@ namespace JSONText\Backends;
 use JSONText\Exceptions\JSONTextException;
 use JSONText\Fields\JSONText;
 
-abstract class JSONBackend
+abstract class JSONBackend extends \Object
 {
     
     /**
