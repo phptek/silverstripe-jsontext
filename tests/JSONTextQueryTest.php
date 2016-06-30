@@ -124,11 +124,6 @@ class JSONTextQueryTest extends SapphireTest
         $field->setReturnType('array');
         $field->setValue('["morris"]');
         $this->assertEquals([], $field->query('->', 17));
-
-        // Test: Invalid #2
-        $field->setReturnType('array');
-        $field->setValue('["ass"]');
-        $this->assertEquals(['ass'], $field->query('->', 0));
     }
 
     /**
@@ -424,6 +419,22 @@ class JSONTextQueryTest extends SapphireTest
         $this->assertCount(2, $field->query('$.cars.american[*]'));
         $this->assertInstanceOf('Varchar', $field->query('$.cars.american[*]')[0]);
         $this->assertEquals('buick', $field->query('$.cars.american[*]')[0]->getValue());
+    }
+
+    /**
+     * Tests query() by means of passing bad argument combinations.
+     */
+    public function testQueryWithInvalidArgs()
+    {
+        $field = $this->sut;
+
+        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $field->setValue('["trabant"]');
+        $field->query('$.cars.american[*]', 'foo'); // Cannot pass multiple args when in JSONPath context
+
+        $this->setExpectedException(null);
+        $field->setValue('');
+        $field->query('$.cars.american[*]', 'foo'); // Still shouldn't, but routine only kicks in _After_ checks made in setValue()
     }
     
     /**

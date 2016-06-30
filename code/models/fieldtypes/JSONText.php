@@ -34,12 +34,12 @@ use Peekmo\JsonPath\JsonStore;
 class JSONText extends \StringField
 {
     /**
-     * @var int
+     * @var integer
      */
     const JSONTEXT_QUERY_OPERATOR = 1;
 
     /**
-     * @var int
+     * @var integer
      */
     const JSONTEXT_QUERY_JSONPATH = 2;
     
@@ -53,20 +53,23 @@ class JSONText extends \StringField
     private static $backend = 'postgres';
 
     /**
+     * Legitimate query return types.
+     * 
+     * @var array
+     * @config
+     */
+    private static $return_types = [
+        'json', 'array', 'silverstripe'
+    ];
+    
+    /**
      * @var boolean
      */
     protected $nullifyEmpty = false;
 
     /**
-     * Legitimate query return types.
+     * Default query result return type if nothing different is set via setReturnType().
      * 
-     * @var array
-     */
-    private static $return_types = [
-        'json', 'array', 'silverstripe'
-    ];
-
-    /**
      * @var string
      */
     protected $returnType = 'json';
@@ -325,15 +328,20 @@ class JSONText extends \StringField
             return $this->returnAsType([]);
         }
 
-        $isOperator = !is_null($operand) && $this->isValidOperator($operator);
-        $isExpression = is_null($operand) && $this->isValidExpression($operator);
+        $isOperator = $this->isValidOperator($operator);
+        $isExpression = $this->isValidExpression($operator);
+        
+        if ($isExpression && !empty($operand)) {
+            $msg = 'Cannot pass 2nd param when in JSONPath context in ' . __FUNCTION__ . '()';
+            throw new JSONTextException($msg);
+        }
         
         if ($isOperator) {
             $type = self::JSONTEXT_QUERY_OPERATOR;
         } else if ($isExpression) {
             $type = self::JSONTEXT_QUERY_JSONPATH;
         } else {
-            $msg = 'JSON expression: ' . $operator . ' is invalid.';
+            $msg = 'Cannot use: "' . $operator . '" as operand or expression in ' . __FUNCTION__ . '()';
             throw new JSONTextException($msg);
         }
         

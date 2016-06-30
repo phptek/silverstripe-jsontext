@@ -60,7 +60,7 @@ class JSONTextTest extends SapphireTest
         $this->assertFalse($field->isValidDBValue('false'));
         $this->assertFalse($field->isValidDBValue('null'));
         $this->assertTrue($field->isValidDBValue(''));
-        $this->assertTrue($field->isValidJson('["one","two"]'));
-        $this->assertTrue($field->isValidJson('{"cars":{"american":["buick","oldsmobile"]}}'));
+        $this->assertTrue($field->isValidDBValue('["one","two"]'));
+        $this->assertTrue($field->isValidDBValue('{"cars":{"american":["buick","oldsmobile"]}}'));
     }
 }

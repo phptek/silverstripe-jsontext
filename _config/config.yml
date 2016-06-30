@@ -2,5 +2,9 @@
 Name: 'jsontextconfig'
 ---
 
+Injector:
+  JSONText:
+    class: '\JSONText\Fields\JSONText'
+
 JSONText:
   backend: postgres

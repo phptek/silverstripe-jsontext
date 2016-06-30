@@ -9,14 +9,14 @@ You can stipulate what format you want your query results back in, by passing on
 
 **JSON**
 ```
-    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field = \JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('json');
 ```
 
 **Array**
 ```
-    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field = \JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('array');
 ```
@@ -24,7 +24,7 @@ You can stipulate what format you want your query results back in, by passing on
 **SilverStripe**
 ```
     // Will give you Varchar instances for each scalar value
-    $field = JSONText\Fields\JSONText::create('MyJSON');
+    $field = \JSONText\Fields\JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('silverstripe');
 ```
@@ -34,7 +34,7 @@ cleaner syntax:
 
 **Chaining**
 ```
-    $field = JSONText\Fields\JSONText::create('MyJSON')
+    $field = \JSONText\Fields\JSONText::create('MyJSON')
         ->setValue('{"a": {"b":{"c": "foo"}}}')
         ->setReturnType('array');
 ```
@@ -48,7 +48,7 @@ A small handful of simple query methods `first()`, `last()` and `nth()` exist fo
     {
     
         private static $db = [
-            'MyJSON'    => '\JSONText\Fields\JSONText'
+            'MyJSON'    => 'JSONText'
         ];
     
         /*
@@ -86,7 +86,7 @@ You can also use Postgres-like JSON querying syntax, for querying more complex J
     class MyOtherDataObject extends DataObject
     {
         private static $db = [
-            'MyJSON'    => '\JSONText\Fields\JSONText'
+            'MyJSON'    => 'JSONText'
         ];
     
         /**
@@ -144,7 +144,7 @@ See: [Table of JSONPath expressions](jsonpath.md)
                                 }';
     
         private static $db = [
-            'MyJSON'    => '\JSONText\Fields\JSONText'
+            'MyJSON'    => 'JSONText'
         ];
         
         public function requireDefaultRecords()
@@ -218,7 +218,7 @@ node will be modified with the data passed to `setValue()` as the standard `$val
                                     }';
         
             private static $db = [
-                'MyJSON'    => '\JSONText\Fields\JSONText'
+                'MyJSON'    => 'JSONText'
             ];
             
             public function requireDefaultRecords()
