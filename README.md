@@ -26,19 +26,13 @@ or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functio
 
 ### Why?
 
-I've been wanting to write this module for over two years. Prior-to and during that time I have encountered
-scenarios in more than one project where storing several (10s) of terse configuration parameters in separate database columns
-just seemed crazy. 
+Project scenarios where storing 10s of terse configuration parameters in separate database columns
+just seems crazy. 
 
-There's also the time all you wanted was a simple key -> value store but didn't want to muck
-about with the overhead of two or more datastores like MySQL or Postgres together with MongoDB for example.
+When all you wanted was a simple key / value store but didn't want to muck about with the overhead of two or more
+datastores like an RDBMS together with MongoDB for example.
 
-On one project I went as far as declaring that an entire tab's fields within `getCMSFields()`
-would take their data from, and update-to, a single field comprising JSON data for one aspect of the system's
-configuration.
-
-And if you needed any further convincing that a JSON store in an RDBMS is not such a crazy idea, well Postgres, MySQL, Oracle and MSSQL 2016
-all have, or at time of writing, are planning to have, just such a field.
+That Postgres, MySQL, Oracle and MSSQL 2016 all have, or at time of writing, are planning to have, Database level JSON field-types.
 
 ### Postgres
 

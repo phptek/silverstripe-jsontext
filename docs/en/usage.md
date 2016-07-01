@@ -1,11 +1,10 @@
 # Usage
 
-In the examples below, if you pass invalid queries, expressions or malformed JSON (where applicable) an instance of `JSONTextException` is thrown.
+In the examples below, when passed invalid queries, expressions or malformed JSON (where applicable), then an instance of `JSONTextException` is thrown.
 
 ## General
 
-You can stipulate what format you want your query results back in, by passing one of 
-**json**, **array** or **silverstripe** to the `setReturnType()` method, thus:
+You can stipulate the format you want your query results back as by passing: **json**, **array** or **silverstripe** to the `setReturnType()` method:
 
 **JSON**
 ```
@@ -29,8 +28,7 @@ You can stipulate what format you want your query results back in, by passing on
     $field->setReturnType('silverstripe');
 ```
 
-The module's overloaded declaration of the standard SS `setValue()` method is also chainable for a slightly
-cleaner syntax:
+The module's overloaded `setValue()` method is also chainable for a slightly cleaner syntax:
 
 **Chaining**
 ```
@@ -47,6 +45,9 @@ A small handful of simple query methods `first()`, `last()` and `nth()` exist fo
     class MyDataObject extends DataObject
     {
     
+        /**
+         * @var array
+         */
         private static $db = [
             'MyJSON'    => 'JSONText'
         ];
@@ -85,6 +86,10 @@ You can also use Postgres-like JSON querying syntax, for querying more complex J
 ```
     class MyOtherDataObject extends DataObject
     {
+    
+        /**
+         * @var array
+         */
         private static $db = [
             'MyJSON'    => 'JSONText'
         ];
@@ -143,6 +148,9 @@ See: [Table of JSONPath expressions](jsonpath.md)
                                     ]
                                 }';
     
+        /**
+         * @var array
+         */
         private static $db = [
             'MyJSON'    => 'JSONText'
         ];
@@ -203,40 +211,54 @@ node will be modified with the data passed to `setValue()` as the standard `$val
 ```
     class MyDataObject extends DataObject
     {
-            /*
-             * @var string
-             */
-             protected $stubJSON = '{ "store": {
-                                        "book": [ 
-                                          { "category": "reference",
-                                            "author": "Nigel Rees",
-                                          },
-                                          { "category": "fiction",
-                                            "author": "Evelyn Waugh",
-                                          }
-                                        ]
-                                    }';
+        /*
+         * @var string
+         */
+         protected $stubJSON = '{ "store": {
+                                    "book": [ 
+                                      { "category": "reference",
+                                        "author": "Nigel Rees",
+                                      },
+                                      { "category": "fiction",
+                                        "author": "Evelyn Waugh",
+                                      }
+                                    ]
+                                }';
         
-            private static $db = [
-                'MyJSON'    => 'JSONText'
-            ];
-            
-            public function requireDefaultRecords()
-            {
-                parent::requireDefaultRecords();
-                
-                if (!$this->MyJSON) {
-                    $this->setField($this->MyJSON, $this->stubJSON);
-                }
+        /**
+         * @var array
+         */
+        private static $db = [
+            'MyJSON'    => 'JSONText'
+        ];
+        
+        public function requireDefaultRecords()
+        {
+            parent::requireDefaultRecords();
+        
+            if (!$this->MyJSON) {
+                $this->setField($this->MyJSON, $this->stubJSON);
             }
-    
+        }
+            
+        /**
+         * @param array $update
+         * @return mixed void | null
+         */
+        public function updateMyStuff(array $update = [])
+        {
+            if (empty($update)) {
+                return;
+            }
+            
             // Perform a multiple node update
             $newReference = [
-                'category'  => "new-age",
-                'author'    => "Lucy Lastic"
+                'category'  => $update[0],
+                'author'    => $update[1]
             ];
-    
+
             $field->setValue($newReference, null, '$.store.book.[0]');
+        }
     
     }
 ```
