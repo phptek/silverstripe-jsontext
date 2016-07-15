@@ -553,7 +553,7 @@ class JSONText extends \StringField
      */
     public function isValidExpression($expression)
     {
-        return (bool) preg_match("#^\\$\.#", $expression);
+        return (bool) preg_match("#^(\\*|\[\d:\d:\d\]|\\$\.+[^\d]+)#", $expression);
     }
     
     /**

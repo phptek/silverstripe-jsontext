@@ -12,15 +12,21 @@ class JSONTextTest extends SapphireTest
 {
     /**
      * @todo There are a ton more permutations of a JSONPath regex
-     * See the walk() method in JSONStore
+     * See the trace() method in JSONPath for more examples to work from
      */
     public function testIsValidExpression()
     {
         $field = JSONText::create('MyJSON');
         
         $this->assertTrue($field->isValidExpression('$..'));
+        $this->assertTrue($field->isValidExpression('*'));
         $this->assertTrue($field->isValidExpression('$.[2]'));
         $this->assertTrue($field->isValidExpression('$.cars.american[*]'));
+        $this->assertTrue($field->isValidExpression('[0:1:1]'));
+        $this->assertFalse($field->isValidExpression('[0:1:]'));
+        $this->assertFalse($field->isValidExpression('[0:1:1'));
+        $this->assertFalse($field->isValidExpression(''));
+        $this->assertFalse($field->isValidExpression('$.1.cars.american[*]'));
         $this->assertFalse($field->isValidExpression('$'));
         $this->assertFalse($field->isValidExpression('$[2]'));
     }
