@@ -13,7 +13,7 @@
 
 namespace JSONText\Backends;
 
-use JSONText\Exceptions\JSONTextException;
+use JSONText\Exceptions;
 use JSONText\Fields\JSONText;
 
 abstract class JSONBackend extends \Object
@@ -45,7 +45,7 @@ abstract class JSONBackend extends \Object
      * Match on keys by INT. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
-     * @throws JSONTextException
+     * @throws JSONTextInvalidArgsException
      */
     abstract public function matchOnInt();
 
@@ -53,7 +53,7 @@ abstract class JSONBackend extends \Object
      * Match on keys by STRING. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
-     * @throws JSONTextException
+     * @throws JSONTextInvalidArgsException
      */
     abstract public function matchOnStr();
 
@@ -69,13 +69,13 @@ abstract class JSONBackend extends \Object
      * Match on JSONPath expression. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
-     * @throws JSONTextException
+     * @throws JSONTextInvalidArgsException
      */
     public function matchOnExpr()
     {
         if (!is_string($this->operand)) {
             $msg = 'Non-string operand passed to: ' . __FUNCTION__ . '()';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
         }
 
         // Re-use existing field passed via constructor

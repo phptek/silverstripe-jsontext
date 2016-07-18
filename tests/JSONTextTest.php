@@ -11,6 +11,26 @@ use JSONText\Fields\JSONText;
 class JSONTextTest extends SapphireTest
 {
     /**
+     * @var array
+     */
+    protected $fixtures = [
+        'array'     => 'tests/fixtures/json/array.json',
+        'object'    => 'tests/fixtures/json/object.json'
+    ];
+    
+    /**
+     * JSONTextTest constructor.
+     * 
+     * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
+     */
+    public function __construct()
+    {
+        foreach($this->fixtures as $name => $path) {
+            $this->fixtures[$name] = MODULE_DIR . '/' . $path;
+        }
+    }
+    
+    /**
      * @todo There are a ton more permutations of a JSONPath regex
      * See the trace() method in JSONPath for more examples to work from
      */
@@ -68,5 +88,43 @@ class JSONTextTest extends SapphireTest
         $this->assertTrue($field->isValidDBValue(''));
         $this->assertTrue($field->isValidDBValue('["one","two"]'));
         $this->assertTrue($field->isValidDBValue('{"cars":{"american":["buick","oldsmobile"]}}'));
+    }
+    
+    /**
+     * Properly excercise our internal SS type conversion.
+     */
+    public function testToSSTypes()
+    {
+        $field = JSONText::create('MyJSON');
+        $field->setValue($this->getFixture('array'));
+        $field->setReturnType('silverstripe');
+        
+        $data = $field->last()[6];
+        $this->assertInstanceOf('Float', $data);
+        
+        $data = $field->first()[0];
+        $this->assertInstanceOf('Varchar', $data);
+        
+        $data = $field->nth(5)[5];
+        $this->assertInstanceOf('Int', $data);
+        
+        $data = $field->nth(1)[1];
+        $this->assertInstanceOf('Boolean', $data);
+        
+        $field->setValue('["true"]');
+        $data = $field->first()[0];
+        $this->assertInstanceOf('Varchar', $data);
+    }
+        
+    /**
+     * Get the contents of a fixture
+     * 
+     * @param string $fixture
+     * @return string
+     */
+    private function getFixture($fixture)
+    {
+        $files = $this->fixtures;
+        return file_get_contents($files[$fixture]);
     }
 }

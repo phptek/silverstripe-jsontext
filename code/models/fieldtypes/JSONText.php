@@ -136,13 +136,13 @@ class JSONText extends \StringField
      * 
      * @param string $type
      * @return JSONText
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextInvalidArgsException
      */
     public function setReturnType($type)
     {
         if (!in_array($type, $this->config()->return_types)) {
             $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__ . '()';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
         }
         
         $this->returnType = $type;
@@ -164,7 +164,7 @@ class JSONText extends \StringField
         
         if (!$this->isValidJson($value)) {
             $msg = 'DB data is munged.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextException($msg);
         }
         
         $this->jsonStore = new JsonStore($value);
@@ -230,7 +230,7 @@ class JSONText extends \StringField
     /**
      * @param mixed $value
      * @return array
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextDataException
      */
     public function toArray($value)
     {
@@ -238,7 +238,7 @@ class JSONText extends \StringField
         
         if (is_null($decode)) {
             $msg = 'Decoded JSON is invalid.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextDataException($msg);
         }
         
         return $decode;
@@ -288,7 +288,7 @@ class JSONText extends \StringField
      *
      * @param int $n
      * @return mixed array
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextInvalidArgsException
      */
     public function nth($n)
     {
@@ -300,7 +300,7 @@ class JSONText extends \StringField
         
         if (!is_int($n)) {
             $msg = 'Argument passed to ' . __FUNCTION__ . '() must be an integer.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
         }
 
         $i = 0;
@@ -321,7 +321,7 @@ class JSONText extends \StringField
      * @param string $operator One of the legitimate operators for the current backend or a valid JSONPath expression.
      * @param string $operand
      * @return mixed null|array
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextInvalidArgsException
      */
     public function query($operator, $operand = null)
     {
@@ -336,7 +336,7 @@ class JSONText extends \StringField
         
         if ($isExpression && !empty($operand)) {
             $msg = 'Cannot pass 2nd param when in JSONPath context in ' . __FUNCTION__ . '()';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
         }
         
         if ($isOperator) {
@@ -345,7 +345,7 @@ class JSONText extends \StringField
             $type = self::JSONTEXT_QUERY_JSONPATH;
         } else {
             $msg = 'Cannot use: "' . $operator . '" as operand or expression in ' . __FUNCTION__ . '()';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
         }
         
         if ($marshalled = $this->marshallQuery(func_get_args(), $type)) {
@@ -361,7 +361,6 @@ class JSONText extends \StringField
      * @param array $args
      * @param integer $type
      * @return array
-     * @throws \JSONText\Exceptions\JSONTextException
      */
     private function marshallQuery($args, $type = 1)
     {
@@ -407,19 +406,19 @@ class JSONText extends \StringField
         if (empty($expr)) {
             if (!$this->isValidDBValue($value)) {
                 $msg = 'Invalid data passed to ' . __FUNCTION__ . '()';
-                throw new JSONTextException($msg);
+                throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
             }
             
             $this->value = $value;
         } else {
             if (!$this->isValidExpression($expr)) {
                 $msg = 'Invalid JSONPath expression: ' . $expr . ' passed to ' . __FUNCTION__ . '()';
-                throw new JSONTextException($msg);
+                throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
             }
             
             if (!$this->getJSONStore()->set($expr, $value)) {
                 $msg = 'Failed to properly set custom data to the JSONStore in ' . __FUNCTION__ . '()';
-                throw new JSONTextException($msg);
+                throw new \JSONText\Exceptions\JSONTextDataException($msg);
             }
 
             $this->value = $this->jsonStore->toString();
@@ -435,7 +434,7 @@ class JSONText extends \StringField
      * 
      * @param mixed
      * @return mixed array|null
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws \JSONText\Exceptions\JSONTextInvalidArgsException
      */
     private function returnAsType($data)
     {
@@ -466,7 +465,7 @@ class JSONText extends \StringField
         }
         
         $msg = 'Bad argument passed to ' . __FUNCTION__ . '()';
-        throw new JSONTextException($msg);
+        throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
     }
     
     /**
@@ -474,7 +473,7 @@ class JSONText extends \StringField
      * 
      * @param string operand
      * @return JSONBackend
-     * @throws JSONTextException
+     * @throws JSONTextConfigException
      */
     protected function createBackendInst($operand = '')
     {
@@ -483,7 +482,7 @@ class JSONText extends \StringField
         
         if (!class_exists($dbBackendClass)) {
             $msg = 'JSONText backend class ' . $dbBackendClass . ' not found.';
-            throw new JSONTextException($msg);
+            throw new \JSONText\Exceptions\JSONTextConfigException($msg);
         }
         
         return \Injector::inst()->createWithArgs(
