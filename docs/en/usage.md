@@ -262,3 +262,44 @@ node will be modified with the data passed to `setValue()` as the standard `$val
     
     }
 ```
+
+## In the CMS
+
+Using the `JSONTextExtension` we can subvert SilverStripe's default behaviour of
+needing a `DBField` mapped to a UI field like `TextField`. We can actually map
+non DB-backed UI fields like `TextField` and `Text` to JSON values stored in `JSONtext` fields
+where the non DB-backed UI field's name, becomes a JSON key, and the field's value, the respective
+JSON value.
+
+Simply declare a `$json_field_map` array static in your `DataObject`'s and `SiteTree` objects,
+comprising values as arrays whose keys are the name(s) of your `JSONText` DB fields and values
+are arrays of non DB-backed fields who's data should be stored in the respective `JSONTxt` field.
+
+Obviously, your JSON data can only be simple and single dimensional so that there's
+an easy to manage relationship between UI field and JSON key=>value pairs.
+
+### Example
+
+```
+    private static $db = [
+         'MyJSON' => 'JSONText',
+    ];
+    
+    private static $json_field_map = [
+         'MyJSON' => ['Test1', 'Test2']
+    ];
+     
+    public function getCMSFields()
+    {
+         $fields = parent::getCMSFields();
+         $fields->addFieldsToTab('Root.Main', [
+             TextField::create('Test1', 'Test 1'),  // Look no DB field!
+             TextField::create('Test2', 'Test 2'),  // Look no DB field!
+             TextField::create('MyJSON', 'My JSON') // Use a TextField just to demo
+         ]);
+    
+         return $fields;
+    }
+ ```
+
+

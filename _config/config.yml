@@ -5,6 +5,8 @@ Name: 'jsontextconfig'
 Injector:
   JSONText:
     class: '\JSONText\Fields\JSONText'
+  JSONTextExtension:
+    class: '\JSONText\Extensions\JSONTextExtension'
 
 JSONText:
   backend: postgres
