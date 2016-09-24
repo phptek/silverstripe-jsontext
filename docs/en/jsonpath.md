@@ -1,6 +1,6 @@
 # JSONPath
 
-All the informatation on JSONPath you can eat [can be found here](http://goessner.net/articles/JsonPath/).
+All the information on JSONPath you can eat [can be found here](http://goessner.net/articles/JsonPath/).
 
 ## Quick Reference
 

@@ -18,6 +18,7 @@ JSON storage, querying and modification.
 * Query JSON data via simple accessors, Postgres-like operators or [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
 * Selectively return results of queries as JSON, Array or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
 * Selectively update portions of your source JSON, using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
+* Selectively convert selected CMS input field-data, into JSON and write to specific field(s) on your models.
 
 ## Introduction
 

@@ -208,6 +208,8 @@ expression.
 If the expression matches >1 JSON nodes, then that result is expressed as an indexed array, and each matching
 node will be modified with the data passed to `setValue()` as the standard `$value` (first) param.
 
+Example:
+
 ```
     class MyDataObject extends DataObject
     {
@@ -237,7 +239,7 @@ node will be modified with the data passed to `setValue()` as the standard `$val
             parent::requireDefaultRecords();
         
             if (!$this->MyJSON) {
-                $this->setField($this->MyJSON, $this->stubJSON);
+                $this->setField('MyJSON', $this->stubJSON);
             }
         }
             
@@ -260,5 +262,45 @@ node will be modified with the data passed to `setValue()` as the standard `$val
             $field->setValue($newReference, null, '$.store.book.[0]');
         }
     
+    }
+```
+
+You can also take input from standard CMS input fields, convert those fields' data into JSON
+and save it to a specific DB field. You need to declare a special `$jsontext_field_map` config
+static on each model who's fields you wish to behave in this way.
+
+In the example below, `MyDBField1` will receive JSON data comprising the combined data of
+`MyInputField1` and `MyInputField2` CMS input fields, but not `MyDBField2` which will be inserted into
+a DB field of the same name, in the usual way.
+
+Example:
+
+```
+    class MyDataObject extends DataObject
+    {
+        private static $jsontext_field_map = [
+         'MyDBField1' => [
+            'MyInputField1',
+            'MyInputField2'
+            ]
+        ];
+
+        private static $db = [
+            'MyDBField1' => 'JSONText',
+            'MyDBField2' => 'Text'
+        ]
+
+        public function getCMSFields()
+        {
+            $fields = parent::getCMSFields();
+            //
+            $fields->addFieldsToTab('Root.Main', FieldList::create([
+                TextField::create('MyInputField1', 'My Input One'),
+                TextField::create('MyInputField2', 'My Input Two'),
+                TextField::create('MyDBField2', 'My Input Three')`
+            ]));
+
+            return $fields;
+        }
     }
 ```
