@@ -266,8 +266,8 @@ Example:
 ```
 
 You can also take input from standard CMS input fields, convert those fields' data into JSON
-and save it to a specific DB field. You need to declare a special `$jsontext_field_map` config
-static on each model who's fields you wish to behave in this way.
+and save to a specific DB field. You need to extend your desired models with the `JSONTextExtension`
+and declare a special `$jsontext_field_map` config static on each decorated model who's fields you wish to behave in this way.
 
 In the example below, `MyDBField1` will receive JSON data comprising the combined data of
 `MyInputField1` and `MyInputField2` CMS input fields, but not `MyDBField2` which will be inserted into
