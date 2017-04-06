@@ -101,4 +101,9 @@ Please include all details, no matter how small. If it were *your module*, what 
 
 ## Author
 
-Russell Michell 2016 <russ@theruss.com>
+Russell Michell 2016-2017 <russ@theruss.com>
+
+## TODO
+
+* Add missing `prepValueForDB()` to `JSONText` class.
+* See official list of issues on GitHub. 
