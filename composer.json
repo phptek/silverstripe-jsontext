@@ -2,7 +2,7 @@
     "name": "phptek/jsontext",
     "description": "JSON storage, querying and modification.",
     "type": "silverstripe-module",
-    "keywords": ["silverstripe", "JSON", "JSON Field", "json", "Field", "Query", "Text", "JSONPath", "Postgres"],
+    "keywords": ["silverstripe", "json", "dbfield", "query", "multi", "multivaluefield", "text", "JSONPath", "Postgres"],
     "license": "BSD",
     "authors": [
         {
