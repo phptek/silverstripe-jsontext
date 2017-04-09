@@ -1,7 +1,8 @@
 <?php
 
 /**
- * A text-based database field intended for the storage and querying of JSON structured data. 
+ * A text-based database field intended for the storage and querying of JSON 
+ * structured data. 
  * 
  * JSON data can be queried in a variety of ways:
  * 
@@ -9,19 +10,29 @@
  * 2. Postgres style:    `->`, `->>` and `#>`
  * 3. JSONPath style:    `$..`, `$.store.book[*].author`, `$..book[?(@.price<10)]` (etc)
  * 
- * Note: The extraction techniques employed here are simple key / value comparisons. They do not use any native JSON
- * features of your project's underlying RDBMS, e.g. those found either in PostGreSQL >= v9.3 or MySQL >= v5.7. As such
- * any JSON queries you construct are unlikely to be as performant as a native implementation. 
+ * Note: The extraction techniques employed here are simple key / value comparisons. 
+ * They do not use any native JSON features of your project's underlying RDBMS, 
+ * e.g. those found either in PostGreSQL >= v9.3 or MySQL >= v5.7. As such any
+ * JSON queries you construct are unlikely to be as performant as a native implementation. 
  *
  * Example definition via {@link DataObject::$db} static:
  * 
  * <code>
- * static $db = [
+ * private static $db = [
  *  'MyJSON' => 'JSONText'
  * ];
  * </code>
  * 
- * See the README and docs/en/usage.md for example queries.
+ * When using the JSONTextExtension, you also need a `json_field_map` static:
+ * 
+ * <code>
+ * private static $json_field_map = [
+ *  'MyJSONField1' => ['SomeField1', 'SomeField2'],
+ *  'MyJSONField2' => ['SomeField3', 'SomeField4'],
+ * ];
+ * </code>
+ * 
+ * See the README and docs/en/usage.md for setup and example queries.
  * 
  * @package silverstripe-jsontext
  * @subpackage fields
@@ -232,16 +243,17 @@ class JSONText extends \StringField
      * @return array
      * @throws \JSONText\Exceptions\JSONTextDataException
      */
-    public function toArray($value)
+    public function toArray($value = null)
     {
-        $decode = json_decode($value, true);
+        $value = $value ?: $this->getValue();
+        $decoded = json_decode($value, true);
         
-        if (is_null($decode)) {
+        if (is_null($decoded)) {
             $msg = 'Decoded JSON is invalid.';
             throw new \JSONText\Exceptions\JSONTextDataException($msg);
         }
         
-        return $decode;
+        return $decoded;
     }
     
     /**
@@ -403,6 +415,10 @@ class JSONText extends \StringField
      */
     public function setValue($value, $record = null, $expr = '')
     {
+        if (is_null($value)) {
+            return null;
+        }
+        
         if (empty($expr)) {
             if (!$this->isValidDBValue($value)) {
                 $msg = 'Invalid data passed to ' . __FUNCTION__ . '()';
@@ -494,11 +510,12 @@ class JSONText extends \StringField
 
     /**
      * Utility method to determine whether a value is really valid JSON or not.
-     * The Peekmo JSONStore lib won't accept otherwise valid JSON values like `true`, `false` & `""` so these need
-     * to be disallowed.
+     * The Peekmo JSONStore lib won't accept normally valid JSON values like 
+     * `true`, `false` & `""` so these need to be explicitly disallowed.
      *
      * @param string $value
      * @return boolean
+     * @todo Deal with true, false and null then!
      */
     public function isValidJson($value)
     {
@@ -506,7 +523,6 @@ class JSONText extends \StringField
             return false;
         }
 
-        $value = trim($value);
         return !is_null(json_decode($value, true));
     }
 
@@ -514,8 +530,6 @@ class JSONText extends \StringField
      * @return boolean
      */
     public function isValidDBValue($value) {
-        $value = trim($value);
-        
         if (in_array($value, ['true', 'false'])) {
             return false;
         }

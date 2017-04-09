@@ -265,42 +265,41 @@ Example:
     }
 ```
 
-You can also take input from standard CMS input fields, convert those fields' data into JSON
-and save to a specific DB field. You need to extend your desired models with the `JSONTextExtension`
-and declare a special `$jsontext_field_map` config static on each decorated model who's fields you wish to behave in this way.
+## In the CMS
 
-In the example below, `MyDBField1` will receive JSON data comprising the combined data of
-`MyInputField1` and `MyInputField2` CMS input fields, but not `MyDBField2` which will be inserted into
-a DB field of the same name, in the usual way.
+Using the `JSONTextExtension` we can subvert SilverStripe's default behaviour of
+needing a `DBField` mapped to a UI field like `TextField`. We can actually map
+non DB-backed UI fields like `TextField` and `Text` to JSON values stored in `JSONtext` fields
+where the non DB-backed UI field's name, becomes a JSON key, and the field's value, the respective
+JSON value.
 
-Example:
+Simply declare a `$json_field_map` array static in your `DataObject`'s and `SiteTree` objects,
+comprising values as arrays whose keys are the name(s) of your `JSONText` DB fields and values
+are arrays of non DB-backed fields who's data should be stored in the respective `JSONTxt` field.
+
+Obviously, your JSON data can only be simple and single dimensional so that there's
+an easy to manage relationship between UI field and JSON key=>value pairs.
+
+### Example
 
 ```
-    class MyDataObject extends DataObject
+    private static $db = [
+         'MyJSON' => 'JSONText',
+    ];
+    
+    private static $json_field_map = [
+         'MyJSON' => ['Test1', 'Test2']
+    ];
+     
+    public function getCMSFields()
     {
-        private static $jsontext_field_map = [
-         'MyDBField1' => [
-            'MyInputField1',
-            'MyInputField2'
-            ]
-        ];
-
-        private static $db = [
-            'MyDBField1' => 'JSONText',
-            'MyDBField2' => 'Text'
-        ]
-
-        public function getCMSFields()
-        {
-            $fields = parent::getCMSFields();
-            //
-            $fields->addFieldsToTab('Root.Main', FieldList::create([
-                TextField::create('MyInputField1', 'My Input One'),
-                TextField::create('MyInputField2', 'My Input Two'),
-                TextField::create('MyDBField2', 'My Input Three')`
-            ]));
-
-            return $fields;
-        }
+         $fields = parent::getCMSFields();
+         $fields->addFieldsToTab('Root.Main', [
+             TextField::create('Test1', 'Test 1'),  // Look no DB field!
+             TextField::create('Test2', 'Test 2'),  // Look no DB field!
+             TextField::create('MyJSON', 'My JSON') // Use a TextField just to demo
+         ]);
+    
+         return $fields;
     }
-```
+ ```

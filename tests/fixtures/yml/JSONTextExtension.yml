@@ -1,0 +1,26 @@
+Permission:
+  admin:
+    Code: ADMIN
+
+Group:
+  admins:
+    Title: Administrators
+    Permissions: =>Permission.admin
+
+Member:
+  admin:
+    FirstName: Admin
+    Email: admin@user.com
+    Groups: =>Group.admins
+    
+Page:
+  parent:
+    ID: 1,
+    Title: Parent
+
+JSONTextTestPage:
+  jsontext-text:
+    Title: Dummy
+    Parent: =>Page.parent
+    ID: 44
+    MyJSON: '["test1", "test2"]'
