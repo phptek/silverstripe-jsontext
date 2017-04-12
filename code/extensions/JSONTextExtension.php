@@ -65,7 +65,7 @@ class JSONTextExtension extends \DataExtension
         $doUpdate = (
             count($postVars) &&
             in_array(get_class($controller), ['CMSPageEditController', 'FakeController']) && 
-            !empty($owner->config()->json_field_map)
+            !empty($owner->config()->get('json_field_map'))
         );
         
         if (!$doUpdate) {
@@ -91,7 +91,7 @@ class JSONTextExtension extends \DataExtension
      */
     public function updateJSON(array $postVars, $owner)
     {
-        $jsonFieldMap = $owner->config()->json_field_map;
+        $jsonFieldMap = $owner->config()->get('json_field_map');
         
         foreach ($jsonFieldMap as $jsonField => $mappedFields) {
             $jsonFieldData = [];

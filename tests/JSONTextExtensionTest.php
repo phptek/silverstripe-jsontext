@@ -29,18 +29,15 @@ class JSONTextExtensionTest extends FunctionalTest
     public function testExceptionThrownOnBeforeWrite()
     {
         $member = $this->objFromFixture('Member', 'admin');
-        $this->session()->inst_set('loggedInAs', $member->ID);
         $fixture = $this->objFromFixture('JSONTextTestPage', 'jsontext-text');
+        $this->session()->inst_set('loggedInAs', $member->ID);
         
         $this->setExpectedException('\JSONText\Exceptions\JSONTextException', "FooField doesn't exist in POST data.");
-        
-        $response = $this->post('admin/pages/edit/EditForm', [
+        $this->post('admin/pages/edit/EditForm', [
             'Title' => 'Dummy',
-            'URLSegment' => 'dummy',
-			'action_save' => 1,
-			'ID' => 44,
-            'ParentID' => 1,
-		]);
+            'action_save' => 1,
+            'ID' => 44,
+        ]);
     }
 }
 
@@ -53,5 +50,4 @@ class JSONTextTestPage extends Page implements TestOnly
     private static $json_field_map = [
         'MyJSON' => ['FooField']
     ];
-    
 }

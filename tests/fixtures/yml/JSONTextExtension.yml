@@ -12,15 +12,9 @@ Member:
     FirstName: Admin
     Email: admin@user.com
     Groups: =>Group.admins
-    
-Page:
-  parent:
-    ID: 1,
-    Title: Parent
 
 JSONTextTestPage:
   jsontext-text:
     Title: Dummy
-    Parent: =>Page.parent
+    ParentID: 0
     ID: 44
-    MyJSON: '["test1", "test2"]'
