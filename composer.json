@@ -2,20 +2,20 @@
     "name": "phptek/jsontext",
     "description": "JSON storage, querying and modification.",
     "type": "silverstripe-module",
-    "keywords": ["silverstripe", "json", "dbfield", "query", "multi", "multivaluefield", "text", "JSONPath", "Postgres"],
+    "keywords": ["silverstripe", "json", "dbfield", "query", "multi", "multivalue", "multivaluefield", "text", "JSONPath", "Postgres"],
     "license": "BSD",
     "authors": [
         {
             "name": "Russell Michell",
-	    "homepage": "http://theruss.com/",
+            "homepage": "http://theruss.com/",
             "email": "russ@theruss.com"
         }
     ],
     "require": {
-	"php": ">=5.4,<7",
+        "php": ">=5.4,<7",
         "silverstripe/framework": "~3.1",
         "silverstripe/cms": "~3.1",
-	"peekmo/jsonpath": "dev-master"
+        "peekmo/jsonpath": "dev-master"
     },
     "support": {
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"
