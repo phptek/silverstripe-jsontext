@@ -62,10 +62,11 @@ class JSONTextExtension extends \DataExtension
         $owner = $this->getOwner();
         $controller = \Controller::curr();
         $postVars = $controller->getRequest()->postVars();
+        $fieldMap = $owner->config()->get('json_field_map');
         $doUpdate = (
             count($postVars) &&
             in_array(get_class($controller), ['CMSPageEditController', 'FakeController']) && 
-            !empty($owner->config()->get('json_field_map'))
+            !empty($fieldMap)
         );
         
         if (!$doUpdate) {
