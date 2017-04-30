@@ -6,6 +6,9 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
+use SilverStripe\Dev\FunctionalTest;
+use SilverStripe\Dev\TestOnly;
+
 class JSONTextExtensionTest extends FunctionalTest
 {
     /**
@@ -32,7 +35,7 @@ class JSONTextExtensionTest extends FunctionalTest
         $fixture = $this->objFromFixture('JSONTextTestPage', 'jsontext-text');
         $this->session()->inst_set('loggedInAs', $member->ID);
         
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException', "FooField doesn't exist in POST data.");
+        $this->setExpectedException('JSONTextException', "FooField doesn't exist in POST data.");
         $this->post('admin/pages/edit/EditForm', [
             'Title' => 'Dummy',
             'action_save' => 1,
@@ -44,7 +47,7 @@ class JSONTextExtensionTest extends FunctionalTest
 class JSONTextTestPage extends Page implements TestOnly
 {
     private static $db = [
-        'MyJSON' => 'JSONText'
+        'MyJSON' => '\phptek\JSONText\Fields\JSONText'
     ];
     
     private static $json_field_map = [

@@ -6,7 +6,7 @@
  * @author Russell Michell 2016 <russ@theruss.com>
  */
 
-namespace JSONText\Exceptions;
+namespace phptek\JSONText\Exceptions;
 
 /**
  * Generic base module exception.

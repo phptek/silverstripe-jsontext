@@ -4,9 +4,7 @@ Name: 'jsontextconfig'
 
 Injector:
   JSONText:
-    class: '\JSONText\Fields\JSONText'
+    class: \phptek\JSONText\Fields\JSONText
+    backend: postgres
   JSONTextExtension:
-    class: '\JSONText\Extensions\JSONTextExtension'
-
-JSONText:
-  backend: postgres
+    class: \phptek\JSONText\Extensions\JSONTextExtension

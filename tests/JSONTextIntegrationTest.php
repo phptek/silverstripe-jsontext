@@ -6,11 +6,12 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Exceptions;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Dev\TestOnly;
 
 class JSONTextIntegrationTest extends SapphireTest
 {
-    
     /**
      * @var string
      */
@@ -88,9 +89,9 @@ class JSONTextIntegrationTest extends SapphireTest
 /**
  * @package silverstripe-jsontext
  */
-class MyAwesomeJSONModel extends \DataObject
+class MyAwesomeJSONModel extends DataObject implements TestOnly
 {
     private static $db = [
-        'MyJSON' => '\JSONText\Fields\JSONText'
+        'MyJSON' => '\phptek\JSONText\Fields\JSONText'
     ];
 }

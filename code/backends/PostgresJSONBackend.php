@@ -9,9 +9,9 @@
  * @see https://www.postgresql.org/docs/9.6/static/functions-json.html
  */
 
-namespace JSONText\Backends;
+namespace phptek\JSONText\Backends;
 
-use JSONText\Exceptions;
+use phptek\JSONText\Exceptions\JSONTextInvalidArgsException;
 
 class PostgresJSONBackend extends JSONBackend
 {
@@ -34,7 +34,7 @@ class PostgresJSONBackend extends JSONBackend
     {
         if (!is_int($this->operand)) {
             $msg = 'Non-integer passed to: ' . __FUNCTION__ . '()';
-            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
+            throw new JSONTextInvalidArgsException($msg);
         }
         
         $expr = '$.[' . $this->operand . ']';
@@ -55,7 +55,7 @@ class PostgresJSONBackend extends JSONBackend
     {
         if (!is_string($this->operand)) {
             $msg = 'Non-string passed to: ' . __FUNCTION__ . '()';
-            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
+            throw new sJSONTextInvalidArgsException($msg);
         }
         
         $expr = '$..' . $this->operand;
@@ -76,7 +76,7 @@ class PostgresJSONBackend extends JSONBackend
     {
         if (!is_string($this->operand) || !$this->jsonText->isValidJson($this->operand)) {
             $msg = 'Invalid JSON passed as operand on RHS.';
-            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
+            throw new JSONTextInvalidArgsException($msg);
         }
         
         $operandAsArray = $this->jsonText->toArray($this->operand);
@@ -89,7 +89,7 @@ class PostgresJSONBackend extends JSONBackend
         $vals = array_values($operandAsArray);
         if (count($keys) > 1 || count($vals) > 1) {
             $msg = 'Sorry. I can\'t handle complex operands.';
-            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
+            throw new JSONTextInvalidArgsException($msg);
         }
 
         $source = $this->jsonText->getStoreAsArray();

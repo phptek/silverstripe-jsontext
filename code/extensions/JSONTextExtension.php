@@ -42,12 +42,13 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-namespace JSONText\Extensions;
+namespace phptek\JSONText\Extensions;
 
-use JSONText\Fields\JSONText;
-use JSONText\Exceptions\JSONTextException;
+use phptek\JSONText\Fields\JSONText;
+use phptek\JSONText\Exceptions\JSONTextException;
+use SilverStripe\ORM\DataExtension;
 
-class JSONTextExtension extends \DataExtension
+class JSONTextExtension extends DataExtension
 {    
     /**
      * Pre-process incoming CMS POST data, and modify any available {@link JSONText}
@@ -120,7 +121,7 @@ class JSONTextExtension extends \DataExtension
      * @param FieldList $fields
      * @return void
      */
-    public function updateCMSFields(\FieldList $fields)
+    public function updateCMSFields(\SilverStripe\Forms\FieldList $fields)
     {
         $owner = $this->getOwner();
         $jsonFieldMap = $owner->config()->json_field_map;
