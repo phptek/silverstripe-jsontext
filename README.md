@@ -8,7 +8,17 @@ JSON storage, querying and modification.
 
 ## Requirements
 
-* PHP 5.4+
+### SilverStripe 4
+
+* Use version master (or 2.x when available) 
+* PHP 5.6+,>=7.1
+* SilverStripe Framework ^4.0@dev
+* SilverStripe CMS ^4.0@dev
+
+### SilverStripe 3
+
+* Use version 1.x
+* PHP 5.4+,<7.0
 * SilverStripe Framework 3.1+
 * SilverStripe CMS 3.1+
 
