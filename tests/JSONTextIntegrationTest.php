@@ -24,6 +24,14 @@ class JSONTextIntegrationTest extends SapphireTest
     {
         self::$fixture_file = MODULE_DIR . '/tests/fixtures/yml/MyAwesomeJSONModel.yml';
     }
+    
+    /**
+     * Allows us the ability to scaffold DB records for {@link TestOnly} implementations.
+     * @var array
+     */
+    protected static $extra_dataobjects = [
+        'MyAwesomeJSONModel'
+    ];
 
     /**
      * Tests JSONText::setValue() by means of a simple JSONPath expression operating on a nested JSON array

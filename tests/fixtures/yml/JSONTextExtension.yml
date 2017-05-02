@@ -1,20 +1,14 @@
-Permission:
-  admin:
-    Code: ADMIN
-
-Group:
+'SilverStripe\Security\Group':
   admins:
     Title: Administrators
-    Permissions: =>Permission.admin
 
-Member:
+'SilverStripe\Security\Permission':
+  admin:
+    Code: ADMIN
+    GroupID: '=>SilverStripe\Security\Group.admins'
+
+'SilverStripe\Security\Member':
   admin:
     FirstName: Admin
     Email: admin@user.com
-    Groups: =>Group.admins
-
-JSONTextTestPage:
-  jsontext-text:
-    Title: Dummy
-    ParentID: 0
-    ID: 44
+    Groups: '=>SilverStripe\Security\Group.admins'

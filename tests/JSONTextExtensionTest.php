@@ -8,6 +8,7 @@
 
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Dev\TestOnly;
+use SilverStripe\Core\Config\Config;
 
 class JSONTextExtensionTest extends FunctionalTest
 {
@@ -17,40 +18,30 @@ class JSONTextExtensionTest extends FunctionalTest
     protected static $fixture_file = 'jsontext/tests/fixtures/yml/JSONTextExtension.yml';
     
     /**
-     * Ensure our TestOnly DO's are usable as fixtures in the test DB
-     * 
-     * @var array
-     */
-	protected $extraDataObjects = [
-		'JSONTextTestPage',
-	];
-    
-    /**
      * Is an exception thrown when no POSTed vars are available for
      * non DB-backed fields declared on a SiteTree class?
      */
     public function testExceptionThrownOnBeforeWrite()
     {
-        $member = $this->objFromFixture('Member', 'admin');
-        $fixture = $this->objFromFixture('JSONTextTestPage', 'jsontext-text');
-        $this->session()->inst_set('loggedInAs', $member->ID);
+        $member = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
         
-        $this->setExpectedException('JSONTextException', "FooField doesn't exist in POST data.");
-        $this->post('admin/pages/edit/EditForm', [
-            'Title' => 'Dummy',
-            'action_save' => 1,
+        $fixture = Page::create([
             'ID' => 44,
+            'Title' => 'Dummy',
+            'ParentID' => 0
+        ]);
+        
+        $member->logIn();
+        $fixture->config()->update('db', ['MyJSON' => 'JSONText']);
+        $fixture->config()->update('json_field_map', ['MyJSON' => ['FooField']]);
+        $fixture->write();
+        
+        // Submit a CMS POST request _without_ JSON data
+        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException', "FooField doesn't exist in POST data.");
+        $this->post('admin/pages/edit/EditForm/44/', [
+            'ParentID' => '0',
+            'action_save' => 'Saved',
+            'ID' => '44',
         ]);
     }
-}
-
-class JSONTextTestPage extends Page implements TestOnly
-{
-    private static $db = [
-        'MyJSON' => '\phptek\JSONText\Fields\JSONText'
-    ];
-    
-    private static $json_field_map = [
-        'MyJSON' => ['FooField']
-    ];
 }
