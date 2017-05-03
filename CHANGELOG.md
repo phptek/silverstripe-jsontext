@@ -1,3 +1,21 @@
+##2.0
+
+* MINOR: Tweaked README and travis config to suit SS4+PHP7 [view commit](https://github.com/phptek/silverstripe-jsontext/commit/fea02f918e819a041f1eaeb5b0cec7b4c4344c4d)
+* FIX: Adapted existing tests to SS4 and all is green. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/4d7a5d255b6742cac80696e1d88a920553e33ec9)
+* API: Refactored namespaces to include maintainer GitHub acc name. - Altered namespaces to consumed classes to suit SS4 [view commit](https://github.com/phptek/silverstripe-jsontext/commit/764d9c975df41f33c04373ed140662d51a87b6ae)
+* MINOR: Updated docs to suit instructions for SS4 & SS3 [view commit](https://github.com/phptek/silverstripe-jsontext/commit/ff5f2ca129ea8594e9774b4cb710ad9e013fa14e)
+
+##1.0
+
+* NEW: Fixes #7 - Added always-on DataExtension for no-db-field getCMSFelds() fields (!!). - API Made JSONtext::toArray() more flexible to deal with internal getValue() if no $value passed. - Updated docs. - Also resolves default (null) field value issue on dev/build. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/b5c4207a7aa5cbc69e83c9152b0086e7789d0220)
+* MINOR: Updated README with TODO items. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/64942cb03fbbd8ce6a56f3a573ab4b2665431990)
+* MINOR: Tweaked Composer keywords. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/a238bbbe725e789c03edb000b75daadf33b7f1d1)
+* NEW: Compliments 39204a983 via displaying JSON data in the selected CMS input fields. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/0d7657cd17f3ab3f2b2257ad3a05aa0ebcd9d49a)
+* NEW: Allow CMS feld-data to be converted to JSON and stored to a specific DB field. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/32cc9c8b1b61fd9b06c8368907031aef40d522c5)
+* Removed tests from gitattributes. These are useful to have. Added dedicated Exceptions for specific scenarios. Added more tests. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/39204a9839cfc4df407bd47de46fb8fa7bd0970d)
+* MINOR: Improved range of accepted JSONPath expressions in JSONText::isValidExpression() including test cases. [view commit](https://github.com/phptek/silverstripe-jsontext/commit/25699d5c8e53e7c90ab2ad459e92255d3feac08d)
+* MINOR: Added completed changelog up to 0.7 [view commit](https://github.com/phptek/silverstripe-jsontext/commit/c121e31670db3af048e4acec447ea55771165b68)
+
 ##0.7  
 
  * MINOR: Docs [view commit](http://github.com/phptek/silverstripe-jsontext/commit/09c137842e8cfe35efb032287eb240effd998890)

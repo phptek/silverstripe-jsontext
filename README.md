@@ -10,14 +10,14 @@ JSON storage, querying and modification.
 
 ### SilverStripe 4
 
-* Use dev-master (or 2.x when available) 
+* Use ^2.0
 * PHP 5.6+, >=7.0
 * SilverStripe Framework ^4.0@dev
 * SilverStripe CMS ^4.0@dev
 
 ### SilverStripe 3
 
-* Use version 1.x
+* Use ^1.0
 * PHP 5.4+, <7.0
 * SilverStripe Framework 3.1+
 * SilverStripe CMS 3.1+
