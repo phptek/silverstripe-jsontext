@@ -11,12 +11,13 @@
  * @see http://goessner.net/articles/JsonPath/
  */
 
-namespace JSONText\Backends;
+namespace phptek\JSONText\Backends;
 
-use JSONText\Exceptions;
-use JSONText\Fields\JSONText;
+use phptek\JSONText\Exceptions\JSONTextInvalidArgsException;
+use phptek\JSONText\Fields\JSONText;
+use SilverStripe\Core\Object;
 
-abstract class JSONBackend extends \Object
+abstract class JSONBackend extends Object
 {
     
     /**
@@ -61,7 +62,7 @@ abstract class JSONBackend extends \Object
      * Match on RDBMS-specific path operator. If >1 matches are found, an indexed array of all matches is returned.
      *
      * @return array
-     * @throws \JSONText\Exceptions\JSONTextException
+     * @throws JSONTextException
      */
     abstract public function matchOnPath();
 
@@ -75,7 +76,7 @@ abstract class JSONBackend extends \Object
     {
         if (!is_string($this->operand)) {
             $msg = 'Non-string operand passed to: ' . __FUNCTION__ . '()';
-            throw new \JSONText\Exceptions\JSONTextInvalidArgsException($msg);
+            throw new JSONTextInvalidArgsException($msg);
         }
 
         // Re-use existing field passed via constructor

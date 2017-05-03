@@ -6,11 +6,12 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Exceptions;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Dev\TestOnly;
 
 class JSONTextIntegrationTest extends SapphireTest
 {
-    
     /**
      * @var string
      */
@@ -23,6 +24,14 @@ class JSONTextIntegrationTest extends SapphireTest
     {
         self::$fixture_file = MODULE_DIR . '/tests/fixtures/yml/MyAwesomeJSONModel.yml';
     }
+    
+    /**
+     * Allows us the ability to scaffold DB records for {@link TestOnly} implementations.
+     * @var array
+     */
+    protected static $extra_dataobjects = [
+        'MyAwesomeJSONModel'
+    ];
 
     /**
      * Tests JSONText::setValue() by means of a simple JSONPath expression operating on a nested JSON array
@@ -88,9 +97,9 @@ class JSONTextIntegrationTest extends SapphireTest
 /**
  * @package silverstripe-jsontext
  */
-class MyAwesomeJSONModel extends \DataObject
+class MyAwesomeJSONModel extends DataObject implements TestOnly
 {
     private static $db = [
-        'MyJSON' => '\JSONText\Fields\JSONText'
+        'MyJSON' => '\phptek\JSONText\Fields\JSONText'
     ];
 }

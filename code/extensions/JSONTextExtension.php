@@ -42,12 +42,14 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-namespace JSONText\Extensions;
+namespace phptek\JSONText\Extensions;
 
-use JSONText\Fields\JSONText;
-use JSONText\Exceptions\JSONTextException;
+use phptek\JSONText\Fields\JSONText;
+use phptek\JSONText\Exceptions\JSONTextException;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Control\Controller;
 
-class JSONTextExtension extends \DataExtension
+class JSONTextExtension extends DataExtension
 {    
     /**
      * Pre-process incoming CMS POST data, and modify any available {@link JSONText}
@@ -60,20 +62,22 @@ class JSONTextExtension extends \DataExtension
         parent::onBeforeWrite();
         
         $owner = $this->getOwner();
-        $controller = \Controller::curr();
+        $controller = Controller::curr();
         $postVars = $controller->getRequest()->postVars();
         $fieldMap = $owner->config()->get('json_field_map');
         $doUpdate = (
             count($postVars) &&
-            in_array(get_class($controller), ['CMSPageEditController', 'FakeController']) && 
-            !empty($fieldMap)
+            in_array(get_class($controller), [
+                'SilverStripe\CMS\Controllers\CMSPageEditController',
+                'SilverStripe\Control\Tests\FakeController']
+            ) && !empty($fieldMap)
         );
         
         if (!$doUpdate) {
             return null;
         }
         
-        foreach ($owner->db() as $field => $type) {
+        foreach ($owner->config()->get('db') as $field => $type) {
             if ($type === 'JSONText') {
                 $this->updateJSON($postVars, $owner);
             }
@@ -120,10 +124,10 @@ class JSONTextExtension extends \DataExtension
      * @param FieldList $fields
      * @return void
      */
-    public function updateCMSFields(\FieldList $fields)
+    public function updateCMSFields(\SilverStripe\Forms\FieldList $fields)
     {
         $owner = $this->getOwner();
-        $jsonFieldMap = $owner->config()->json_field_map;
+        $jsonFieldMap = $owner->config()->get('json_field_map');
         
         foreach ($jsonFieldMap as $jsonField => $mappedFields) {
             if (!$owner->getField($jsonField)) {

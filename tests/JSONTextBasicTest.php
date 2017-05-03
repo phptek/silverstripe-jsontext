@@ -7,8 +7,9 @@
  * @todo Add 'object' fixture to each
  */
 
-use JSONText\Fields\JSONText;
-use JSONText\Exceptions;
+use phptek\JSONText\Fields\JSONText;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 class JSONTextBasicTest extends SapphireTest
 {
@@ -79,7 +80,7 @@ class JSONTextBasicTest extends SapphireTest
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->first());
-        $this->assertInstanceOf('Varchar', $field->first()[0]);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBVarchar', $field->first()[0]);
         $this->assertEquals('great wall', $field->first()[0]->getValue());
 
         // Test: Empty
@@ -113,7 +114,7 @@ class JSONTextBasicTest extends SapphireTest
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->last());
-        $this->assertInstanceOf('Float', $field->last()[6]);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBFloat', $field->last()[6]);
         $this->assertEquals(33.3333, $field->last()[6]->getValue());
 
         // Test: Empty
@@ -147,7 +148,7 @@ class JSONTextBasicTest extends SapphireTest
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('array'));
         $this->assertInternalType('array', $field->nth(1));
-        $this->assertInstanceOf('Boolean', $field->nth(1)[1]);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBBoolean', $field->nth(1)[1]);
         $this->assertEquals(true, $field->nth(1)[1]->getValue());
 
         // Test: Empty

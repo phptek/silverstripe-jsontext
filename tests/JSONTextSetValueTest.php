@@ -6,8 +6,8 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Fields\JSONText;
-use JSONText\Exceptions;
+use phptek\JSONText\Fields\JSONText;
+use SilverStripe\Dev\SapphireTest;
 
 class JSONTextSetValueTest extends SapphireTest
 {
@@ -63,21 +63,21 @@ class JSONTextSetValueTest extends SapphireTest
         $this->assertEquals([99.99], $field->query('$.[6]'));
         
         // Invalid #1
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException');
         $field->setValue(99.99, null, '$[6]'); // Invalid JSON path expression
 
         // Reset expected exception
         $this->setExpectedException(null);
 
         // Invalid #2
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException');
         $field->setValue('true'); // Invalid JSON passed to setValue()
 
         // Reset expected exception
         $this->setExpectedException(null);
 
         // Invalid #3
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException');
         $field->setValue('{'); // Invalid JSON. Period.
 
         // Ensure default SS behaviour is respected with empty strings, evenm though it's invalid JSON
@@ -128,7 +128,7 @@ class JSONTextSetValueTest extends SapphireTest
             'american'   => ['chrysler', 'general motors', 'edsel']
         ];
 
-        $this->setExpectedException('\JSONText\Exceptions\JSONTextException');
+        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException');
         $field->setValue($newerCars, null, '{"cars":"american"}'); // setValue() only takes JSONPath expressions
     }
     

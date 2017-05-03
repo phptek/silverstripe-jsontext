@@ -6,7 +6,8 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use JSONText\Fields\JSONText;
+use phptek\JSONText\Fields\JSONText;
+use SilverStripe\Dev\SapphireTest;
 
 class JSONTextTest extends SapphireTest
 {
@@ -100,20 +101,20 @@ class JSONTextTest extends SapphireTest
         $field->setReturnType('silverstripe');
         
         $data = $field->last()[6];
-        $this->assertInstanceOf('Float', $data);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBFloat', $data);
         
         $data = $field->first()[0];
-        $this->assertInstanceOf('Varchar', $data);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBVarchar', $data);
         
         $data = $field->nth(5)[5];
-        $this->assertInstanceOf('Int', $data);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBInt', $data);
         
         $data = $field->nth(1)[1];
-        $this->assertInstanceOf('Boolean', $data);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBBoolean', $data);
         
         $field->setValue('["true"]');
         $data = $field->first()[0];
-        $this->assertInstanceOf('Varchar', $data);
+        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBVarchar', $data);
     }
         
     /**
