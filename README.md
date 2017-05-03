@@ -10,25 +10,25 @@ JSON storage, querying and modification.
 
 ### SilverStripe 4
 
-* Use version master (or 2.x when available) 
-* PHP 5.6+,>=7.1
+* Use dev-master (or 2.x when available) 
+* PHP 5.6+, >=7.0
 * SilverStripe Framework ^4.0@dev
 * SilverStripe CMS ^4.0@dev
 
 ### SilverStripe 3
 
 * Use version 1.x
-* PHP 5.4+,<7.0
+* PHP 5.4+, <7.0
 * SilverStripe Framework 3.1+
 * SilverStripe CMS 3.1+
 
 ## Features
 
-* Store JSON in a dedicated JSON-specific `DBField`  subclass
-* Query JSON data via simple accessors, Postgres-like operators or [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
-* Selectively return results of queries as JSON, Array or cast to SilverStripe `Varchar`, `Int`, `Float` or `Boolean` objects.
-* Selectively update portions of your source JSON, using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
-* Selectively convert selected CMS input field-data, into JSON and write to specific field(s) on your models.
+* Store JSON "object-strings" in a JSON-specific `DBField`  subclass.
+* Query stored JSON via simple accessors: `first()`, `last()` & `nth()` or Postgres-like operators: `->`, `->>` & `#>` or even [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
+* Selectively return query-results as `JSON`, `Array` or cast to SilverStripe's `Varchar`, `Int`, `Float` or `Boolean` objects.
+* Selectively update portions of stored JSON using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
+* Selectively transform one or more CMS input fields, to write to a single JSON store.
 
 ## Introduction
 
@@ -40,14 +40,14 @@ or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functio
 Project scenarios where storing 10s of terse configuration parameters in separate database columns
 just seems crazy. 
 
-When all you wanted was a simple key / value store but didn't want to muck about with the overhead of two or more
-datastores like an RDBMS together with MongoDB for example.
+When all you wanted was a simple key / value store but didn't want to muck about with the overhead of an RDBMS _and_ a NOSQL DB.
 
-That Postgres, MySQL, Oracle and MSSQL 2016 all have, or at time of writing, are planning to have, Database level JSON field-types.
+That Postgres, MySQL, Oracle and MSSQL 2016 all have, or at time of writing, are planning to have, Database level JSON field-types. This module plugs the gap for users of RDBMS'
+_without_ native JSON support, while offering the a convenient scaffold on top of which native JSON support could be built.
 
 ### Postgres
 
-In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or object respectively. The module
+In Postgres both the `->` and `->>` operators act as string and integer key matchers on a JSON array or JSON object respectively. The module
 however treats both source types the same - they are after all *both JSON* so `->` is used as an **Integer Matcher** and `->>` as a **String Matcher**
 *regardless* of the "type" of source JSON stored. The `#>` **Path Matcher** operator can act as an object or a text matcher, but the module wishes to simplify things and as such
 the `#>` operator is *just a simple path matcher*.
