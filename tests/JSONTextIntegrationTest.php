@@ -9,20 +9,23 @@
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
+use PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONModel;
 
 class JSONTextIntegrationTest extends SapphireTest
 {
     /**
      * @var string
      */
-    protected static $fixture_file = '/tests/fixtures/yml/MyAwesomeJSONModel.yml';
+    protected static $fixture_file = '/fixtures/yml/MyAwesomeJSONModel.yml';
 
     /**
      * Modifies fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
     {
-        self::$fixture_file = MODULE_DIR . '/tests/fixtures/yml/MyAwesomeJSONModel.yml';
+        $dir = realpath(__DIR__);
+        
+        self::$fixture_file = $dir . '/fixtures/yml/MyAwesomeJSONModel.yml';
     }
     
     /**
@@ -30,7 +33,7 @@ class JSONTextIntegrationTest extends SapphireTest
      * @var array
      */
     protected static $extra_dataobjects = [
-        'MyAwesomeJSONModel'
+        MyAwesomeJSONModel::class
     ];
 
     /**
@@ -39,7 +42,7 @@ class JSONTextIntegrationTest extends SapphireTest
      */
     public function testSetValueOnNestedArray()
     {
-        $model = $this->objFromFixture('MyAwesomeJSONModel', 'json-as-object');
+        $model = $this->objFromFixture(MyAwesomeJSONModel::class, 'json-as-object');
         $expression = '$.cars.american.[0]';
         $field = $model->dbObject('MyJSON');
 
@@ -69,7 +72,7 @@ class JSONTextIntegrationTest extends SapphireTest
      */
     public function testSetValueOnUnNestedArray()
     {
-        $model = $this->objFromFixture('MyAwesomeJSONModel', 'json-as-array');
+        $model = $this->objFromFixture(MyAwesomeJSONModel::class, 'json-as-array');
         $expression = '$.[0]';
         $field = $model->dbObject('MyJSON');
 
@@ -92,14 +95,4 @@ class JSONTextIntegrationTest extends SapphireTest
         $this->assertEquals(['chrysler'], $field->query($expression));
     }
 
-}
-
-/**
- * @package silverstripe-jsontext
- */
-class MyAwesomeJSONModel extends DataObject implements TestOnly
-{
-    private static $db = [
-        'MyJSON' => '\phptek\JSONText\Fields\JSONText'
-    ];
 }

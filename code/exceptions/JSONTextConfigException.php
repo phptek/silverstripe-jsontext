@@ -9,8 +9,8 @@
 namespace PhpTek\JSONText\Exception;
 
 /**
- * Generic base module exception.
+ * Thrown when issues with regard to SilverStripe config are discovered.
  */
-class JSONTextException extends \Exception
+class JSONTextConfigException extends JSONTextException
 {
 }

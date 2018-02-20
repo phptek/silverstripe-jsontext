@@ -9,9 +9,9 @@
  * @see https://www.postgresql.org/docs/9.6/static/functions-json.html
  */
 
-namespace phptek\JSONText\Backends;
+namespace PhpTek\JSONText\Backend;
 
-use phptek\JSONText\Exceptions\JSONTextInvalidArgsException;
+use PhpTek\JSONText\Exception\JSONTextInvalidArgsException;
 
 class PostgresJSONBackend extends JSONBackend
 {
@@ -32,14 +32,14 @@ class PostgresJSONBackend extends JSONBackend
      */
     public function matchOnInt()
     {
-        if (!is_int($this->operand)) {
+        if (!\is_int($this->operand)) {
             $msg = 'Non-integer passed to: ' . __FUNCTION__ . '()';
             throw new JSONTextInvalidArgsException($msg);
         }
         
         $expr = '$.[' . $this->operand . ']';
         $fetch = $this->jsonText->getJSONStore()->get($expr);
-        $vals = array_values($fetch);
+        $vals = \array_values($fetch);
         
         if (isset($vals[0])) {
             return [$this->operand => $vals[0]];
@@ -53,14 +53,14 @@ class PostgresJSONBackend extends JSONBackend
      */
     public function matchOnStr()
     {
-        if (!is_string($this->operand)) {
+        if (!\is_string($this->operand)) {
             $msg = 'Non-string passed to: ' . __FUNCTION__ . '()';
-            throw new sJSONTextInvalidArgsException($msg);
+            throw new JSONTextInvalidArgsException($msg);
         }
         
         $expr = '$..' . $this->operand;
         $fetch = $this->jsonText->getJSONStore()->get($expr);
-        $vals = array_values($fetch);
+        $vals = \array_values($fetch);
 
         if (isset($vals[0])) {
             return [$this->operand => $vals[0]];
@@ -74,20 +74,21 @@ class PostgresJSONBackend extends JSONBackend
      */
     public function matchOnPath()
     {
-        if (!is_string($this->operand) || !$this->jsonText->isValidJson($this->operand)) {
+        if (!\is_string($this->operand) || !$this->jsonText->isValidJson($this->operand)) {
             $msg = 'Invalid JSON passed as operand on RHS.';
             throw new JSONTextInvalidArgsException($msg);
         }
         
         $operandAsArray = $this->jsonText->toArray($this->operand);
         
-        if (!count($operandAsArray)) {
+        if (!\count($operandAsArray)) {
             return [];
         }
 
-        $keys = array_keys($operandAsArray);
-        $vals = array_values($operandAsArray);
-        if (count($keys) > 1 || count($vals) > 1) {
+        $keys = \array_keys($operandAsArray);
+        $vals = \array_values($operandAsArray);
+        
+        if (\count($keys) > 1 || \count($vals) > 1) {
             $msg = 'Sorry. I can\'t handle complex operands.';
             throw new JSONTextInvalidArgsException($msg);
         }

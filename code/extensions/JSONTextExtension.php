@@ -7,8 +7,8 @@
  * The SilverStripe default gives you one DBField for every input field declared
  * in getCMSFields(). This extension however allows you to use a single blob
  * of JSON, stored in a single {@link JSONTextField} and manage each key=>value pair
- * from individual input fields without needing to declare equivalent or further
- * database fields. All you need to do is add a `$json_field_map` static to
+ * from individual form input fields, without needing to declare equivalent or further
+ * database fields. All you need to do is add a `$json_field_map` config static to
  * your model (See below).
  * 
  * Notes: 
@@ -17,7 +17,7 @@
  * 
  * <code>
  * private static $db = [
- *      'TestJSON' => 'JSONText',
+ *      'TestJSON' => JSONText::class,
  * ];
  * 
  * private static $json_field_map = [
@@ -42,10 +42,10 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-namespace phptek\JSONText\Extensions;
+namespace PhpTek\JSONText\Extension;
 
-use phptek\JSONText\Fields\JSONText;
-use phptek\JSONText\Exceptions\JSONTextException;
+use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
 
@@ -89,8 +89,8 @@ class JSONTextExtension extends DataExtension
      * JSONText DB field with the appropriate input-field data, as per the model's 
      * "json_field_map" config static.
      * 
-     * @param array $postVars
-     * @param DataObject $owner
+     * @param  array $postVars
+     * @param  DataObject $owner
      * @return void
      * @throws JSONTextException
      */
@@ -110,7 +110,7 @@ class JSONTextExtension extends DataExtension
                 $jsonFieldData[$fieldName] = $postVars[$fieldName];
             }
             
-            $fieldValue = singleton('JSONText')->toJson($jsonFieldData);
+            $fieldValue = singleton(JSONText::class)->toJson($jsonFieldData);
             $owner->setField($jsonField, $fieldValue);
         }
     }
@@ -121,7 +121,7 @@ class JSONTextExtension extends DataExtension
      * in the relevant JSON data. Therefore we need to pre-populate each such field's
      * value.
      * 
-     * @param FieldList $fields
+     * @param  FieldList $fields
      * @return void
      */
     public function updateCMSFields(\SilverStripe\Forms\FieldList $fields)

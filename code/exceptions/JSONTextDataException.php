@@ -9,8 +9,9 @@
 namespace PhpTek\JSONText\Exception;
 
 /**
- * Generic base module exception.
+ * Thrown when data arrives at a routine in an unexpected format or when raw data
+ * is found to be in an unusable state.
  */
-class JSONTextException extends \Exception
+class JSONTextDataException extends JSONTextException
 {
 }

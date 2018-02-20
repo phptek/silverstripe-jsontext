@@ -9,8 +9,9 @@
 namespace PhpTek\JSONText\Exception;
 
 /**
- * Generic base module exception.
+ * Thrown whenever userland issues with method parameters, types and values are
+ * discovered.
  */
-class JSONTextException extends \Exception
+class JSONTextInvalidArgsException extends JSONTextException
 {
 }

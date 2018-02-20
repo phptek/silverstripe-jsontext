@@ -7,7 +7,7 @@
  * @todo Add 'object' fixture to each
  */
 
-use phptek\JSONText\Fields\JSONText;
+use PhpTek\JSONText\Field\JSONText;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBVarchar;
 
@@ -17,8 +17,8 @@ class JSONTextBasicTest extends SapphireTest
      * @var array
      */
     protected $fixtures = [
-        'array'     => 'tests/fixtures/json/array.json',
-        'object'    => 'tests/fixtures/json/object.json'
+        'array'     => 'fixtures/json/array.json',
+        'object'    => 'fixtures/json/object.json'
     ];
 
     /**
@@ -34,7 +34,7 @@ class JSONTextBasicTest extends SapphireTest
     public function __construct()
     {
         foreach($this->fixtures as $name => $path) {
-            $this->fixtures[$name] = MODULE_DIR . '/' . $path;
+            $this->fixtures[$name] = realpath(__DIR__) . '/' . $path;
         }
     }
 

@@ -11,14 +11,15 @@
  * @see http://goessner.net/articles/JsonPath/
  */
 
-namespace phptek\JSONText\Backends;
+namespace PhpTek\JSONText\Backend;
 
-use phptek\JSONText\Exceptions\JSONTextInvalidArgsException;
-use phptek\JSONText\Fields\JSONText;
-use SilverStripe\Core\Object;
+use PhpTek\JSONText\Exceptions\JSONTextInvalidArgsException;
+use PhpTek\JSONText\Fields\JSONText;
+use SilverStripe\Core\Config\Configurable;
 
-abstract class JSONBackend extends Object
+abstract class JSONBackend
 {
+    use Configurable;
     
     /**
      * @var string

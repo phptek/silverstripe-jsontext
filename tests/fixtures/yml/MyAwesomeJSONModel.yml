@@ -1,4 +1,4 @@
-MyAwesomeJSONModel:
+PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONModel:
   json-as-object:
     MyJSON: '{"cars":{"american":["buick","oldsmobile"]}}'
   json-as-array:

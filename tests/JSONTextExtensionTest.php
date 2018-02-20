@@ -6,9 +6,11 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
+use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Security\Member;
 
 class JSONTextExtensionTest extends FunctionalTest
 {
@@ -23,7 +25,7 @@ class JSONTextExtensionTest extends FunctionalTest
      */
     public function testExceptionThrownOnBeforeWrite()
     {
-        $member = $this->objFromFixture('SilverStripe\\Security\\Member', 'admin');
+        $member = $this->objFromFixture(Member::class, 'admin');
         
         $fixture = Page::create([
             'ID' => 44,
@@ -37,7 +39,7 @@ class JSONTextExtensionTest extends FunctionalTest
         $fixture->write();
         
         // Submit a CMS POST request _without_ JSON data
-        $this->setExpectedException('\phptek\JSONText\Exceptions\JSONTextException', "FooField doesn't exist in POST data.");
+        $this->setExpectedException(JSONTextException::class, "FooField doesn't exist in POST data.");
         $this->post('admin/pages/edit/EditForm/44/', [
             'ParentID' => '0',
             'action_save' => 'Saved',

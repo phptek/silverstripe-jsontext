@@ -6,8 +6,12 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use phptek\JSONText\Fields\JSONText;
+use PhpTek\JSONText\Field\JSONText;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\FieldType\DBFloat;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\ORM\FieldType\DBInt;
 
 class JSONTextTest extends SapphireTest
 {
@@ -15,8 +19,8 @@ class JSONTextTest extends SapphireTest
      * @var array
      */
     protected $fixtures = [
-        'array'     => 'tests/fixtures/json/array.json',
-        'object'    => 'tests/fixtures/json/object.json'
+        'array'     => 'fixtures/json/array.json',
+        'object'    => 'fixtures/json/object.json'
     ];
     
     /**
@@ -27,7 +31,7 @@ class JSONTextTest extends SapphireTest
     public function __construct()
     {
         foreach($this->fixtures as $name => $path) {
-            $this->fixtures[$name] = MODULE_DIR . '/' . $path;
+            $this->fixtures[$name] = realpath(__DIR__) . '/' . $path;
         }
     }
     
@@ -101,20 +105,20 @@ class JSONTextTest extends SapphireTest
         $field->setReturnType('silverstripe');
         
         $data = $field->last()[6];
-        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBFloat', $data);
+        $this->assertInstanceOf(DBFloat::class, $data);
         
         $data = $field->first()[0];
-        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBVarchar', $data);
+        $this->assertInstanceOf(DBVarchar::class, $data);
         
         $data = $field->nth(5)[5];
-        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBInt', $data);
+        $this->assertInstanceOf(DBInt::class, $data);
         
         $data = $field->nth(1)[1];
-        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBBoolean', $data);
+        $this->assertInstanceOf(DBBoolean::class, $data);
         
         $field->setValue('["true"]');
         $data = $field->first()[0];
-        $this->assertInstanceOf('\SilverStripe\ORM\FieldType\DBVarchar', $data);
+        $this->assertInstanceOf(DBVarchar::class, $data);
     }
         
     /**

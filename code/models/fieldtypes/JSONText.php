@@ -19,11 +19,11 @@
  * 
  * <code>
  * private static $db = [
- *  'MyJSON' => 'JSONText'
+ *  'MyJSON' => JSONText::class
  * ];
  * </code>
  * 
- * When using the JSONTextExtension, you also need a `json_field_map` static:
+ * When using the JSONTextExtension, you also need a `json_field_map` config static:
  * 
  * <code>
  * private static $json_field_map = [
@@ -39,12 +39,12 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-namespace phptek\JSONText\Fields;
+namespace PhpTek\JSONText\Field;
 
-use phptek\JSONText\Exceptions\JSONTextException;
-use phptek\JSONText\Exceptions\JSONTextInvalidArgsException;
-use phptek\JSONText\Exceptions\JSONTextDataException;
-use phptek\JSONText\Exceptions\JSONTextConfigException;
+use PhpTek\JSONText\Exception\JSONTextException;
+use PhpTek\JSONText\Exception\JSONTextInvalidArgsException;
+use PhpTek\JSONText\Exception\JSONTextDataException;
+use PhpTek\JSONText\Exception\JSONTextConfigException;
 use Peekmo\JsonPath\JsonStore;
 use SilverStripe\ORM\DB;
 use SilverStripe\Core\Injector\Injector;
@@ -54,6 +54,7 @@ use SilverStripe\Forms\HiddenField;
 
 class JSONText extends DBString
 {
+    
     /**
      * @var integer
      */
@@ -105,7 +106,7 @@ class JSONText extends DBString
     /**
      * Taken from {@link Text}.
      * 
-     * @see DBField::requireField()
+     * @see    DBField::requireField()
      * @return void
      */
     public function requireField()
@@ -126,8 +127,8 @@ class JSONText extends DBString
     }
 
     /**
-     * @param string $title
-     * @return \HiddenField
+     * @param  string $title
+     * @return HiddenField
      */
     public function scaffoldSearchField($title = null)
     {
@@ -135,9 +136,9 @@ class JSONText extends DBString
     }
 
     /**
-     * @param string $title
-     * @param string $params
-     * @return \HiddenField
+     * @param  string $title
+     * @param  string $params
+     * @return HiddenField
      */
     public function scaffoldFormField($title = null, $params = null)
     {
@@ -147,13 +148,13 @@ class JSONText extends DBString
     /**
      * Tell all class methods to return data as JSON , an array or an array of SilverStripe DBField subtypes.
      * 
-     * @param string $type
+     * @param  string $type
      * @return JSONText
      * @throws JSONTextInvalidArgsException
      */
     public function setReturnType($type)
     {
-        if (!in_array($type, $this->config()->return_types)) {
+        if (!in_array($type, $this->config()->get('return_types'))) {
             $msg = 'Bad type: ' . $type . ' passed to ' . __FUNCTION__ . '()';
             throw new JSONTextInvalidArgsException($msg);
         }
@@ -193,6 +194,7 @@ class JSONText extends DBString
     public function getStoreAsArray()
     {
         $store = $this->getJSONStore();
+        
         if (!is_array($store)) {
             return $store->toArray();
         }
@@ -203,7 +205,7 @@ class JSONText extends DBString
     /**
      * Convert an array to JSON via json_encode().
      * 
-     * @param array $value
+     * @param  array $value
      * @return string null|string
      */
     public function toJson(array $value)
@@ -223,12 +225,13 @@ class JSONText extends DBString
      * - {@link DBBoolean}
      * - {@link DBVarchar}
      * 
-     * @param array $data
+     * @param  array $data
      * @return array
      */
     public function toSSTypes(array $data)
     {
         $newList = [];
+        
         foreach ($data as $key => $val) {
             if (is_array($val)) {
                 $newList[$key] = $this->toSSTypes($val);
@@ -241,7 +244,7 @@ class JSONText extends DBString
     }
 
     /**
-     * @param mixed $value
+     * @param  mixed $value
      * @return array
      * @throws JSONTextDataException
      */
@@ -300,7 +303,7 @@ class JSONText extends DBString
     /**
      * Return an array of the JSON key + value represented as the $n'th JSON node.
      *
-     * @param int $n
+     * @param  int $n
      * @return mixed array
      * @throws JSONTextInvalidArgsException
      */
@@ -332,8 +335,8 @@ class JSONText extends DBString
      * Return the key(s) + value(s) represented by $operator extracting relevant result from the source JSON's structure.
      * N.b when using the path match operator '#>' with duplicate keys, an indexed array of results is returned.
      *
-     * @param string $operator One of the legitimate operators for the current backend or a valid JSONPath expression.
-     * @param string $operand
+     * @param  string $operator One of the legitimate operators for the current backend or a valid JSONPath expression.
+     * @param  string $operand
      * @return mixed null|array
      * @throws JSONTextInvalidArgsException
      */
@@ -370,10 +373,11 @@ class JSONText extends DBString
     }
 
     /**
-     * Based on the passed operator or expression, it marshalls the correct backend matcher method into account.
+     * Based on the passed operator or expression, it marshalls the correct backend
+     * matcher method into account.
      *
-     * @param array $args
-     * @param integer $type
+     * @param  array $args
+     * @param  integer $type
      * @return array
      */
     private function marshallQuery($args, $type = 1)
@@ -384,15 +388,17 @@ class JSONText extends DBString
         $expressionParamIsValid = $type === self::JSONTEXT_QUERY_JSONPATH;
         
         if ($operatorParamIsValid) {
-            $dbBackendInst = $this->createBackendInst($operand);
-            $operators = $dbBackendInst->config()->allowed_operators;
+            $dbBackendInst = $this->backendFactory($operand);
+            $operators = $dbBackendInst->config()->get('allowed_operators');
+            
             foreach ($operators as $routine => $backendOperator) {
                 if ($operator === $backendOperator && $result = $dbBackendInst->$routine()) {
                     return $result;
                 }
             }
         } else if($expressionParamIsValid) {
-            $dbBackendInst = $this->createBackendInst($expression);
+            $dbBackendInst = $this->backendFactory($expression);
+            
             if ($result = $dbBackendInst->matchOnExpr()) {
                 return $result;
             }
@@ -409,9 +415,9 @@ class JSONText extends DBString
      * Note: The $expr parameter can only accept JSONPath expressions. Using Postgres operators will not work and will
      * throw an instance of JSONTextException.
      *
-     * @param mixed $value
-     * @param array $record
-     * @param string $expr  A valid JSONPath expression.
+     * @param  mixed $value
+     * @param  array $record
+     * @param  string $expr  A valid JSONPath expression.
      * @return JSONText
      * @throws JSONTextException
      */
@@ -450,7 +456,7 @@ class JSONText extends DBString
     /**
      * Determine the desired userland format to return all query API method results in.
      * 
-     * @param mixed
+     * @param  mixed $data
      * @return mixed array|null
      * @throws JSONTextInvalidArgsException
      */
@@ -458,6 +464,7 @@ class JSONText extends DBString
     {
         $data = (array) $data;
         $type = $this->returnType;
+        
         if ($type === 'array') {
             if (!count($data)) {
                 return [];
@@ -489,14 +496,14 @@ class JSONText extends DBString
     /**
      * Create an instance of {@link JSONBackend} according to the value of JSONText::backend defined in SS config.
      * 
-     * @param string operand
+     * @param  string operand
      * @return JSONBackend
      * @throws JSONTextConfigException
      */
-    protected function createBackendInst($operand = '')
+    protected function backendFactory($operand = '')
     {
-        $backend = $this->config()->backend;
-        $dbBackendClass = '\phptek\JSONText\Backends\\' . ucfirst($backend) . 'JSONBackend';
+        $backend = $this->config()->get('backend');
+        $dbBackendClass = '\PhpTek\JSONText\Backend\\' . ucfirst($backend) . 'JSONBackend';
         
         if (!class_exists($dbBackendClass)) {
             $msg = $dbBackendClass . ' not found.';
@@ -515,9 +522,9 @@ class JSONText extends DBString
      * The Peekmo JSONStore lib won't accept normally valid JSON values like 
      * `true`, `false` & `""` so these need to be explicitly disallowed.
      *
-     * @param string $value
+     * @param  string $value
      * @return boolean
-     * @todo Deal with true, false and null then!
+     * @todo   Deal with true, false and null then!
      */
     public function isValidJson($value)
     {
@@ -546,16 +553,16 @@ class JSONText extends DBString
     /**
      * Is the passed JSON operator valid?
      *
-     * @param string $operator
+     * @param  string $operator
      * @return boolean
      */
     public function isValidOperator($operator)
     {
-        $dbBackendInst = $this->createBackendInst();
+        $dbBackendInst = $this->backendFactory();
 
         return $operator && in_array(
             $operator,
-            $dbBackendInst->config()->allowed_operators,
+            $dbBackendInst->config()->get('allowed_operators'),
             true
         );
     }
@@ -563,7 +570,7 @@ class JSONText extends DBString
     /**
      * Is the passed JSPONPath expression valid?
      * 
-     * @param string $expression
+     * @param  string $expression
      * @return bool
      */
     public function isValidExpression($expression)
@@ -574,7 +581,7 @@ class JSONText extends DBString
     /**
      * Casts a value to a {@link DBField} subclass.
      * 
-     * @param mixed $val
+     * @param  mixed $val
      * @return mixed DBField|array
      */
     private function castToDBField($val)
