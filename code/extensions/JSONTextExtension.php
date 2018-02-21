@@ -129,6 +129,10 @@ class JSONTextExtension extends DataExtension
         $owner = $this->getOwner();
         $jsonFieldMap = $owner->config()->get('json_field_map');
         
+        if (empty($jsonFieldMap)) {
+            return;
+        }
+        
         foreach ($jsonFieldMap as $jsonField => $mappedFields) {
             if (!$owner->getField($jsonField)) {
                 continue;
