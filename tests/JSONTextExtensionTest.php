@@ -39,7 +39,7 @@ class JSONTextExtensionTest extends FunctionalTest
         $fixture->write();
         
         // Submit a CMS POST request _without_ JSON data
-        $this->setExpectedException(JSONTextException::class, "FooField doesn't exist in POST data.");
+        $this->setExpectedException(JSONTextException::class);
         $this->post('admin/pages/edit/EditForm/44/', [
             'ParentID' => '0',
             'action_save' => 'Saved',

@@ -14,4 +14,11 @@ class MyAwesomeJSONModel extends DataObject implements TestOnly
     private static $db = [
         'MyJSON' => JSONText::class
     ];
+    
+    /**
+     * @var string
+     * @config
+     */
+    private static $table_name = 'MyAwesomeJSONModel';
+    
 }
