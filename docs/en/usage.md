@@ -8,22 +8,22 @@ You can stipulate the format you want your query results back as by passing: **j
 
 **JSON**
 ```
-    $field = \JSONText\Fields\JSONText::create('MyJSON');
+    $field = JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('json');
 ```
 
 **Array**
 ```
-    $field = \JSONText\Fields\JSONText::create('MyJSON');
+    $field = JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('array');
 ```
 
 **SilverStripe**
 ```
-    // Will give you Varchar instances for each scalar value
-    $field = \JSONText\Fields\JSONText::create('MyJSON');
+    // Will give you DBVarchar instances for each scalar value
+    $field = JSONText::create('MyJSON');
     $field->setValue('{"a": {"b":{"c": "foo"}}}');
     $field->setReturnType('silverstripe');
 ```
@@ -32,7 +32,7 @@ The module's overloaded `setValue()` method is also chainable for a slightly cle
 
 **Chaining**
 ```
-    $field = \JSONText\Fields\JSONText::create('MyJSON')
+    $field = JSONText::create('MyJSON')
         ->setValue('{"a": {"b":{"c": "foo"}}}')
         ->setReturnType('array');
 ```
@@ -42,6 +42,8 @@ The module's overloaded `setValue()` method is also chainable for a slightly cle
 A small handful of simple query methods `first()`, `last()` and `nth()` exist for when your source JSON is a simple JSON array:
 
 ```
+    use PhpTek\JSONText\Field\JSONText;
+
     class MyDataObject extends DataObject
     {
     
@@ -49,7 +51,7 @@ A small handful of simple query methods `first()`, `last()` and `nth()` exist fo
          * @var array
          */
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => JSONText::class
         ];
     
         /*
@@ -83,7 +85,10 @@ A small handful of simple query methods `first()`, `last()` and `nth()` exist fo
 
 You can also use Postgres-like JSON querying syntax, for querying more complex JSON data as nested JSON objects:
 
+
 ```
+    use PhpTek\JSONText\Field\JSONText;
+
     class MyOtherDataObject extends DataObject
     {
     
@@ -91,7 +96,7 @@ You can also use Postgres-like JSON querying syntax, for querying more complex J
          * @var array
          */
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => JSONText::class
         ];
     
         /**
@@ -132,6 +137,8 @@ JSONPath is an XPath-like syntax but specific to traversing JSON.
 See: [Table of JSONPath expressions](jsonpath.md)
 
 ```
+    use PhpTek\JSONText\Field\JSONText;
+
     class MyDataObject extends DataObject
     {
         /*
@@ -152,7 +159,7 @@ See: [Table of JSONPath expressions](jsonpath.md)
          * @var array
          */
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => JSONText::class
         ];
         
         public function requireDefaultRecords()
@@ -211,6 +218,8 @@ node will be modified with the data passed to `setValue()` as the standard `$val
 Example:
 
 ```
+    use PhpTek\JSONText\Field\JSONText;
+
     class MyDataObject extends DataObject
     {
         /*
@@ -231,7 +240,7 @@ Example:
          * @var array
          */
         private static $db = [
-            'MyJSON'    => 'JSONText'
+            'MyJSON'    => JSONText::class
         ];
         
         public function requireDefaultRecords()
@@ -268,14 +277,14 @@ Example:
 ## In the CMS
 
 Using the `JSONTextExtension` we can subvert SilverStripe's default behaviour of
-needing a `DBField` mapped to a UI field like `TextField`. We can actually map
-non DB-backed UI fields like `TextField` and `Text` to JSON values stored in `JSONtext` fields
+needing a `DBField` mapped to a UI field in `getCMSFields()` such as `TextField`. We can actually map
+non DB-backed CMS fields, such as a `TextField` for example, to JSON values stored in `JSONtext` DB fields,
 where the non DB-backed UI field's name, becomes a JSON key, and the field's value, the respective
 JSON value.
 
 Simply declare a `$json_field_map` array static in your `DataObject`'s and `SiteTree` objects,
-comprising values as arrays whose keys are the name(s) of your `JSONText` DB fields and values
-are arrays of non DB-backed fields who's data should be stored in the respective `JSONTxt` field.
+comprising an array whose keys are the name(s) of your `JSONText` DB fields and values
+are arrays of non DB-backed CMS fields who's data should be stored as JSON in the respective `JSONTxt` field.
 
 Obviously, your JSON data can only be simple and single dimensional so that there's
 an easy to manage relationship between UI field and JSON key=>value pairs.
@@ -283,8 +292,10 @@ an easy to manage relationship between UI field and JSON key=>value pairs.
 ### Example
 
 ```
+    use PhpTek\JSONText\Field\JSONText;
+
     private static $db = [
-         'MyJSON' => 'JSONText',
+         'MyJSON' => JSONText::class,
     ];
     
     private static $json_field_map = [
@@ -295,9 +306,9 @@ an easy to manage relationship between UI field and JSON key=>value pairs.
     {
          $fields = parent::getCMSFields();
          $fields->addFieldsToTab('Root.Main', [
-             TextField::create('Test1', 'Test 1'),  // Look no DB field!
-             TextField::create('Test2', 'Test 2'),  // Look no DB field!
-             TextField::create('MyJSON', 'My JSON') // Use a TextField just to demo
+             TextField::create('Test1', 'Test 1'),  // Look no DB!
+             TextField::create('Test2', 'Test 2'),  // Look no DB!
+             TextField::create('MyJSON', 'My JSON') // Use a TextField just to visualize
          ]);
     
          return $fields;

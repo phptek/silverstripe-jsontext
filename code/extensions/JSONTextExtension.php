@@ -48,6 +48,7 @@ use PhpTek\JSONText\Field\JSONText;
 use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Control\Controller;
+use SilverStripe\CMS\Controllers\CMSPageEditController;
 
 class JSONTextExtension extends DataExtension
 {    
@@ -67,18 +68,17 @@ class JSONTextExtension extends DataExtension
         $fieldMap = $owner->config()->get('json_field_map');
         $doUpdate = (
             count($postVars) &&
-            in_array(get_class($controller), [
-                'SilverStripe\CMS\Controllers\CMSPageEditController',
-                'SilverStripe\Control\Tests\FakeController']
-            ) && !empty($fieldMap)
+            !empty($fieldMap) &&
+            in_array(get_class($controller), [CMSPageEditController::class])
         );
         
         if (!$doUpdate) {
             return null;
         }
         
+        // Could also use DataObject::getSchema()->fieldSpecs()
         foreach ($owner->config()->get('db') as $field => $type) {
-            if ($type === 'JSONText') {
+            if ($type === JSONText::class) {
                 $this->updateJSON($postVars, $owner);
             }
         }
