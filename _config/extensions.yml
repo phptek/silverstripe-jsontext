@@ -1,3 +1,3 @@
-Page:
+SilverStripe\CMS\Model\SiteTree:
   extensions:
-    - \PhpTek\JSONText\Extension\JSONTextExtension
+    - PhpTek\JSONText\Extension\JSONTextExtension
