@@ -11,6 +11,8 @@ php:
 
 env:
   - DB=MYSQL CORE_RELEASE=4.0
+  - SS_ENVIRONMENT_TYPE="dev"
+  - PHPUNIT_TEST=jsontext
 
 matrix:
   include:
@@ -33,9 +35,10 @@ before_script:
   - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
   - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
   - cd ~/builds/ss
-  - composer install
+  - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
+  - if [[ $PHPUNIT_TEST ]]; then vendor/bin/phpunit --testsuite $PHPUNIT_TEST; fi
   - vendor/bin/phpunit jsontext/tests
 
 branches:
