@@ -26,7 +26,7 @@ Using JSONPath (Think XPath but for JSON) and the module's extensive API, develo
 
 * Store JSON "object-strings" in a JSON-specific `DBField`  subclass.
 * Query stored JSON via simple accessors: `first()`, `last()` & `nth()` or Postgres-like operators: `->`, `->>` & `#>` or even [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
-* Selectively return query-results as `JSON`, `Array` or cast to SilverStripe's `Varchar`, `Int`, `Float` or `Boolean` objects.
+* Selectively return query-results as `JSON`, `Array` or cast to SilverStripe's `DBVarchar`, `DBInt`, `DBFloat` or `DBBoolean` objects.
 * Selectively update portions of stored JSON using [JSONPath](http://goessner.net/articles/JsonPath/) expressions.
 * Selectively transform one or more CMS input fields, to write to a single JSON store.
 
@@ -37,8 +37,7 @@ or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functio
 
 ### Why?
 
-Project scenarios where storing 10s of terse configuration parameters in separate database columns
-just seems crazy. 
+Project scenarios where storing 10s of terse configuration parameters as Booleans and Ints in separate database columns just seems crazy. 
 
 When all you wanted was a simple key / value store but didn't want to muck about with the overhead of an RDBMS _and_ a NOSQL DB.
 
@@ -62,12 +61,12 @@ Legitimate types are:
 * Array
 * SilverStripe
 
-If using `SilverStripe`, the module will automatically cast the result(s) to one of SilverStripe's `DBObject` subtypes:
+If using `SilverStripe` as the return type, the module will automatically cast the result(s) to one of SilverStripe's `DBObject` subtypes:
 
-* `Boolean`
-* `Int`
-* `Float`
-* `Varchar`
+* `DBBoolean`
+* `DBInt`
+* `DBFloat`
+* `DBVarchar`
 
 If there are multiple results from a query, the output will be an indexed array containing a single-value array for each result found.
 
@@ -83,7 +82,7 @@ the module into `mysql` or `postgres` mode using SS config, see [Configuration D
 
 ## Installation
 
-    #> composer require phptek/jsontext dev-master
+    #> composer require phptek/jsontext
 
 ## Configuration
 
@@ -111,7 +110,7 @@ Please include all details, no matter how small. If it were *your module*, what 
 
 ## Author
 
-Russell Michell 2016-2017 <russ@theruss.com>
+Russell Michell 2016-2018 <russ@theruss.com>
 
 ## TODO
 
