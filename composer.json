@@ -17,6 +17,9 @@
         "silverstripe/cms": "4.0.x-dev",
         "peekmo/jsonpath": "dev-master"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7"
+    },
     "support": {
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"
     },
