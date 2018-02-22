@@ -12,3 +12,9 @@
     FirstName: Admin
     Email: admin@user.com
     Groups: '=>SilverStripe\Security\Group.admins'
+
+PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONPage:
+  dummy:
+    ID: 44
+    Title: Dummy
+    ParentID: 0

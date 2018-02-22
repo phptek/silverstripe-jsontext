@@ -8,12 +8,18 @@
 
 use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\FunctionalTest;
-use SilverStripe\Dev\TestOnly;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Security\Member;
+use PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONPage;
 
 class JSONTextExtensionTest extends FunctionalTest
 {
+    /**
+     * @var string
+     */
+    protected static $extra_dataobjects = [
+        MyAwesomeJSONPage::class,
+    ];
+    
     /**
      * @var string
      */
@@ -26,15 +32,9 @@ class JSONTextExtensionTest extends FunctionalTest
     public function testExceptionThrownOnBeforeWrite()
     {
         $member = $this->objFromFixture(Member::class, 'admin');
-        
-        $fixture = Page::create([
-            'ID' => 44,
-            'Title' => 'Dummy',
-            'ParentID' => 0
-        ]);
+        $fixture = $this->objFromFixture(MyAwesomeJSONPage::class, 'dummy');
         
         $member->logIn();
-        $fixture->config()->update('db', ['MyJSON' => 'JSONText']);
         $fixture->config()->update('json_field_map', ['MyJSON' => ['FooField']]);
         $fixture->write();
         
