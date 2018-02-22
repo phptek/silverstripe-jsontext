@@ -37,7 +37,6 @@ before_script:
 
 script:
   - if [[ $PHPUNIT_TEST ]]; then vendor/bin/phpunit --testsuite $PHPUNIT_TEST; fi
-  - vendor/bin/phpunit jsontext/tests
 
 branches:
   only: 
