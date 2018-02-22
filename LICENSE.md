@@ -1,4 +1,6 @@
-Copyright (c) 2016, Russell Michell - theruss.com
+BSD 3-Clause License
+
+Copyright (c) 20016-2018, Russell Michell - http://theruss.com/ 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -11,7 +13,7 @@ modification, are permitted provided that the following conditions are met:
   this list of conditions and the following disclaimer in the documentation
   and/or other materials provided with the distribution.
 
-* Neither the name of the author Russell Michell nor the names of any of its
+* Neither the name of the author Russell Michell nor the names of their
   contributors may be used to endorse or promote products derived from
   this software without specific prior written permission.
 
