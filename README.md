@@ -4,7 +4,9 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/?branch=master)
 [![License](https://poser.pugx.org/phptek/jsontext/license.svg)](https://github.com/phptek/silverstripe-jsontext/blob/master/LICENSE.md)
 
-Allows developers to write-to, and query-from JSON in a dedicated `JSONText` `DBField` subclass. If your project uses the `silverstripe/cms` package, then all `SiteTree` objects are automatically extended to allow multiple, arbitrary UI fields as declared in `getCMSFields()` to write to a JSON object in a _single_ database field.
+Exposes a complete API that allows developers to write-to, and query-from JSON in a dedicated `DBField` subclass. 
+
+In addition, if your project uses the `silverstripe/cms` package, then all `SiteTree` objects are automatically extended to allow multiple, arbitrary UI fields as declared in `getCMSFields()`, to write to a JSON object in a _single_ database field.
 
 Using JSONPath (Think XPath but for JSON) and the module's extensive API, developers can selectively target specific JSON keys for modification.
 
