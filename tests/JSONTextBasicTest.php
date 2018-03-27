@@ -7,7 +7,7 @@
  * @todo Add 'object' fixture to each
  */
 
-use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBVarchar;
 
@@ -22,13 +22,13 @@ class JSONTextBasicTest extends SapphireTest
     ];
 
     /**
-     * @var \JSONText\Fields\JSONText
+     * @var \JSONText\ORM\FieldType\JSONText
      */
     protected $sut;
 
     /**
      * JSONTextTest constructor.
-     * 
+     *
      * Modifies fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
@@ -44,14 +44,14 @@ class JSONTextBasicTest extends SapphireTest
     public function setUp()
     {
         parent::setUp();
-        
+
         $this->sut = JSONText::create('MyJSON');
     }
 
     public function testGetValueAsJSONStore()
     {
         $field = $this->sut;
-        
+
         $field->setValue('');
         $this->assertEquals([], $field->getStoreAsArray());
     }
@@ -93,7 +93,7 @@ class JSONTextBasicTest extends SapphireTest
     public function testLast()
     {
         $field = $this->sut;
-        
+
         // Test: Source data is simple JSON array
         // Return type: Array
         $field->setReturnType('array');
@@ -127,7 +127,7 @@ class JSONTextBasicTest extends SapphireTest
     public function testNth()
     {
         $field = $this->sut;
-        
+
         // Test: Source data is simple JSON array
         // Return type: Array
         $field->setReturnType('array');
@@ -157,10 +157,10 @@ class JSONTextBasicTest extends SapphireTest
         $this->assertInternalType('array', $field->nth(1));
         $this->assertCount(0, $field->nth(1));
     }
-    
+
     /**
      * Get the contents of a fixture
-     * 
+     *
      * @param string $fixture
      * @return string
      */

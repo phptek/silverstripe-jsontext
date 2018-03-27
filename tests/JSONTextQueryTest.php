@@ -5,11 +5,11 @@
  * @subpackage fields
  * @author Russell Michell <russ@theruss.com>
  * @todo Add tests where source data is a JSON array, not just a JSON object
- * 
+ *
  *
  */
 
-use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBBoolean;
@@ -34,7 +34,7 @@ class JSONTextQueryTest extends SapphireTest
 
     /**
      * JSONTextTest constructor.
-     * 
+     *
      * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
@@ -56,20 +56,20 @@ class JSONTextQueryTest extends SapphireTest
 
     /**
      * Tests query() by means of the integer Postgres Int match operator: '->'
-     * 
+     *
      * @todo Use same source data instead of repeating..
      */
     public function testQueryWithMatchOnInt()
     {
         $field = $this->sut;
-        
+
         // Data Source: Array
         // Return Type: ARRAY
         // Operator: "->" (Int)
         $field->setReturnType('array');
         $field->setValue($this->getFixture('array'));
         $this->assertEquals([2 => 'trabant'], $field->query('->', 2));
-        
+
         // Data Source: Array
         // Return Type: JSON
         // Operator: "->" (Int)
@@ -77,7 +77,7 @@ class JSONTextQueryTest extends SapphireTest
         $field->setValue($this->getFixture('array'));
         $this->assertEquals('{"2":"trabant"}', $field->query('->', 2));
         $this->assertEquals('{"5":101}', $field->query('->', 5));
-        
+
         // Data Source: Array
         // Return Type: SILVERSTRIPE
         // Operator: "->" (Int)
@@ -136,7 +136,7 @@ class JSONTextQueryTest extends SapphireTest
     public function testQueryWithMatchOnStr()
     {
         $field = $this->sut;
-        
+
         // Data Source: Object
         // Return Type: ARRAY
         // Operator: "->>" (String)
@@ -234,7 +234,7 @@ class JSONTextQueryTest extends SapphireTest
     public function testQueryWithMatchOnPath()
     {
         $field = $this->sut;
-        
+
         // Data Source: Object
         // Return Type: ARRAY
         // Operator: "#>" (Path)
@@ -265,10 +265,10 @@ class JSONTextQueryTest extends SapphireTest
         $field->setValue($this->getFixture('object'));
         $this->assertInternalType('array', $field->query('#>', '{"japanese":"fast"}'));
         $this->assertCount(2, $field->query('#>', '{"japanese":"fast"}'));
-        
+
         $one = $field->query('#>', '{"japanese":"fast"}')[0];
         $two = $field->query('#>', '{"japanese":"fast"}')[1];
-        
+
         $this->assertInternalType('array', $one);
         $this->assertInternalType('array', $two);
         $this->assertInstanceOf(DBVarchar::class, array_values($one)[0]);
@@ -308,9 +308,9 @@ class JSONTextQueryTest extends SapphireTest
         // Expect: Direct scalar comparison assertion (Float)
         $field->setReturnType('silverstripe');
         $field->setValue($this->getFixture('object'));
-        
+
         $res = $field->query('#>', '{"floats":"0"}');
-        
+
         $this->assertInternalType('array', $res);
         $this->assertInternalType('array', $res[0]); // Why? Because value of "floats" key is a JSON array
         $this->assertInstanceOf(DBFloat::class, array_values($res[0])[0]);
@@ -369,7 +369,7 @@ class JSONTextQueryTest extends SapphireTest
     public function testQueryWithMatchOnExpr()
     {
         $field = $this->sut;
-        
+
         // Data Source: Object
         // Return Type: ARRAY
         // Expression: "$.." (Everything)
@@ -440,10 +440,10 @@ class JSONTextQueryTest extends SapphireTest
         $field->setValue('');
         $field->query('$.cars.american[*]', 'foo'); // Still shouldn't, but routine only kicks in _After_ checks made in setValue()
     }
-    
+
     /**
      * Get the contents of a fixture
-     * 
+     *
      * @param string $fixture
      * @return string
      */
