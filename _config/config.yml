@@ -2,9 +2,9 @@
 Name: 'jsontextconfig'
 ---
 
-Injector:
+SilverStripe\Core\Injector\Injector:
   JSONText:
-    class: \phptek\JSONText\Fields\JSONText
+    class: \phptek\JSONText\ORM\FieldType\JSONText
     backend: postgres
   JSONTextExtension:
     class: \phptek\JSONText\Extensions\JSONTextExtension

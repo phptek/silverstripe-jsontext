@@ -6,7 +6,7 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBFloat;
 use SilverStripe\ORM\FieldType\DBBoolean;
@@ -22,10 +22,10 @@ class JSONTextTest extends SapphireTest
         'array'     => 'fixtures/json/array.json',
         'object'    => 'fixtures/json/object.json'
     ];
-    
+
     /**
      * JSONTextTest constructor.
-     * 
+     *
      * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
@@ -34,7 +34,7 @@ class JSONTextTest extends SapphireTest
             $this->fixtures[$name] = realpath(__DIR__) . '/' . $path;
         }
     }
-    
+
     /**
      * @todo There are a ton more permutations of a JSONPath regex
      * See the trace() method in JSONPath for more examples to work from
@@ -42,7 +42,7 @@ class JSONTextTest extends SapphireTest
     public function testIsValidExpression()
     {
         $field = JSONText::create('MyJSON');
-        
+
         $this->assertTrue($field->isValidExpression('$..'));
         $this->assertTrue($field->isValidExpression('*'));
         $this->assertTrue($field->isValidExpression('$.[2]'));
@@ -86,7 +86,7 @@ class JSONTextTest extends SapphireTest
     public function testIsValidDBValue()
     {
         $field = JSONText::create('MyJSON');
-        
+
         $this->assertFalse($field->isValidDBValue('true'));
         $this->assertFalse($field->isValidDBValue('false'));
         $this->assertFalse($field->isValidDBValue('null'));
@@ -94,7 +94,7 @@ class JSONTextTest extends SapphireTest
         $this->assertTrue($field->isValidDBValue('["one","two"]'));
         $this->assertTrue($field->isValidDBValue('{"cars":{"american":["buick","oldsmobile"]}}'));
     }
-    
+
     /**
      * Properly excercise our internal SS type conversion.
      */
@@ -103,27 +103,27 @@ class JSONTextTest extends SapphireTest
         $field = JSONText::create('MyJSON');
         $field->setValue($this->getFixture('array'));
         $field->setReturnType('silverstripe');
-        
+
         $data = $field->last()[6];
         $this->assertInstanceOf(DBFloat::class, $data);
-        
+
         $data = $field->first()[0];
         $this->assertInstanceOf(DBVarchar::class, $data);
-        
+
         $data = $field->nth(5)[5];
         $this->assertInstanceOf(DBInt::class, $data);
-        
+
         $data = $field->nth(1)[1];
         $this->assertInstanceOf(DBBoolean::class, $data);
-        
+
         $field->setValue('["true"]');
         $data = $field->first()[0];
         $this->assertInstanceOf(DBVarchar::class, $data);
     }
-        
+
     /**
      * Get the contents of a fixture
-     * 
+     *
      * @param string $fixture
      * @return string
      */

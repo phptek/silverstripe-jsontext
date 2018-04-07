@@ -42,7 +42,7 @@ The module's overloaded `setValue()` method is also chainable for a slightly cle
 A small handful of simple query methods `first()`, `last()` and `nth()` exist for when your source JSON is a simple JSON array:
 
 ```
-    use PhpTek\JSONText\Field\JSONText;
+    use PhpTek\JSONText\ORM\FieldType\JSONText;
 
     class MyDataObject extends DataObject
     {
@@ -87,7 +87,7 @@ You can also use Postgres-like JSON querying syntax, for querying more complex J
 
 
 ```
-    use PhpTek\JSONText\Field\JSONText;
+    use PhpTek\JSONText\ORM\FieldType\JSONText;
 
     class MyOtherDataObject extends DataObject
     {
@@ -137,7 +137,7 @@ JSONPath is an XPath-like syntax but specific to traversing JSON.
 See: [Table of JSONPath expressions](jsonpath.md)
 
 ```
-    use PhpTek\JSONText\Field\JSONText;
+    use PhpTek\JSONText\ORM\FieldType\JSONText;
 
     class MyDataObject extends DataObject
     {
@@ -218,7 +218,7 @@ node will be modified with the data passed to `setValue()` as the standard `$val
 Example:
 
 ```
-    use PhpTek\JSONText\Field\JSONText;
+    use PhpTek\JSONText\ORM\FieldType\JSONText;
 
     class MyDataObject extends DataObject
     {
@@ -292,7 +292,7 @@ an easy to manage relationship between UI field and JSON key=>value pairs.
 ### Example
 
 ```
-    use PhpTek\JSONText\Field\JSONText;
+    use PhpTek\JSONText\ORM\FieldType\JSONText;
 
     private static $db = [
          'MyJSON' => JSONText::class,
