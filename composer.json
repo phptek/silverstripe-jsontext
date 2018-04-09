@@ -23,9 +23,11 @@
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"
     },
     "suggest": {
-      "silverstripe/cms": "Use the SendNotificationJob to queue and send notifications."
+      "silverstripe/cms": "Use silverstripe/cms package if you want to write to JSON-backed DB fields via the CMS module's UI"
     },
     "extra": {
         "installer-name": "jsontext"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
