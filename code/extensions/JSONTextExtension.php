@@ -103,11 +103,10 @@ class JSONTextExtension extends DataExtension
      */
     public function updateJSON(array $postVars, $owner)
     {
+        $jsonFieldData = [];
         $jsonFieldMap = $owner->config()->get('json_field_map');
         
         foreach ($jsonFieldMap as $jsonField => $mappedFields) {
-            $jsonFieldData = [];
-            
             foreach ($mappedFields as $fieldName) {
                 if (!isset($postVars[$fieldName])) {
                     $msg = sprintf('%s doesn\'t exist in POST data.', $fieldName);
@@ -140,7 +139,12 @@ class JSONTextExtension extends DataExtension
             return;
         }
         
+        $hidden_fields_array = array();
+        
         foreach ($jsonFieldMap as $jsonField => $mappedFields) {
+            
+            $hidden_fields_array[] = HiddenField::create($jsonField);
+            
             if (!$owner->getField($jsonField)) {
                 continue;
             }
@@ -158,5 +162,8 @@ class JSONTextExtension extends DataExtension
                 }
             }
         }
+        
+        $fields->addFieldsToTab("Root.Main", $hidden_fields_array);
+        
     }
 }
