@@ -1,13 +1,13 @@
-'SilverStripe\Security\Group':
+SilverStripe\Security\Group:
   admins:
     Title: Administrators
 
-'SilverStripe\Security\Permission':
+SilverStripe\Security\Permission:
   admin:
     Code: ADMIN
     GroupID: '=>SilverStripe\Security\Group.admins'
 
-'SilverStripe\Security\Member':
+SilverStripe\Security\Member:
   admin:
     FirstName: Admin
     Email: admin@user.com
