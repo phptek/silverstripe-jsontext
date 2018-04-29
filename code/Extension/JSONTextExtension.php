@@ -44,6 +44,13 @@
 
 namespace PhpTek\JSONText\Extension;
 
+use SilverStripe\Control\Director;
+
+if (!Director::is_cli() && !class_exists('SilverStripe\CMS\Controllers\CMSPageEditController')) {
+    $msg = 'Please install the silverstripe/cms package in order to use this extension.';
+    throw new JSONTextException($msg);
+}
+
 use PhpTek\JSONText\Exception\JSONTextException;
 use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\ORM\DataExtension;
