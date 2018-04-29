@@ -13,8 +13,7 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "silverstripe/framework": "4.0.x-dev",
-        "silverstripe/cms": "4.0.x-dev",
+        "silverstripe/framework": "^4.0",
         "peekmo/jsonpath": "dev-master"
     },
     "require-dev": {
@@ -23,7 +22,12 @@
     "support": {
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"
     },
+    "suggest": {
+      "silverstripe/cms": "Use silverstripe/cms package if you want to write to JSON-backed DB fields via the CMS module's UI"
+    },
     "extra": {
         "installer-name": "jsontext"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

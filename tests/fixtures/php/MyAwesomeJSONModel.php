@@ -2,7 +2,7 @@
 
 namespace PhpTek\JSONText\Dev\Fixture;
 
-use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
 
@@ -14,11 +14,11 @@ class MyAwesomeJSONModel extends DataObject implements TestOnly
     private static $db = [
         'MyJSON' => JSONText::class
     ];
-    
+
     /**
      * @var string
      * @config
      */
     private static $table_name = 'MyAwesomeJSONModel';
-    
+
 }

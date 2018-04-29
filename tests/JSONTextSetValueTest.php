@@ -6,7 +6,7 @@
  * @author Russell Michell <russ@theruss.com>
  */
 
-use PhpTek\JSONText\Field\JSONText;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\SapphireTest;
 
@@ -22,7 +22,7 @@ class JSONTextSetValueTest extends SapphireTest
 
     /**
      * JSONTextTest constructor.
-     * 
+     *
      * Modify fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
      */
     public function __construct()
@@ -62,7 +62,7 @@ class JSONTextSetValueTest extends SapphireTest
         $field->setValue(99.99, null, '$.[6]');
         // Assert new value
         $this->assertEquals([99.99], $field->query('$.[6]'));
-        
+
         // Invalid #1
         $this->setExpectedException(JSONTextException::class);
         $field->setValue(99.99, null, '$[6]'); // Invalid JSON path expression
@@ -88,7 +88,7 @@ class JSONTextSetValueTest extends SapphireTest
 
     /**
      * Tests JSONText::setValue() by means of a simple JSONPath expression operating on a JSON object
-     * 
+     *
      * Tests performing single and multiple updates
      */
     public function testSetValueOnSourceObject()
@@ -107,7 +107,7 @@ class JSONTextSetValueTest extends SapphireTest
         $this->assertCount(3, $field->query('$.cars')[0]); //...with three classifications of car manufacturer by country
         $this->assertCount(2, $field->query('$.cars')[0]['british']);
         $this->assertEquals('morris', $field->query('$.cars')[0]['british'][1]);
-        
+
         // Now do a multiple update
         $newCars = [
             'american'  => ['ford', 'tesla'],
@@ -115,14 +115,14 @@ class JSONTextSetValueTest extends SapphireTest
         ];
 
         $field->setValue($newCars, null, '$.cars');
-        
+
         // Assert news types and value
         $this->assertInternalType('array', $field->query('$.cars'));
         $this->assertCount(1, $field->query('$.cars')); // The "cars" key's value is an object returned as a single value array
         $this->assertCount(2, $field->query('$.cars')[0]); //...with three classifications of car manufacturer by country
         $this->assertCount(3, $field->query('$.cars')[0]['british']);
         $this->assertEquals('austin', $field->query('$.cars')[0]['british'][1]);
-        
+
         // So far we've used JSONPath to identify and update, let's try Postgres operators too
         // Now do attempt multiple update
         $newerCars = [
@@ -132,10 +132,10 @@ class JSONTextSetValueTest extends SapphireTest
         $this->setExpectedException(JSONTextException::class);
         $field->setValue($newerCars, null, '{"cars":"american"}'); // setValue() only takes JSONPath expressions
     }
-    
+
     /**
      * Get the contents of a fixture
-     * 
+     *
      * @param string $fixture
      * @return string
      */
