@@ -16,7 +16,7 @@ class JSONTextIntegrationTest extends SapphireTest
     /**
      * @var string
      */
-    protected static $fixture_file = '/fixtures/yml/MyAwesomeJSONModel.yml';
+    protected static $fixture_file;
 
     /**
      * Modifies fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
@@ -26,6 +26,8 @@ class JSONTextIntegrationTest extends SapphireTest
         $dir = realpath(__DIR__);
         
         self::$fixture_file = $dir . '/fixtures/yml/MyAwesomeJSONModel.yml';
+        
+        parent::__construct();
     }
     
     /**

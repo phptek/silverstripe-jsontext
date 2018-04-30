@@ -23,7 +23,19 @@ class JSONTextExtensionTest extends FunctionalTest
     /**
      * @var string
      */
-    protected static $fixture_file = 'jsontext/tests/fixtures/yml/JSONTextExtension.yml';
+    protected static $fixture_file;
+    
+    /**
+     * Modifies fixtures property to be able to run on PHP <5.6 without use of constant in class property which 5.6+ allows
+     */
+    public function __construct()
+    {
+        $dir = realpath(__DIR__);
+        
+        self::$fixture_file = $dir . '/fixtures/yml/JSONTextExtension.yml';
+        
+        parent::__construct();
+    }
     
     /**
      * Is an exception thrown when no POSTed vars are available for
