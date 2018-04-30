@@ -3,7 +3,7 @@
     "description": "JSON storage, querying and modification.",
     "type": "silverstripe-module",
     "keywords": ["silverstripe", "json", "dbfield", "query", "multi", "multivalue", "multivaluefield", "text", "JSONPath", "Postgres"],
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Russell Michell",
