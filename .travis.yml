@@ -34,10 +34,11 @@ matrix:
 
 before_script:
   - composer self-update || true
+  - composer require --no-update silverstripe/recipe-cms:1.0.x-dev
   - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
-  - vendor/bin/phpunit --testsuite jsontext
+  - vendor/bin/phpunit jsontext
 
 branches:
   only: 
