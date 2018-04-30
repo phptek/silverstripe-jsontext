@@ -57,7 +57,7 @@ class JSONTextExtension extends DataExtension
     public function __construct()
     {
         // Helpful class applicability message
-        if (!Director::is_cli() && !class_exists('SilverStripe\CMS\Controllers\CMSPageEditController')) {
+        if (!Director::is_cli() && !class_exists(CMSPageEditController::class)) {
             $msg = 'Please install the silverstripe/cms package in order to use this extension.';
             throw new JSONTextException($msg);
         }
