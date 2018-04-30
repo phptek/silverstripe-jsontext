@@ -38,7 +38,7 @@ before_script:
   - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
-  - vendor/bin/phpunit jsontext
+  - vendor/bin/phpunit --testsuite jsontext
 
 branches:
   only: 
