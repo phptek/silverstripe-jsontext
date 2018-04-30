@@ -250,15 +250,20 @@ class JSONText extends DBString
      */
     public function toArray($value = null)
     {
+        $output = [];
         $value = $value ?: $this->getValue();
-        $decoded = json_decode($value, true);
 
-        if (is_null($decoded)) {
-            $msg = 'Decoded JSON is invalid.';
-            throw new JSONTextDataException($msg);
+        // Check for value
+        if (!empty($value)) {
+            $output = json_decode($value, true);
+
+            // Check for parse errors
+            if (JSON_ERROR_NONE !== json_last_error()) {
+                throw new JSONTextDataException('Unable to parse JSONText value into array: ' . json_last_error());
+            }
         }
 
-        return $decoded;
+        return $output;
     }
 
     /**
