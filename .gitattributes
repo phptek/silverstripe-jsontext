@@ -1,3 +1,7 @@
 /.gitignore export-ignore
 /.travis.yml export-ignore
 /.scrutinuzer.yml export-ignore
+/tests export-ignore
+
+# Line endings
+sake text eol=lf
