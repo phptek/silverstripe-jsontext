@@ -116,3 +116,23 @@ Russell Michell 2016-2018 <russ@theruss.com>
 
 * Add missing `prepValueForDB()` to `JSONText` class.
 * See official list of issues on GitHub. 
+
+## Support Me
+
+If you like what you see, support me! I accept Bitcoin:
+
+<table border="0">
+	<tr>
+		<td rowspan="2">
+			<img src="https://bitcoin.org/img/icons/logo_ios.png" alt="Bitcoin" width="64" height="64" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<b>bc1qmg0jjtmu3fmm53mkvw69xz8kerq3l3lnh6529d</b>
+		</td>
+	</tr>
+</table>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
