@@ -129,7 +129,7 @@ If you like what you see, support me! I accept Bitcoin:
 	</tr>
 	<tr>
 		<td>
-			<b>bc1qmg0jjtmu3fmm53mkvw69xz8kerq3l3lnh6529d</b>
+			<b>3KxmqFeVWoigjvXZoLGnoNzvEwnDq3dZ8Q</b>
 		</td>
 	</tr>
 </table>
