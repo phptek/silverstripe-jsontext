@@ -75,7 +75,7 @@ class JSONTextExtension extends DataExtension
      * @return array
      * @throws JSONTextConfigException When no field-mapping config is found.
      */
-    public function getJSONFields() : array
+    public function getJSONFields()
     {
         $owner = $this->getOwner();
         
