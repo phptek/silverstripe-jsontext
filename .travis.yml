@@ -30,7 +30,7 @@ matrix:
 
 before_script:
   - composer self-update || true
-  - composer require --no-update silverstripe/recipe-cms:1.0.x-dev
+  - composer require --no-update silverstripe/recipe-cms:4.0.x-dev
   - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
 script:
