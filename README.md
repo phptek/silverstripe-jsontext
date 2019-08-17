@@ -107,7 +107,7 @@ Please include all details, no matter how small. If it were *your module*, what 
 
 ## Author
 
-Russell Michell 2016-2018 <russ@theruss.com>
+Russell Michell 2016-2019 <russ@theruss.com>
 
 ## TODO
 
