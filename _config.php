@@ -1,7 +1,8 @@
 <?php
+
 /**
- * @author Russell Michell <russ@theruss.com>
- * @package jsontext
+ * @package silverstripe-jsontext
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
 define('MODULE_NAME', 'JSONText');

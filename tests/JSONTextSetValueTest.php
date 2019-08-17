@@ -2,13 +2,12 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
+use SilverStripe\Dev\SapphireTest;
 use PhpTek\JSONText\ORM\FieldType\JSONText;
 use PhpTek\JSONText\Exception\JSONTextException;
-use SilverStripe\Dev\SapphireTest;
 
 class JSONTextSetValueTest extends SapphireTest
 {

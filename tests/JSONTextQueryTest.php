@@ -2,20 +2,16 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
- * @todo Add tests where source data is a JSON array, not just a JSON object
- *
- *
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
-use PhpTek\JSONText\ORM\FieldType\JSONText;
-use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBFloat;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\FieldType\DBInt;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
+use PhpTek\JSONText\Exception\JSONTextException;
 
 class JSONTextQueryTest extends SapphireTest
 {

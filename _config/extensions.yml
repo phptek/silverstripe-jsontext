@@ -1,7 +1,0 @@
----
-Only:
-  classexists: 'SilverStripe\CMS\Controllers\CMSPageEditController'
----
-SilverStripe\CMS\Model\SiteTree:
-  extensions:
-    - PhpTek\JSONText\Extension\JSONTextExtension

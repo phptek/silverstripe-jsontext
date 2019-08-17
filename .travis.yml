@@ -21,6 +21,12 @@ matrix:
     - php: 7.1
       env:
         - DB=MYSQL
+    - php: 7.2
+      env:
+        - DB=MYSQL
+    - php: 7.3
+      env:
+        - DB=MYSQL
 
 before_script:
   - composer self-update || true
@@ -33,3 +39,4 @@ script:
 branches:
   only: 
     - master
+    - 3.0

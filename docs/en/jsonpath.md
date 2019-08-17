@@ -1,6 +1,7 @@
 # JSONPath
 
-All the information on JSONPath you can eat [can be found here](http://goessner.net/articles/JsonPath/).
+* All the information on querying your JSON using JSONPath you can eat [can be found here](http://goessner.net/articles/JsonPath/).
+* For manipulating JSON on the command line, the excellent [jq](https://stedolan.github.io/jq/) tool is a great addition to your toolbox.
 
 ## Quick Reference
 
@@ -19,3 +20,4 @@ All the information on JSONPath you can eat [can be found here](http://goessner.
 | []        | ?()                | Applies a filter (script) expression |
 | N/A       | ()                 | Script expression           |
 | ()        | N/A                | Grouping in Xpath           |
+|-----------|--------------------|-----------------------------|

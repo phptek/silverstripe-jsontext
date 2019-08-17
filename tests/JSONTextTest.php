@@ -2,16 +2,14 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
-
-use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBFloat;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
 use SilverStripe\ORM\FieldType\DBInt;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 
 class JSONTextTest extends SapphireTest
 {

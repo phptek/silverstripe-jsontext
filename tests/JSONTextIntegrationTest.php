@@ -2,13 +2,10 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Dev\TestOnly;
 use PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONModel;
 
 class JSONTextIntegrationTest extends SapphireTest

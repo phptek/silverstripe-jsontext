@@ -18,3 +18,15 @@ PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONPage:
     ID: 44
     Title: Dummy
     ParentID: 0
+    
+PhpTek\JSONText\Dev\Fixture\MyJSONPageWithBoth:
+  dummy:
+    ID: 45
+    Title: Tummy
+    ParentID: 0
+    
+PhpTek\JSONText\Dev\Fixture\MyJSONPageWithNone:
+  dummy:
+    ID: 46
+    Title: Scrummy
+    ParentID: 0

@@ -1,5 +1,5 @@
 {
-    "name": "phptek/jsontext",
+    "name": "phptek/silverstripe-jsontext",
     "description": "JSON storage, querying and modification.",
     "type": "silverstripe-vendormodule",
     "keywords": ["silverstripe", "json", "dbfield", "query", "multi", "multivalue", "multivaluefield", "text", "JSONPath", "Postgres"],
@@ -23,10 +23,13 @@
         "issues": "https://github.com/phptek/silverstripe-jsontext/issues"
     },
     "suggest": {
-      "silverstripe/cms": "Use silverstripe/cms package if you want to write to JSON-backed DB fields via the CMS module's UI"
+        "silverstripe/cms": "Use silverstripe/cms package if you want to write to JSON-backed DB fields via the CMS module's UI"
     },
     "extra": {
         "installer-name": "jsontext"
+    },
+    "replace": {
+        "phptek/jsontext": "*"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

@@ -4,8 +4,7 @@
  * JSONText database backend that encapsulates a Postgres-like syntax for JSON querying.
  * 
  * @package silverstripe-jsontext
- * @subpackage models
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  * @see https://www.postgresql.org/docs/9.6/static/functions-json.html
  */
 

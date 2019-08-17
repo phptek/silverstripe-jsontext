@@ -35,26 +35,24 @@
  * See the README and docs/en/usage.md for setup and example queries.
  *
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
 namespace PhpTek\JSONText\ORM\FieldType;
 
-use PhpTek\JSONText\Exception\JSONTextException;
-use PhpTek\JSONText\Exception\JSONTextInvalidArgsException;
-use PhpTek\JSONText\Exception\JSONTextDataException;
-use PhpTek\JSONText\Exception\JSONTextConfigException;
-use Peekmo\JsonPath\JsonStore;
 use SilverStripe\ORM\DB;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBString;
 use SilverStripe\Forms\HiddenField;
+use Peekmo\JsonPath\JsonStore;
+use PhpTek\JSONText\Exception\JSONTextException;
+use PhpTek\JSONText\Exception\JSONTextInvalidArgsException;
+use PhpTek\JSONText\Exception\JSONTextDataException;
+use PhpTek\JSONText\Exception\JSONTextConfigException;
 
 class JSONText extends DBString
 {
-
     /**
      * @var integer
      */

@@ -1,9 +1,10 @@
 <?php
+
 /**
  * Custom situation-specific module exceptions.
  * 
  * @package silverstripe-jsontext
- * @author Russell Michell 2016 <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
 namespace PhpTek\JSONText\Exception;

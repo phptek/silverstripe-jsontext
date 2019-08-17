@@ -1,10 +1,17 @@
 # Configuration
 
 As the [README](../../README.md) suggests you can put the module into `postgres` (The default) or `mysql` mode, but only `postgres` works at this time. You can
-do this via standard SS config in your project's `mysite/_config/config.yml` file:
+do this via standard YML config in your project's `_config` folder:
 
-    JSONText:
+    PhpTek\JSONText\ORM\FieldType\JSONText:
       backend: postgres
+
+To extend your project's `DataObject` subclasses to allow multiple form fields to write to a single database field, simply add the extension
+in the normal way, for example:
+
+    SilverStripe\CMS\Model\SiteTree:
+      extensions:
+        - PhpTek\JSONText\Extension\JSONTextExtension
 
 
 Notes: 

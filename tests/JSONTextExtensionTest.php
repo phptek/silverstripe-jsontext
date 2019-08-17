@@ -2,14 +2,16 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  */
 
-use PhpTek\JSONText\Exception\JSONTextException;
 use SilverStripe\Dev\FunctionalTest;
 use SilverStripe\Security\Member;
+use PhpTek\JSONText\Exception\JSONTextException;
+use PhpTek\JSONText\Exception\JSONTextConfigException;
 use PhpTek\JSONText\Dev\Fixture\MyAwesomeJSONPage;
+use PhpTek\JSONText\Dev\Fixture\MyJSONPageWithBoth;
+use PhpTek\JSONText\Dev\Fixture\MyJSONPageWithNone;
 
 class JSONTextExtensionTest extends FunctionalTest
 {
@@ -18,6 +20,8 @@ class JSONTextExtensionTest extends FunctionalTest
      */
     protected static $extra_dataobjects = [
         MyAwesomeJSONPage::class,
+        MyJSONPageWithBoth::class,
+        MyJSONPageWithNone::class,
     ];
     
     /**
@@ -57,5 +61,31 @@ class JSONTextExtensionTest extends FunctionalTest
             'action_save' => 'Saved',
             'ID' => '44',
         ]);
+    }
+    
+    /**
+     * Ensure the correct array of fields is returned when both a YML config static
+     * and a method are declared on the same method.
+     */
+    public function testGetJSONFieldsWithBoth()
+    {
+        $fixture = $this->objFromFixture(MyJSONPageWithBoth::class, 'dummy');
+        
+        $this->assertEquals([
+            'MyJSON' => [
+                'Field_From_METHOD_1',
+                'Field_From_METHOD_2'
+            ]], $fixture->getJSONFields());
+    }
+    
+    /**
+     * Ensure a exception is thrown, if a class tries to access getJSONFields()
+     * but without declaring a field-map
+     */
+    public function testGetJSONFieldsWithNone()
+    {
+        $fixture = $this->objFromFixture(MyJSONPageWithNone::class, 'dummy');
+        $this->setExpectedException(JSONTextConfigException::class);
+        $fixture->getJSONFields();
     }
 }

@@ -2,14 +2,12 @@
 
 /**
  * @package silverstripe-jsontext
- * @subpackage fields
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  * @todo Add 'object' fixture to each
  */
 
-use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\ORM\FieldType\DBVarchar;
+use PhpTek\JSONText\ORM\FieldType\JSONText;
 
 class JSONTextBasicTest extends SapphireTest
 {

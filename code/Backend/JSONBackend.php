@@ -5,17 +5,16 @@
  * the module.
  *
  * @package silverstripe-jsontext
- * @subpackage models
- * @author Russell Michell <russ@theruss.com>
+ * @author Russell Michell 2016-2019 <russ@theruss.com>
  * @see https://github.com/Peekmo/JsonPath/blob/master/tests/JsonStoreTest.php
  * @see http://goessner.net/articles/JsonPath/
  */
 
 namespace PhpTek\JSONText\Backend;
 
+use SilverStripe\Core\Config\Configurable;
 use PhpTek\JSONText\Exceptions\JSONTextInvalidArgsException;
 use PhpTek\JSONText\ORM\FieldType\JSONText;
-use SilverStripe\Core\Config\Configurable;
 
 abstract class JSONBackend
 {

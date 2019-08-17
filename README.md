@@ -4,9 +4,9 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/phptek/silverstripe-jsontext/?branch=master)
 [![License](https://poser.pugx.org/phptek/jsontext/license.svg)](https://github.com/phptek/silverstripe-jsontext/blob/master/LICENSE.md)
 
-Exposes a complete API that allows developers to write-to, and query-from JSON in a dedicated `DBField` subclass. 
+Exposes an API that allows developers to write-to, and query-from JSON data from a dedicated `DBField` subclass. 
 
-In addition, if your project uses the `silverstripe/cms` package, then all `SiteTree` objects are automatically extended to allow multiple, arbitrary UI fields as declared in `getCMSFields()`, to write to a JSON object in a _single_ database field.
+In addition, if your project uses the `silverstripe/cms` package, then you can extend arbitrary `DataObject`'s to allow multiple, arbitrary UI fields as declared in `getCMSFields()`, to write to a JSON object in a _single_ database field.
 
 Using JSONPath (Think XPath but for JSON) and the module's extensive API, developers can selectively target specific JSON keys for modification.
 
@@ -14,8 +14,8 @@ Using JSONPath (Think XPath but for JSON) and the module's extensive API, develo
 
 ### SilverStripe 4
 
-* Use ^2.0
-* PHP >=5.6, <=7.1
+* Use >=2.0
+* PHP >=5.6
 
 ### SilverStripe 3
 
@@ -37,12 +37,9 @@ or [Postgres' JSON operators](https://www.postgresql.org/docs/9.5/static/functio
 
 ### Why?
 
-Project scenarios where storing 10s of terse configuration parameters as Booleans and Ints in separate database columns just seems crazy. 
-
-When all you wanted was a simple key / value store but didn't want to muck about with the overhead of an RDBMS _and_ a NOSQL DB.
-
-That Postgres, MySQL, Oracle and MSSQL 2016 all have, or at time of writing, are planning to have, Database level JSON field-types. This module plugs the gap for users of RDBMS'
-_without_ native JSON support, while offering the a convenient scaffold on top of which native JSON support could be built.
+* Where storing dozens of terse configuration parameters as separate `Boolean` and `Int` database columns just seems crazy. 
+* When all you wanted was a simple key / value store but didn't want to muck about with the overhead of NOSQL _as well_.
+* As an alternative to other multivalue-field modules.
 
 ### Postgres
 
@@ -57,9 +54,9 @@ Regardless of the type of query you can set what type you'd like the data return
 
 Legitimate types are:
 
-* JSON
-* Array
-* SilverStripe
+* "JSON"
+* "Array"
+* "SilverStripe"
 
 If using `SilverStripe` as the return type, the module will automatically cast the result(s) to one of SilverStripe's `DBObject` subtypes:
 
@@ -76,13 +73,13 @@ to an overloaded `setValue()` method.
 See [the usage docs](docs/en/usage.md) for examples of JSONPath and Postgres querying and updating.
 
 Note: This module's query API is based on a relatively simple JSON to array conversion principle. 
-It does *not* use Postgres' or MySQL's native JSON operators at or below the level of the ORM. The aim however 
+It does *not* use Postgres' or MySQL's _native_ JSON operators at or below the level of the ORM. The aim 
 is to allow dev's to use their preferred DB's syntax, and to this end you can set
-the module into `mysql` or `postgres` mode using SS config, see [Configuration Docs](docs/en/configuration.md).
+the module into `mysql` or `postgres` mode using YML config, see [Configuration Docs](docs/en/configuration.md).
 
 ## Installation
 
-    #> composer require phptek/jsontext
+    #> composer require phptek/silverstripe-jsontext
 
 ## Configuration
 
@@ -116,23 +113,3 @@ Russell Michell 2016-2018 <russ@theruss.com>
 
 * Add missing `prepValueForDB()` to `JSONText` class.
 * See official list of issues on GitHub. 
-
-## Support Me
-
-If you like what you see, support me! I accept Bitcoin:
-
-<table border="0">
-	<tr>
-		<td rowspan="2">
-			<img src="https://bitcoin.org/img/icons/logo_ios.png" alt="Bitcoin" width="64" height="64" />
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<b>3KxmqFeVWoigjvXZoLGnoNzvEwnDq3dZ8Q</b>
-		</td>
-	</tr>
-</table>
-
-<p>&nbsp;</p>
-<p>&nbsp;</p>
