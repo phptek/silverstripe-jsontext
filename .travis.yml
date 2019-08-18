@@ -6,7 +6,7 @@ language: php
 
 env:
   global:
-    - COMPOSER_ROOT_VERSION=4.0.x-dev
+    - COMPOSER_ROOT_VERSION=4.4.x-dev
     - SS_ENVIRONMENT_TYPE="dev"
 
 matrix:
