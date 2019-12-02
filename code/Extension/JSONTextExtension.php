@@ -47,6 +47,7 @@ namespace PhpTek\JSONText\Extension;
 use PhpTek\JSONText\Exception\JSONTextException;
 use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataExtension;
@@ -82,7 +83,7 @@ class JSONTextExtension extends DataExtension
         $doUpdate = (
             count($postVars) &&
             !empty($fieldMap) &&
-            in_array(get_class($controller), [CMSPageEditController::class])
+            $controller instanceof LeftAndMain
         );
 
         if (!$doUpdate) {
