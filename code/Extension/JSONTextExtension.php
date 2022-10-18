@@ -55,7 +55,6 @@ use PhpTek\JSONText\ORM\FieldType\JSONText;
 
 class JSONTextExtension extends DataExtension
 {
-
     public function __construct()
     {
         // Helpful class applicability message
@@ -66,27 +65,27 @@ class JSONTextExtension extends DataExtension
 
         return parent::__construct();
     }
-    
+
     /**
      * Deal with userland declaration of a config static or a method for obtaining
      * an array of CMS input fields. Existence of a method takes precedence over
      * a config static.
-     * 
+     *
      * @return array
      * @throws JSONTextConfigException When no field-mapping config is found.
      */
     public function getJSONFields()
     {
         $owner = $this->getOwner();
-        
+
         if (ClassInfo::hasMethod($owner, 'jsonFieldMap')) {
             return $owner->jsonFieldMap();
         }
-        
+
         if (!$owner->config()->get('json_field_map')) {
             throw new JSONTextConfigException('No field map found.');
         }
-        
+
         return $owner->config()->get('json_field_map');
     }
 
@@ -135,6 +134,9 @@ class JSONTextExtension extends DataExtension
 
             foreach ($mappedFields as $fieldName) {
                 if (!isset($postVars[$fieldName])) {
+                    if (!$this->owner->config()->get('jsonTextExtensionFailOnMissingKey') || false) {
+                        continue;
+                    }
                     $msg = sprintf('%s doesn\'t exist in POST data.', $fieldName);
                     throw new JSONTextException($msg);
                 }
