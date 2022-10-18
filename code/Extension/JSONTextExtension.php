@@ -134,9 +134,16 @@ class JSONTextExtension extends DataExtension
 
             foreach ($mappedFields as $fieldName) {
                 if (!isset($postVars[$fieldName])) {
-                    if (!$this->owner->config()->get('jsonTextExtensionFailOnMissingKey') || false) {
+                    if ($this->owner->config()->get('jsonTextExtensionFailOnMissingKey') !== null) {
+                        $failOnMissingKey = $this->owner->config()->get('jsonTextExtensionFailOnMissingKey');
+                    } else {
+                        $failOnMissingKey = true;
+                    }
+
+                    if (!$failOnMissingKey) {
                         continue;
                     }
+
                     $msg = sprintf('%s doesn\'t exist in POST data.', $fieldName);
                     throw new JSONTextException($msg);
                 }
